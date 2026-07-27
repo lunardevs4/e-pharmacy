@@ -1,0 +1,409 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum UserRole {
+  PATIENT
+  PHARMACY_OWNER
+  PHARMACIST
+  GOVERNMENT
+  ADMIN
+}
+
+enum ReservationStatus {
+  PENDING
+  CONFIRMED
+  COLLECTED
+  CANCELLED
+}
+
+enum PrescriptionStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
+enum ReminderStatus {
+  PENDING
+  SENT
+  FAILED
+  COMPLETED
+  MISSED
+}
+
+enum NotificationType {
+  IN_APP
+  SMS
+  VOICE
+}
+
+enum PharmacyStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
+model User {
+  id                String              @id @default(uuid())
+  email             String              @unique
+  phone             String              @unique
+  password          String
+  firstName         String
+  lastName          String
+  role              UserRole
+  isActive          Boolean             @default(true)
+  createdAt         DateTime            @default(now())
+  updatedAt         DateTime            @updatedAt
+  deletedAt         DateTime?
+
+  refreshTokens     RefreshToken[]
+  patient           Patient?
+  pharmacies        Pharmacy[]
+  pharmacyEmployees PharmacyEmployee[]
+  pharmacistPrescriptions Prescription[]
+  auditLogs         AuditLog[]
+  notifications     Notification[]
+
+  @@index([email])
+  @@index([phone])
+  @@index([role])
+}
+
+model RefreshToken {
+  id        String   @id @default(uuid())
+  userId    String
+  token     String   @unique
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([token])
+}
+
+model Patient {
+  id               String        @id @default(uuid())
+  userId           String        @unique
+  medicalProfile   String?
+  address          String?
+  dateOfBirth      DateTime?
+  gender           String?
+  createdAt        DateTime      @default(now())
+  updatedAt        DateTime      @updatedAt
+
+  user             User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  reservations     Reservation[]
+  prescriptions    Prescription[]
+  reminderSchedules ReminderSchedule[]
+  reminderLogs     ReminderLog[]
+
+  @@index([userId])
+}
+
+model Pharmacy {
+  id             String           @id @default(uuid())
+  ownerId        String
+  name           String
+  address        String
+  latitude       Decimal?
+  longitude      Decimal?
+  phone          String
+  licenseUrl     String?
+  status         PharmacyStatus   @default(PENDING)
+  isActive       Boolean          @default(true)
+  createdAt      DateTime         @default(now())
+  updatedAt      DateTime         @updatedAt
+  deletedAt      DateTime?
+
+  owner          User             @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+  employees      PharmacyEmployee[]
+  inventories    Inventory[]
+  reservations   Reservation[]
+  prescriptions  Prescription[]
+  auditLogs      AuditLog[]
+
+  @@index([ownerId])
+  @@index([status])
+  @@index([latitude, longitude])
+}
+
+model PharmacyEmployee {
+  id         String   @id @default(uuid())
+  pharmacyId String
+  userId     String
+  role       UserRole
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  pharmacy   Pharmacy @relation(fields: [pharmacyId], references: [id], onDelete: Cascade)
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([pharmacyId])
+  @@index([userId])
+  @@unique([pharmacyId, userId])
+}
+
+model Category {
+  id          String     @id @default(uuid())
+  name        String
+  parentId    String?
+  description String?
+  isActive    Boolean    @default(true)
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+  deletedAt   DateTime?
+
+  parent      Category?  @relation("CategoryParent", fields: [parentId], references: [id], onDelete: SetNull)
+  children    Category[] @relation("CategoryParent")
+  medicines   Medicine[]
+
+  @@index([parentId])
+}
+
+model Manufacturer {
+  id          String    @id @default(uuid())
+  name        String
+  country     String?
+  isActive    Boolean   @default(true)
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  deletedAt   DateTime?
+
+  medicines   Medicine[]
+
+  @@index([name])
+}
+
+model Medicine {
+  id                    String            @id @default(uuid())
+  name                  String
+  genericName           String?
+  description           String?
+  categoryId            String
+  manufacturerId        String?
+  dosageForm            String?
+  strength              String?
+  imageUrl              String?
+  isActive              Boolean           @default(true)
+  createdAt             DateTime          @default(now())
+  updatedAt             DateTime          @updatedAt
+  deletedAt             DateTime?
+
+  category              Category          @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  manufacturer          Manufacturer?     @relation(fields: [manufacturerId], references: [id], onDelete: SetNull)
+  inventories           Inventory[]
+  reservations          Reservation[]
+  prescriptionMedicines PrescriptionMedicine[]
+  reminderSchedules     ReminderSchedule[]
+
+  @@index([name])
+  @@index([genericName])
+  @@index([categoryId])
+  @@index([manufacturerId])
+}
+
+model Inventory {
+  id               String            @id @default(uuid())
+  pharmacyId       String
+  medicineId       String
+  quantity         Int               @default(0)
+  price            Decimal
+  expiryDate       DateTime?
+  batchNumber      String?
+  createdAt        DateTime          @default(now())
+  updatedAt        DateTime          @updatedAt
+  deletedAt        DateTime?
+
+  pharmacy         Pharmacy          @relation(fields: [pharmacyId], references: [id], onDelete: Cascade)
+  medicine         Medicine          @relation(fields: [medicineId], references: [id], onDelete: Cascade)
+  inventoryHistory InventoryHistory[]
+  stockMovements   StockMovement[]
+
+  @@unique([pharmacyId, medicineId])
+  @@index([pharmacyId])
+  @@index([medicineId])
+  @@index([expiryDate])
+}
+
+model InventoryHistory {
+  id          String   @id @default(uuid())
+  inventoryId String
+  oldQuantity Int
+  newQuantity Int
+  oldPrice    Decimal?
+  newPrice    Decimal?
+  changedBy   String?
+  changedAt   DateTime @default(now())
+
+  inventory   Inventory @relation(fields: [inventoryId], references: [id], onDelete: Cascade)
+
+  @@index([inventoryId])
+  @@index([changedAt])
+}
+
+model StockMovement {
+  id          String   @id @default(uuid())
+  inventoryId String
+  type        String
+  quantity    Int
+  reason      String?
+  movedBy     String?
+  movedAt     DateTime @default(now())
+
+  inventory   Inventory @relation(fields: [inventoryId], references: [id], onDelete: Cascade)
+
+  @@index([inventoryId])
+  @@index([movedAt])
+}
+
+model Reservation {
+  id          String            @id @default(uuid())
+  patientId   String
+  pharmacyId  String
+  medicineId  String
+  quantity    Int
+  status      ReservationStatus @default(PENDING)
+  expiresAt   DateTime
+  createdAt   DateTime          @default(now())
+  updatedAt   DateTime          @updatedAt
+
+  patient     Patient           @relation(fields: [patientId], references: [id], onDelete: Cascade)
+  pharmacy    Pharmacy          @relation(fields: [pharmacyId], references: [id], onDelete: Cascade)
+  medicine    Medicine          @relation(fields: [medicineId], references: [id], onDelete: Cascade)
+
+  @@index([patientId])
+  @@index([pharmacyId])
+  @@index([medicineId])
+  @@index([status])
+  @@index([expiresAt])
+}
+
+model Prescription {
+  id               String                 @id @default(uuid())
+  patientId        String
+  pharmacyId       String?
+  pharmacistId     String?
+  documentUrl      String?
+  status           PrescriptionStatus     @default(PENDING)
+  notes            String?
+  createdAt        DateTime               @default(now())
+  updatedAt        DateTime               @updatedAt
+
+  patient          Patient                @relation(fields: [patientId], references: [id], onDelete: Cascade)
+  pharmacy         Pharmacy?              @relation(fields: [pharmacyId], references: [id], onDelete: SetNull)
+  pharmacist       User?                  @relation(fields: [pharmacistId], references: [id], onDelete: SetNull)
+  medicines        PrescriptionMedicine[]
+  reminderSchedules ReminderSchedule[]
+
+  @@index([patientId])
+  @@index([pharmacyId])
+  @@index([status])
+}
+
+model PrescriptionMedicine {
+  id             String       @id @default(uuid())
+  prescriptionId String
+  medicineId     String
+  dosage         String
+  frequency      String
+  duration       String
+  quantity       Int
+
+  prescription   Prescription @relation(fields: [prescriptionId], references: [id], onDelete: Cascade)
+  medicine       Medicine     @relation(fields: [medicineId], references: [id], onDelete: Cascade)
+
+  @@index([prescriptionId])
+  @@index([medicineId])
+}
+
+model ReminderSchedule {
+  id            String           @id @default(uuid())
+  patientId     String
+  prescriptionId String?
+  medicineId    String
+  dosage        String
+  startDate     DateTime
+  endDate       DateTime
+  timeOfDay     String[]
+  intervalHours Int?
+  createdAt     DateTime         @default(now())
+  updatedAt     DateTime         @updatedAt
+
+  patient       Patient          @relation(fields: [patientId], references: [id], onDelete: Cascade)
+  prescription  Prescription?    @relation(fields: [prescriptionId], references: [id], onDelete: SetNull)
+  medicine      Medicine         @relation(fields: [medicineId], references: [id], onDelete: Cascade)
+  logs          ReminderLog[]
+
+  @@index([patientId])
+  @@index([prescriptionId])
+  @@index([startDate, endDate])
+}
+
+model ReminderLog {
+  id         String         @id @default(uuid())
+  scheduleId String
+  patientId  String
+  type       NotificationType
+  status     ReminderStatus
+  sentAt     DateTime?
+  error      String?
+  createdAt  DateTime       @default(now())
+
+  schedule   ReminderSchedule @relation(fields: [scheduleId], references: [id], onDelete: Cascade)
+  patient    Patient           @relation(fields: [patientId], references: [id], onDelete: Cascade)
+
+  @@index([scheduleId])
+  @@index([patientId])
+  @@index([status])
+  @@index([createdAt])
+}
+
+model Notification {
+  id        String           @id @default(uuid())
+  userId    String
+  type      NotificationType
+  title     String
+  message   String
+  isRead    Boolean          @default(false)
+  createdAt DateTime         @default(now())
+
+  user      User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([isRead])
+}
+
+model AuditLog {
+  id          String   @id @default(uuid())
+  userId      String?
+  pharmacyId  String?
+  action      String
+  entityType  String
+  entityId    String?
+  changes     Json?
+  ipAddress   String?
+  userAgent   String?
+  createdAt   DateTime @default(now())
+
+  user        User?     @relation(fields: [userId], references: [id], onDelete: SetNull)
+  pharmacy    Pharmacy? @relation(fields: [pharmacyId], references: [id], onDelete: SetNull)
+
+  @@index([userId])
+  @@index([pharmacyId])
+  @@index([createdAt])
+}
+
+model SystemSetting {
+  id        String   @id @default(uuid())
+  key       String   @unique
+  value     String
+  updatedAt DateTime @updatedAt
+
+  @@index([key])
+}
