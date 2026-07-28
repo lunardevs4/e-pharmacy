@@ -6,10 +6,14 @@ import { join } from 'path';
 import helmet from 'helmet';
 import rateLimit from 'express-rate-limit';
 import * as hpp from 'hpp';
+import * as bcrypt from 'bcrypt';
 import { AppModule } from './app.module';
 import { HttpExceptionFilter } from './common/filters/http-exception.filter';
 import { XssSanitizationPipe } from './common/pipes/xss-sanitization.pipe';
 import { noSqlSanitize } from './common/middleware/nosql-sanitize.middleware';
+import { PrismaService } from './common/prisma/prisma.service';
+import { AUTH_PERMISSIONS } from './auth/auth.constants';
+import { UserRole } from '@generated/prisma';
 
 async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule);
@@ -120,6 +124,31 @@ async function bootstrap() {
       stopAtFirstError: false,
     }),
   );
+
+  const prismaService = app.get(PrismaService);
+  const adminEmail = process.env.BOOTSTRAP_ADMIN_EMAIL || 'admin@epharmacy.test';
+  const adminPassword = process.env.BOOTSTRAP_ADMIN_PASSWORD || 'Admin123!';
+
+  const existingAdmin = await prismaService.prisma.user.findFirst({
+    where: { email: adminEmail },
+  });
+
+  if (!existingAdmin) {
+    const hashedPassword = await bcrypt.hash(adminPassword, 10);
+    await prismaService.prisma.user.create({
+      data: {
+        email: adminEmail,
+        phone: '+250700000000',
+        password: hashedPassword,
+        firstName: 'System',
+        lastName: 'Administrator',
+        role: UserRole.ADMIN,
+        permissions: AUTH_PERMISSIONS.admin,
+        firstLogin: false,
+        isActive: true,
+      },
+    });
+  }
 
   const config = new DocumentBuilder()
     .setTitle('Rwanda E-Pharmacy API')

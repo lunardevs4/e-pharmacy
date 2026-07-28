@@ -9,6 +9,8 @@ import { TransformInterceptor } from './common/interceptors/transform.intercepto
 import { AuditInterceptor } from './common/interceptors/audit.interceptor';
 import { HttpExceptionFilter } from './common/filters/http-exception.filter';
 import { RolesGuard } from './common/guards/roles.guard';
+import { PermissionsGuard } from './common/guards/permissions.guard';
+import { FirstLoginGuard } from './common/guards/first-login.guard';
 import { JwtAuthGuard } from './auth/guards/jwt-auth.guard';
 import { UsersModule } from './users/users.module';
 import { PatientsModule } from './patients/patients.module';
@@ -62,6 +64,8 @@ import { ReportsModule } from './reports/reports.module';
     { provide: APP_GUARD, useClass: ThrottlerGuard },
     { provide: APP_GUARD, useClass: JwtAuthGuard },
     { provide: APP_GUARD, useClass: RolesGuard },
+    { provide: APP_GUARD, useClass: PermissionsGuard },
+    { provide: APP_GUARD, useClass: FirstLoginGuard },
   ],
 })
 export class AppModule { }

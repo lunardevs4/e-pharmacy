@@ -32,6 +32,10 @@ export type UserMinAggregateOutputType = {
   firstName: string | null
   lastName: string | null
   role: $Enums.UserRole | null
+  position: string | null
+  pharmacyId: string | null
+  organizationId: string | null
+  firstLogin: boolean | null
   isActive: boolean | null
   createdAt: Date | null
   updatedAt: Date | null
@@ -46,6 +50,10 @@ export type UserMaxAggregateOutputType = {
   firstName: string | null
   lastName: string | null
   role: $Enums.UserRole | null
+  position: string | null
+  pharmacyId: string | null
+  organizationId: string | null
+  firstLogin: boolean | null
   isActive: boolean | null
   createdAt: Date | null
   updatedAt: Date | null
@@ -60,6 +68,11 @@ export type UserCountAggregateOutputType = {
   firstName: number
   lastName: number
   role: number
+  position: number
+  permissions: number
+  pharmacyId: number
+  organizationId: number
+  firstLogin: number
   isActive: number
   createdAt: number
   updatedAt: number
@@ -76,6 +89,10 @@ export type UserMinAggregateInputType = {
   firstName?: true
   lastName?: true
   role?: true
+  position?: true
+  pharmacyId?: true
+  organizationId?: true
+  firstLogin?: true
   isActive?: true
   createdAt?: true
   updatedAt?: true
@@ -90,6 +107,10 @@ export type UserMaxAggregateInputType = {
   firstName?: true
   lastName?: true
   role?: true
+  position?: true
+  pharmacyId?: true
+  organizationId?: true
+  firstLogin?: true
   isActive?: true
   createdAt?: true
   updatedAt?: true
@@ -104,6 +125,11 @@ export type UserCountAggregateInputType = {
   firstName?: true
   lastName?: true
   role?: true
+  position?: true
+  permissions?: true
+  pharmacyId?: true
+  organizationId?: true
+  firstLogin?: true
   isActive?: true
   createdAt?: true
   updatedAt?: true
@@ -191,6 +217,11 @@ export type UserGroupByOutputType = {
   firstName: string
   lastName: string
   role: $Enums.UserRole
+  position: string | null
+  permissions: string[]
+  pharmacyId: string | null
+  organizationId: string | null
+  firstLogin: boolean
   isActive: boolean
   createdAt: Date
   updatedAt: Date
@@ -226,6 +257,11 @@ export type UserWhereInput = {
   firstName?: Prisma.StringFilter<"User"> | string
   lastName?: Prisma.StringFilter<"User"> | string
   role?: Prisma.EnumUserRoleFilter<"User"> | $Enums.UserRole
+  position?: Prisma.StringNullableFilter<"User"> | string | null
+  permissions?: Prisma.StringNullableListFilter<"User">
+  pharmacyId?: Prisma.StringNullableFilter<"User"> | string | null
+  organizationId?: Prisma.StringNullableFilter<"User"> | string | null
+  firstLogin?: Prisma.BoolFilter<"User"> | boolean
   isActive?: Prisma.BoolFilter<"User"> | boolean
   createdAt?: Prisma.DateTimeFilter<"User"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"User"> | Date | string
@@ -237,6 +273,7 @@ export type UserWhereInput = {
   pharmacistPrescriptions?: Prisma.PrescriptionListRelationFilter
   auditLogs?: Prisma.AuditLogListRelationFilter
   notifications?: Prisma.NotificationListRelationFilter
+  pharmacy?: Prisma.XOR<Prisma.PharmacyNullableScalarRelationFilter, Prisma.PharmacyWhereInput> | null
 }
 
 export type UserOrderByWithRelationInput = {
@@ -247,6 +284,11 @@ export type UserOrderByWithRelationInput = {
   firstName?: Prisma.SortOrder
   lastName?: Prisma.SortOrder
   role?: Prisma.SortOrder
+  position?: Prisma.SortOrderInput | Prisma.SortOrder
+  permissions?: Prisma.SortOrder
+  pharmacyId?: Prisma.SortOrderInput | Prisma.SortOrder
+  organizationId?: Prisma.SortOrderInput | Prisma.SortOrder
+  firstLogin?: Prisma.SortOrder
   isActive?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
@@ -258,6 +300,7 @@ export type UserOrderByWithRelationInput = {
   pharmacistPrescriptions?: Prisma.PrescriptionOrderByRelationAggregateInput
   auditLogs?: Prisma.AuditLogOrderByRelationAggregateInput
   notifications?: Prisma.NotificationOrderByRelationAggregateInput
+  pharmacy?: Prisma.PharmacyOrderByWithRelationInput
 }
 
 export type UserWhereUniqueInput = Prisma.AtLeast<{
@@ -271,6 +314,11 @@ export type UserWhereUniqueInput = Prisma.AtLeast<{
   firstName?: Prisma.StringFilter<"User"> | string
   lastName?: Prisma.StringFilter<"User"> | string
   role?: Prisma.EnumUserRoleFilter<"User"> | $Enums.UserRole
+  position?: Prisma.StringNullableFilter<"User"> | string | null
+  permissions?: Prisma.StringNullableListFilter<"User">
+  pharmacyId?: Prisma.StringNullableFilter<"User"> | string | null
+  organizationId?: Prisma.StringNullableFilter<"User"> | string | null
+  firstLogin?: Prisma.BoolFilter<"User"> | boolean
   isActive?: Prisma.BoolFilter<"User"> | boolean
   createdAt?: Prisma.DateTimeFilter<"User"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"User"> | Date | string
@@ -282,6 +330,7 @@ export type UserWhereUniqueInput = Prisma.AtLeast<{
   pharmacistPrescriptions?: Prisma.PrescriptionListRelationFilter
   auditLogs?: Prisma.AuditLogListRelationFilter
   notifications?: Prisma.NotificationListRelationFilter
+  pharmacy?: Prisma.XOR<Prisma.PharmacyNullableScalarRelationFilter, Prisma.PharmacyWhereInput> | null
 }, "id" | "email" | "phone">
 
 export type UserOrderByWithAggregationInput = {
@@ -292,6 +341,11 @@ export type UserOrderByWithAggregationInput = {
   firstName?: Prisma.SortOrder
   lastName?: Prisma.SortOrder
   role?: Prisma.SortOrder
+  position?: Prisma.SortOrderInput | Prisma.SortOrder
+  permissions?: Prisma.SortOrder
+  pharmacyId?: Prisma.SortOrderInput | Prisma.SortOrder
+  organizationId?: Prisma.SortOrderInput | Prisma.SortOrder
+  firstLogin?: Prisma.SortOrder
   isActive?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
@@ -312,6 +366,11 @@ export type UserScalarWhereWithAggregatesInput = {
   firstName?: Prisma.StringWithAggregatesFilter<"User"> | string
   lastName?: Prisma.StringWithAggregatesFilter<"User"> | string
   role?: Prisma.EnumUserRoleWithAggregatesFilter<"User"> | $Enums.UserRole
+  position?: Prisma.StringNullableWithAggregatesFilter<"User"> | string | null
+  permissions?: Prisma.StringNullableListFilter<"User">
+  pharmacyId?: Prisma.StringNullableWithAggregatesFilter<"User"> | string | null
+  organizationId?: Prisma.StringNullableWithAggregatesFilter<"User"> | string | null
+  firstLogin?: Prisma.BoolWithAggregatesFilter<"User"> | boolean
   isActive?: Prisma.BoolWithAggregatesFilter<"User"> | boolean
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"User"> | Date | string
   updatedAt?: Prisma.DateTimeWithAggregatesFilter<"User"> | Date | string
@@ -326,6 +385,10 @@ export type UserCreateInput = {
   firstName: string
   lastName: string
   role: $Enums.UserRole
+  position?: string | null
+  permissions?: Prisma.UserCreatepermissionsInput | string[]
+  organizationId?: string | null
+  firstLogin?: boolean
   isActive?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -337,6 +400,7 @@ export type UserCreateInput = {
   pharmacistPrescriptions?: Prisma.PrescriptionCreateNestedManyWithoutPharmacistInput
   auditLogs?: Prisma.AuditLogCreateNestedManyWithoutUserInput
   notifications?: Prisma.NotificationCreateNestedManyWithoutUserInput
+  pharmacy?: Prisma.PharmacyCreateNestedOneWithoutMembersInput
 }
 
 export type UserUncheckedCreateInput = {
@@ -347,6 +411,11 @@ export type UserUncheckedCreateInput = {
   firstName: string
   lastName: string
   role: $Enums.UserRole
+  position?: string | null
+  permissions?: Prisma.UserCreatepermissionsInput | string[]
+  pharmacyId?: string | null
+  organizationId?: string | null
+  firstLogin?: boolean
   isActive?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -368,6 +437,10 @@ export type UserUpdateInput = {
   firstName?: Prisma.StringFieldUpdateOperationsInput | string
   lastName?: Prisma.StringFieldUpdateOperationsInput | string
   role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
+  position?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  permissions?: Prisma.UserUpdatepermissionsInput | string[]
+  organizationId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  firstLogin?: Prisma.BoolFieldUpdateOperationsInput | boolean
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -379,6 +452,7 @@ export type UserUpdateInput = {
   pharmacistPrescriptions?: Prisma.PrescriptionUpdateManyWithoutPharmacistNestedInput
   auditLogs?: Prisma.AuditLogUpdateManyWithoutUserNestedInput
   notifications?: Prisma.NotificationUpdateManyWithoutUserNestedInput
+  pharmacy?: Prisma.PharmacyUpdateOneWithoutMembersNestedInput
 }
 
 export type UserUncheckedUpdateInput = {
@@ -389,6 +463,11 @@ export type UserUncheckedUpdateInput = {
   firstName?: Prisma.StringFieldUpdateOperationsInput | string
   lastName?: Prisma.StringFieldUpdateOperationsInput | string
   role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
+  position?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  permissions?: Prisma.UserUpdatepermissionsInput | string[]
+  pharmacyId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  organizationId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  firstLogin?: Prisma.BoolFieldUpdateOperationsInput | boolean
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -410,6 +489,11 @@ export type UserCreateManyInput = {
   firstName: string
   lastName: string
   role: $Enums.UserRole
+  position?: string | null
+  permissions?: Prisma.UserCreatepermissionsInput | string[]
+  pharmacyId?: string | null
+  organizationId?: string | null
+  firstLogin?: boolean
   isActive?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -424,6 +508,10 @@ export type UserUpdateManyMutationInput = {
   firstName?: Prisma.StringFieldUpdateOperationsInput | string
   lastName?: Prisma.StringFieldUpdateOperationsInput | string
   role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
+  position?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  permissions?: Prisma.UserUpdatepermissionsInput | string[]
+  organizationId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  firstLogin?: Prisma.BoolFieldUpdateOperationsInput | boolean
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -438,10 +526,23 @@ export type UserUncheckedUpdateManyInput = {
   firstName?: Prisma.StringFieldUpdateOperationsInput | string
   lastName?: Prisma.StringFieldUpdateOperationsInput | string
   role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
+  position?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  permissions?: Prisma.UserUpdatepermissionsInput | string[]
+  pharmacyId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  organizationId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  firstLogin?: Prisma.BoolFieldUpdateOperationsInput | boolean
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+}
+
+export type StringNullableListFilter<$PrismaModel = never> = {
+  equals?: string[] | Prisma.ListStringFieldRefInput<$PrismaModel> | null
+  has?: string | Prisma.StringFieldRefInput<$PrismaModel> | null
+  hasEvery?: string[] | Prisma.ListStringFieldRefInput<$PrismaModel>
+  hasSome?: string[] | Prisma.ListStringFieldRefInput<$PrismaModel>
+  isEmpty?: boolean
 }
 
 export type UserCountOrderByAggregateInput = {
@@ -452,6 +553,11 @@ export type UserCountOrderByAggregateInput = {
   firstName?: Prisma.SortOrder
   lastName?: Prisma.SortOrder
   role?: Prisma.SortOrder
+  position?: Prisma.SortOrder
+  permissions?: Prisma.SortOrder
+  pharmacyId?: Prisma.SortOrder
+  organizationId?: Prisma.SortOrder
+  firstLogin?: Prisma.SortOrder
   isActive?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
@@ -466,6 +572,10 @@ export type UserMaxOrderByAggregateInput = {
   firstName?: Prisma.SortOrder
   lastName?: Prisma.SortOrder
   role?: Prisma.SortOrder
+  position?: Prisma.SortOrder
+  pharmacyId?: Prisma.SortOrder
+  organizationId?: Prisma.SortOrder
+  firstLogin?: Prisma.SortOrder
   isActive?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
@@ -480,6 +590,10 @@ export type UserMinOrderByAggregateInput = {
   firstName?: Prisma.SortOrder
   lastName?: Prisma.SortOrder
   role?: Prisma.SortOrder
+  position?: Prisma.SortOrder
+  pharmacyId?: Prisma.SortOrder
+  organizationId?: Prisma.SortOrder
+  firstLogin?: Prisma.SortOrder
   isActive?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
@@ -491,9 +605,23 @@ export type UserScalarRelationFilter = {
   isNot?: Prisma.UserWhereInput
 }
 
+export type UserListRelationFilter = {
+  every?: Prisma.UserWhereInput
+  some?: Prisma.UserWhereInput
+  none?: Prisma.UserWhereInput
+}
+
+export type UserOrderByRelationAggregateInput = {
+  _count?: Prisma.SortOrder
+}
+
 export type UserNullableScalarRelationFilter = {
   is?: Prisma.UserWhereInput | null
   isNot?: Prisma.UserWhereInput | null
+}
+
+export type UserCreatepermissionsInput = {
+  set: string[]
 }
 
 export type StringFieldUpdateOperationsInput = {
@@ -502,6 +630,15 @@ export type StringFieldUpdateOperationsInput = {
 
 export type EnumUserRoleFieldUpdateOperationsInput = {
   set?: $Enums.UserRole
+}
+
+export type NullableStringFieldUpdateOperationsInput = {
+  set?: string | null
+}
+
+export type UserUpdatepermissionsInput = {
+  set?: string[]
+  push?: string | string[]
 }
 
 export type BoolFieldUpdateOperationsInput = {
@@ -550,12 +687,54 @@ export type UserCreateNestedOneWithoutPharmaciesInput = {
   connect?: Prisma.UserWhereUniqueInput
 }
 
+export type UserCreateNestedManyWithoutPharmacyInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutPharmacyInput, Prisma.UserUncheckedCreateWithoutPharmacyInput> | Prisma.UserCreateWithoutPharmacyInput[] | Prisma.UserUncheckedCreateWithoutPharmacyInput[]
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutPharmacyInput | Prisma.UserCreateOrConnectWithoutPharmacyInput[]
+  createMany?: Prisma.UserCreateManyPharmacyInputEnvelope
+  connect?: Prisma.UserWhereUniqueInput | Prisma.UserWhereUniqueInput[]
+}
+
+export type UserUncheckedCreateNestedManyWithoutPharmacyInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutPharmacyInput, Prisma.UserUncheckedCreateWithoutPharmacyInput> | Prisma.UserCreateWithoutPharmacyInput[] | Prisma.UserUncheckedCreateWithoutPharmacyInput[]
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutPharmacyInput | Prisma.UserCreateOrConnectWithoutPharmacyInput[]
+  createMany?: Prisma.UserCreateManyPharmacyInputEnvelope
+  connect?: Prisma.UserWhereUniqueInput | Prisma.UserWhereUniqueInput[]
+}
+
 export type UserUpdateOneRequiredWithoutPharmaciesNestedInput = {
   create?: Prisma.XOR<Prisma.UserCreateWithoutPharmaciesInput, Prisma.UserUncheckedCreateWithoutPharmaciesInput>
   connectOrCreate?: Prisma.UserCreateOrConnectWithoutPharmaciesInput
   upsert?: Prisma.UserUpsertWithoutPharmaciesInput
   connect?: Prisma.UserWhereUniqueInput
   update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutPharmaciesInput, Prisma.UserUpdateWithoutPharmaciesInput>, Prisma.UserUncheckedUpdateWithoutPharmaciesInput>
+}
+
+export type UserUpdateManyWithoutPharmacyNestedInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutPharmacyInput, Prisma.UserUncheckedCreateWithoutPharmacyInput> | Prisma.UserCreateWithoutPharmacyInput[] | Prisma.UserUncheckedCreateWithoutPharmacyInput[]
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutPharmacyInput | Prisma.UserCreateOrConnectWithoutPharmacyInput[]
+  upsert?: Prisma.UserUpsertWithWhereUniqueWithoutPharmacyInput | Prisma.UserUpsertWithWhereUniqueWithoutPharmacyInput[]
+  createMany?: Prisma.UserCreateManyPharmacyInputEnvelope
+  set?: Prisma.UserWhereUniqueInput | Prisma.UserWhereUniqueInput[]
+  disconnect?: Prisma.UserWhereUniqueInput | Prisma.UserWhereUniqueInput[]
+  delete?: Prisma.UserWhereUniqueInput | Prisma.UserWhereUniqueInput[]
+  connect?: Prisma.UserWhereUniqueInput | Prisma.UserWhereUniqueInput[]
+  update?: Prisma.UserUpdateWithWhereUniqueWithoutPharmacyInput | Prisma.UserUpdateWithWhereUniqueWithoutPharmacyInput[]
+  updateMany?: Prisma.UserUpdateManyWithWhereWithoutPharmacyInput | Prisma.UserUpdateManyWithWhereWithoutPharmacyInput[]
+  deleteMany?: Prisma.UserScalarWhereInput | Prisma.UserScalarWhereInput[]
+}
+
+export type UserUncheckedUpdateManyWithoutPharmacyNestedInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutPharmacyInput, Prisma.UserUncheckedCreateWithoutPharmacyInput> | Prisma.UserCreateWithoutPharmacyInput[] | Prisma.UserUncheckedCreateWithoutPharmacyInput[]
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutPharmacyInput | Prisma.UserCreateOrConnectWithoutPharmacyInput[]
+  upsert?: Prisma.UserUpsertWithWhereUniqueWithoutPharmacyInput | Prisma.UserUpsertWithWhereUniqueWithoutPharmacyInput[]
+  createMany?: Prisma.UserCreateManyPharmacyInputEnvelope
+  set?: Prisma.UserWhereUniqueInput | Prisma.UserWhereUniqueInput[]
+  disconnect?: Prisma.UserWhereUniqueInput | Prisma.UserWhereUniqueInput[]
+  delete?: Prisma.UserWhereUniqueInput | Prisma.UserWhereUniqueInput[]
+  connect?: Prisma.UserWhereUniqueInput | Prisma.UserWhereUniqueInput[]
+  update?: Prisma.UserUpdateWithWhereUniqueWithoutPharmacyInput | Prisma.UserUpdateWithWhereUniqueWithoutPharmacyInput[]
+  updateMany?: Prisma.UserUpdateManyWithWhereWithoutPharmacyInput | Prisma.UserUpdateManyWithWhereWithoutPharmacyInput[]
+  deleteMany?: Prisma.UserScalarWhereInput | Prisma.UserScalarWhereInput[]
 }
 
 export type UserCreateNestedOneWithoutPharmacyEmployeesInput = {
@@ -626,6 +805,10 @@ export type UserCreateWithoutRefreshTokensInput = {
   firstName: string
   lastName: string
   role: $Enums.UserRole
+  position?: string | null
+  permissions?: Prisma.UserCreatepermissionsInput | string[]
+  organizationId?: string | null
+  firstLogin?: boolean
   isActive?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -636,6 +819,7 @@ export type UserCreateWithoutRefreshTokensInput = {
   pharmacistPrescriptions?: Prisma.PrescriptionCreateNestedManyWithoutPharmacistInput
   auditLogs?: Prisma.AuditLogCreateNestedManyWithoutUserInput
   notifications?: Prisma.NotificationCreateNestedManyWithoutUserInput
+  pharmacy?: Prisma.PharmacyCreateNestedOneWithoutMembersInput
 }
 
 export type UserUncheckedCreateWithoutRefreshTokensInput = {
@@ -646,6 +830,11 @@ export type UserUncheckedCreateWithoutRefreshTokensInput = {
   firstName: string
   lastName: string
   role: $Enums.UserRole
+  position?: string | null
+  permissions?: Prisma.UserCreatepermissionsInput | string[]
+  pharmacyId?: string | null
+  organizationId?: string | null
+  firstLogin?: boolean
   isActive?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -682,6 +871,10 @@ export type UserUpdateWithoutRefreshTokensInput = {
   firstName?: Prisma.StringFieldUpdateOperationsInput | string
   lastName?: Prisma.StringFieldUpdateOperationsInput | string
   role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
+  position?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  permissions?: Prisma.UserUpdatepermissionsInput | string[]
+  organizationId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  firstLogin?: Prisma.BoolFieldUpdateOperationsInput | boolean
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -692,6 +885,7 @@ export type UserUpdateWithoutRefreshTokensInput = {
   pharmacistPrescriptions?: Prisma.PrescriptionUpdateManyWithoutPharmacistNestedInput
   auditLogs?: Prisma.AuditLogUpdateManyWithoutUserNestedInput
   notifications?: Prisma.NotificationUpdateManyWithoutUserNestedInput
+  pharmacy?: Prisma.PharmacyUpdateOneWithoutMembersNestedInput
 }
 
 export type UserUncheckedUpdateWithoutRefreshTokensInput = {
@@ -702,6 +896,11 @@ export type UserUncheckedUpdateWithoutRefreshTokensInput = {
   firstName?: Prisma.StringFieldUpdateOperationsInput | string
   lastName?: Prisma.StringFieldUpdateOperationsInput | string
   role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
+  position?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  permissions?: Prisma.UserUpdatepermissionsInput | string[]
+  pharmacyId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  organizationId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  firstLogin?: Prisma.BoolFieldUpdateOperationsInput | boolean
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -722,6 +921,10 @@ export type UserCreateWithoutPatientInput = {
   firstName: string
   lastName: string
   role: $Enums.UserRole
+  position?: string | null
+  permissions?: Prisma.UserCreatepermissionsInput | string[]
+  organizationId?: string | null
+  firstLogin?: boolean
   isActive?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -732,6 +935,7 @@ export type UserCreateWithoutPatientInput = {
   pharmacistPrescriptions?: Prisma.PrescriptionCreateNestedManyWithoutPharmacistInput
   auditLogs?: Prisma.AuditLogCreateNestedManyWithoutUserInput
   notifications?: Prisma.NotificationCreateNestedManyWithoutUserInput
+  pharmacy?: Prisma.PharmacyCreateNestedOneWithoutMembersInput
 }
 
 export type UserUncheckedCreateWithoutPatientInput = {
@@ -742,6 +946,11 @@ export type UserUncheckedCreateWithoutPatientInput = {
   firstName: string
   lastName: string
   role: $Enums.UserRole
+  position?: string | null
+  permissions?: Prisma.UserCreatepermissionsInput | string[]
+  pharmacyId?: string | null
+  organizationId?: string | null
+  firstLogin?: boolean
   isActive?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -778,6 +987,10 @@ export type UserUpdateWithoutPatientInput = {
   firstName?: Prisma.StringFieldUpdateOperationsInput | string
   lastName?: Prisma.StringFieldUpdateOperationsInput | string
   role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
+  position?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  permissions?: Prisma.UserUpdatepermissionsInput | string[]
+  organizationId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  firstLogin?: Prisma.BoolFieldUpdateOperationsInput | boolean
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -788,6 +1001,7 @@ export type UserUpdateWithoutPatientInput = {
   pharmacistPrescriptions?: Prisma.PrescriptionUpdateManyWithoutPharmacistNestedInput
   auditLogs?: Prisma.AuditLogUpdateManyWithoutUserNestedInput
   notifications?: Prisma.NotificationUpdateManyWithoutUserNestedInput
+  pharmacy?: Prisma.PharmacyUpdateOneWithoutMembersNestedInput
 }
 
 export type UserUncheckedUpdateWithoutPatientInput = {
@@ -798,6 +1012,11 @@ export type UserUncheckedUpdateWithoutPatientInput = {
   firstName?: Prisma.StringFieldUpdateOperationsInput | string
   lastName?: Prisma.StringFieldUpdateOperationsInput | string
   role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
+  position?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  permissions?: Prisma.UserUpdatepermissionsInput | string[]
+  pharmacyId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  organizationId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  firstLogin?: Prisma.BoolFieldUpdateOperationsInput | boolean
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -818,6 +1037,10 @@ export type UserCreateWithoutPharmaciesInput = {
   firstName: string
   lastName: string
   role: $Enums.UserRole
+  position?: string | null
+  permissions?: Prisma.UserCreatepermissionsInput | string[]
+  organizationId?: string | null
+  firstLogin?: boolean
   isActive?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -828,6 +1051,7 @@ export type UserCreateWithoutPharmaciesInput = {
   pharmacistPrescriptions?: Prisma.PrescriptionCreateNestedManyWithoutPharmacistInput
   auditLogs?: Prisma.AuditLogCreateNestedManyWithoutUserInput
   notifications?: Prisma.NotificationCreateNestedManyWithoutUserInput
+  pharmacy?: Prisma.PharmacyCreateNestedOneWithoutMembersInput
 }
 
 export type UserUncheckedCreateWithoutPharmaciesInput = {
@@ -838,6 +1062,11 @@ export type UserUncheckedCreateWithoutPharmaciesInput = {
   firstName: string
   lastName: string
   role: $Enums.UserRole
+  position?: string | null
+  permissions?: Prisma.UserCreatepermissionsInput | string[]
+  pharmacyId?: string | null
+  organizationId?: string | null
+  firstLogin?: boolean
   isActive?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -853,6 +1082,66 @@ export type UserUncheckedCreateWithoutPharmaciesInput = {
 export type UserCreateOrConnectWithoutPharmaciesInput = {
   where: Prisma.UserWhereUniqueInput
   create: Prisma.XOR<Prisma.UserCreateWithoutPharmaciesInput, Prisma.UserUncheckedCreateWithoutPharmaciesInput>
+}
+
+export type UserCreateWithoutPharmacyInput = {
+  id?: string
+  email: string
+  phone: string
+  password: string
+  firstName: string
+  lastName: string
+  role: $Enums.UserRole
+  position?: string | null
+  permissions?: Prisma.UserCreatepermissionsInput | string[]
+  organizationId?: string | null
+  firstLogin?: boolean
+  isActive?: boolean
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  deletedAt?: Date | string | null
+  refreshTokens?: Prisma.RefreshTokenCreateNestedManyWithoutUserInput
+  patient?: Prisma.PatientCreateNestedOneWithoutUserInput
+  pharmacies?: Prisma.PharmacyCreateNestedManyWithoutOwnerInput
+  pharmacyEmployees?: Prisma.PharmacyEmployeeCreateNestedManyWithoutUserInput
+  pharmacistPrescriptions?: Prisma.PrescriptionCreateNestedManyWithoutPharmacistInput
+  auditLogs?: Prisma.AuditLogCreateNestedManyWithoutUserInput
+  notifications?: Prisma.NotificationCreateNestedManyWithoutUserInput
+}
+
+export type UserUncheckedCreateWithoutPharmacyInput = {
+  id?: string
+  email: string
+  phone: string
+  password: string
+  firstName: string
+  lastName: string
+  role: $Enums.UserRole
+  position?: string | null
+  permissions?: Prisma.UserCreatepermissionsInput | string[]
+  organizationId?: string | null
+  firstLogin?: boolean
+  isActive?: boolean
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  deletedAt?: Date | string | null
+  refreshTokens?: Prisma.RefreshTokenUncheckedCreateNestedManyWithoutUserInput
+  patient?: Prisma.PatientUncheckedCreateNestedOneWithoutUserInput
+  pharmacies?: Prisma.PharmacyUncheckedCreateNestedManyWithoutOwnerInput
+  pharmacyEmployees?: Prisma.PharmacyEmployeeUncheckedCreateNestedManyWithoutUserInput
+  pharmacistPrescriptions?: Prisma.PrescriptionUncheckedCreateNestedManyWithoutPharmacistInput
+  auditLogs?: Prisma.AuditLogUncheckedCreateNestedManyWithoutUserInput
+  notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutUserInput
+}
+
+export type UserCreateOrConnectWithoutPharmacyInput = {
+  where: Prisma.UserWhereUniqueInput
+  create: Prisma.XOR<Prisma.UserCreateWithoutPharmacyInput, Prisma.UserUncheckedCreateWithoutPharmacyInput>
+}
+
+export type UserCreateManyPharmacyInputEnvelope = {
+  data: Prisma.UserCreateManyPharmacyInput | Prisma.UserCreateManyPharmacyInput[]
+  skipDuplicates?: boolean
 }
 
 export type UserUpsertWithoutPharmaciesInput = {
@@ -874,6 +1163,10 @@ export type UserUpdateWithoutPharmaciesInput = {
   firstName?: Prisma.StringFieldUpdateOperationsInput | string
   lastName?: Prisma.StringFieldUpdateOperationsInput | string
   role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
+  position?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  permissions?: Prisma.UserUpdatepermissionsInput | string[]
+  organizationId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  firstLogin?: Prisma.BoolFieldUpdateOperationsInput | boolean
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -884,6 +1177,7 @@ export type UserUpdateWithoutPharmaciesInput = {
   pharmacistPrescriptions?: Prisma.PrescriptionUpdateManyWithoutPharmacistNestedInput
   auditLogs?: Prisma.AuditLogUpdateManyWithoutUserNestedInput
   notifications?: Prisma.NotificationUpdateManyWithoutUserNestedInput
+  pharmacy?: Prisma.PharmacyUpdateOneWithoutMembersNestedInput
 }
 
 export type UserUncheckedUpdateWithoutPharmaciesInput = {
@@ -894,6 +1188,11 @@ export type UserUncheckedUpdateWithoutPharmaciesInput = {
   firstName?: Prisma.StringFieldUpdateOperationsInput | string
   lastName?: Prisma.StringFieldUpdateOperationsInput | string
   role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
+  position?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  permissions?: Prisma.UserUpdatepermissionsInput | string[]
+  pharmacyId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  organizationId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  firstLogin?: Prisma.BoolFieldUpdateOperationsInput | boolean
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -906,6 +1205,44 @@ export type UserUncheckedUpdateWithoutPharmaciesInput = {
   notifications?: Prisma.NotificationUncheckedUpdateManyWithoutUserNestedInput
 }
 
+export type UserUpsertWithWhereUniqueWithoutPharmacyInput = {
+  where: Prisma.UserWhereUniqueInput
+  update: Prisma.XOR<Prisma.UserUpdateWithoutPharmacyInput, Prisma.UserUncheckedUpdateWithoutPharmacyInput>
+  create: Prisma.XOR<Prisma.UserCreateWithoutPharmacyInput, Prisma.UserUncheckedCreateWithoutPharmacyInput>
+}
+
+export type UserUpdateWithWhereUniqueWithoutPharmacyInput = {
+  where: Prisma.UserWhereUniqueInput
+  data: Prisma.XOR<Prisma.UserUpdateWithoutPharmacyInput, Prisma.UserUncheckedUpdateWithoutPharmacyInput>
+}
+
+export type UserUpdateManyWithWhereWithoutPharmacyInput = {
+  where: Prisma.UserScalarWhereInput
+  data: Prisma.XOR<Prisma.UserUpdateManyMutationInput, Prisma.UserUncheckedUpdateManyWithoutPharmacyInput>
+}
+
+export type UserScalarWhereInput = {
+  AND?: Prisma.UserScalarWhereInput | Prisma.UserScalarWhereInput[]
+  OR?: Prisma.UserScalarWhereInput[]
+  NOT?: Prisma.UserScalarWhereInput | Prisma.UserScalarWhereInput[]
+  id?: Prisma.StringFilter<"User"> | string
+  email?: Prisma.StringFilter<"User"> | string
+  phone?: Prisma.StringFilter<"User"> | string
+  password?: Prisma.StringFilter<"User"> | string
+  firstName?: Prisma.StringFilter<"User"> | string
+  lastName?: Prisma.StringFilter<"User"> | string
+  role?: Prisma.EnumUserRoleFilter<"User"> | $Enums.UserRole
+  position?: Prisma.StringNullableFilter<"User"> | string | null
+  permissions?: Prisma.StringNullableListFilter<"User">
+  pharmacyId?: Prisma.StringNullableFilter<"User"> | string | null
+  organizationId?: Prisma.StringNullableFilter<"User"> | string | null
+  firstLogin?: Prisma.BoolFilter<"User"> | boolean
+  isActive?: Prisma.BoolFilter<"User"> | boolean
+  createdAt?: Prisma.DateTimeFilter<"User"> | Date | string
+  updatedAt?: Prisma.DateTimeFilter<"User"> | Date | string
+  deletedAt?: Prisma.DateTimeNullableFilter<"User"> | Date | string | null
+}
+
 export type UserCreateWithoutPharmacyEmployeesInput = {
   id?: string
   email: string
@@ -914,6 +1251,10 @@ export type UserCreateWithoutPharmacyEmployeesInput = {
   firstName: string
   lastName: string
   role: $Enums.UserRole
+  position?: string | null
+  permissions?: Prisma.UserCreatepermissionsInput | string[]
+  organizationId?: string | null
+  firstLogin?: boolean
   isActive?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -924,6 +1265,7 @@ export type UserCreateWithoutPharmacyEmployeesInput = {
   pharmacistPrescriptions?: Prisma.PrescriptionCreateNestedManyWithoutPharmacistInput
   auditLogs?: Prisma.AuditLogCreateNestedManyWithoutUserInput
   notifications?: Prisma.NotificationCreateNestedManyWithoutUserInput
+  pharmacy?: Prisma.PharmacyCreateNestedOneWithoutMembersInput
 }
 
 export type UserUncheckedCreateWithoutPharmacyEmployeesInput = {
@@ -934,6 +1276,11 @@ export type UserUncheckedCreateWithoutPharmacyEmployeesInput = {
   firstName: string
   lastName: string
   role: $Enums.UserRole
+  position?: string | null
+  permissions?: Prisma.UserCreatepermissionsInput | string[]
+  pharmacyId?: string | null
+  organizationId?: string | null
+  firstLogin?: boolean
   isActive?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -970,6 +1317,10 @@ export type UserUpdateWithoutPharmacyEmployeesInput = {
   firstName?: Prisma.StringFieldUpdateOperationsInput | string
   lastName?: Prisma.StringFieldUpdateOperationsInput | string
   role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
+  position?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  permissions?: Prisma.UserUpdatepermissionsInput | string[]
+  organizationId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  firstLogin?: Prisma.BoolFieldUpdateOperationsInput | boolean
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -980,6 +1331,7 @@ export type UserUpdateWithoutPharmacyEmployeesInput = {
   pharmacistPrescriptions?: Prisma.PrescriptionUpdateManyWithoutPharmacistNestedInput
   auditLogs?: Prisma.AuditLogUpdateManyWithoutUserNestedInput
   notifications?: Prisma.NotificationUpdateManyWithoutUserNestedInput
+  pharmacy?: Prisma.PharmacyUpdateOneWithoutMembersNestedInput
 }
 
 export type UserUncheckedUpdateWithoutPharmacyEmployeesInput = {
@@ -990,6 +1342,11 @@ export type UserUncheckedUpdateWithoutPharmacyEmployeesInput = {
   firstName?: Prisma.StringFieldUpdateOperationsInput | string
   lastName?: Prisma.StringFieldUpdateOperationsInput | string
   role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
+  position?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  permissions?: Prisma.UserUpdatepermissionsInput | string[]
+  pharmacyId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  organizationId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  firstLogin?: Prisma.BoolFieldUpdateOperationsInput | boolean
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1010,6 +1367,10 @@ export type UserCreateWithoutPharmacistPrescriptionsInput = {
   firstName: string
   lastName: string
   role: $Enums.UserRole
+  position?: string | null
+  permissions?: Prisma.UserCreatepermissionsInput | string[]
+  organizationId?: string | null
+  firstLogin?: boolean
   isActive?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -1020,6 +1381,7 @@ export type UserCreateWithoutPharmacistPrescriptionsInput = {
   pharmacyEmployees?: Prisma.PharmacyEmployeeCreateNestedManyWithoutUserInput
   auditLogs?: Prisma.AuditLogCreateNestedManyWithoutUserInput
   notifications?: Prisma.NotificationCreateNestedManyWithoutUserInput
+  pharmacy?: Prisma.PharmacyCreateNestedOneWithoutMembersInput
 }
 
 export type UserUncheckedCreateWithoutPharmacistPrescriptionsInput = {
@@ -1030,6 +1392,11 @@ export type UserUncheckedCreateWithoutPharmacistPrescriptionsInput = {
   firstName: string
   lastName: string
   role: $Enums.UserRole
+  position?: string | null
+  permissions?: Prisma.UserCreatepermissionsInput | string[]
+  pharmacyId?: string | null
+  organizationId?: string | null
+  firstLogin?: boolean
   isActive?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -1066,6 +1433,10 @@ export type UserUpdateWithoutPharmacistPrescriptionsInput = {
   firstName?: Prisma.StringFieldUpdateOperationsInput | string
   lastName?: Prisma.StringFieldUpdateOperationsInput | string
   role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
+  position?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  permissions?: Prisma.UserUpdatepermissionsInput | string[]
+  organizationId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  firstLogin?: Prisma.BoolFieldUpdateOperationsInput | boolean
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1076,6 +1447,7 @@ export type UserUpdateWithoutPharmacistPrescriptionsInput = {
   pharmacyEmployees?: Prisma.PharmacyEmployeeUpdateManyWithoutUserNestedInput
   auditLogs?: Prisma.AuditLogUpdateManyWithoutUserNestedInput
   notifications?: Prisma.NotificationUpdateManyWithoutUserNestedInput
+  pharmacy?: Prisma.PharmacyUpdateOneWithoutMembersNestedInput
 }
 
 export type UserUncheckedUpdateWithoutPharmacistPrescriptionsInput = {
@@ -1086,6 +1458,11 @@ export type UserUncheckedUpdateWithoutPharmacistPrescriptionsInput = {
   firstName?: Prisma.StringFieldUpdateOperationsInput | string
   lastName?: Prisma.StringFieldUpdateOperationsInput | string
   role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
+  position?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  permissions?: Prisma.UserUpdatepermissionsInput | string[]
+  pharmacyId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  organizationId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  firstLogin?: Prisma.BoolFieldUpdateOperationsInput | boolean
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1106,6 +1483,10 @@ export type UserCreateWithoutNotificationsInput = {
   firstName: string
   lastName: string
   role: $Enums.UserRole
+  position?: string | null
+  permissions?: Prisma.UserCreatepermissionsInput | string[]
+  organizationId?: string | null
+  firstLogin?: boolean
   isActive?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -1116,6 +1497,7 @@ export type UserCreateWithoutNotificationsInput = {
   pharmacyEmployees?: Prisma.PharmacyEmployeeCreateNestedManyWithoutUserInput
   pharmacistPrescriptions?: Prisma.PrescriptionCreateNestedManyWithoutPharmacistInput
   auditLogs?: Prisma.AuditLogCreateNestedManyWithoutUserInput
+  pharmacy?: Prisma.PharmacyCreateNestedOneWithoutMembersInput
 }
 
 export type UserUncheckedCreateWithoutNotificationsInput = {
@@ -1126,6 +1508,11 @@ export type UserUncheckedCreateWithoutNotificationsInput = {
   firstName: string
   lastName: string
   role: $Enums.UserRole
+  position?: string | null
+  permissions?: Prisma.UserCreatepermissionsInput | string[]
+  pharmacyId?: string | null
+  organizationId?: string | null
+  firstLogin?: boolean
   isActive?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -1162,6 +1549,10 @@ export type UserUpdateWithoutNotificationsInput = {
   firstName?: Prisma.StringFieldUpdateOperationsInput | string
   lastName?: Prisma.StringFieldUpdateOperationsInput | string
   role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
+  position?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  permissions?: Prisma.UserUpdatepermissionsInput | string[]
+  organizationId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  firstLogin?: Prisma.BoolFieldUpdateOperationsInput | boolean
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1172,6 +1563,7 @@ export type UserUpdateWithoutNotificationsInput = {
   pharmacyEmployees?: Prisma.PharmacyEmployeeUpdateManyWithoutUserNestedInput
   pharmacistPrescriptions?: Prisma.PrescriptionUpdateManyWithoutPharmacistNestedInput
   auditLogs?: Prisma.AuditLogUpdateManyWithoutUserNestedInput
+  pharmacy?: Prisma.PharmacyUpdateOneWithoutMembersNestedInput
 }
 
 export type UserUncheckedUpdateWithoutNotificationsInput = {
@@ -1182,6 +1574,11 @@ export type UserUncheckedUpdateWithoutNotificationsInput = {
   firstName?: Prisma.StringFieldUpdateOperationsInput | string
   lastName?: Prisma.StringFieldUpdateOperationsInput | string
   role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
+  position?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  permissions?: Prisma.UserUpdatepermissionsInput | string[]
+  pharmacyId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  organizationId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  firstLogin?: Prisma.BoolFieldUpdateOperationsInput | boolean
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1202,6 +1599,10 @@ export type UserCreateWithoutAuditLogsInput = {
   firstName: string
   lastName: string
   role: $Enums.UserRole
+  position?: string | null
+  permissions?: Prisma.UserCreatepermissionsInput | string[]
+  organizationId?: string | null
+  firstLogin?: boolean
   isActive?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -1212,6 +1613,7 @@ export type UserCreateWithoutAuditLogsInput = {
   pharmacyEmployees?: Prisma.PharmacyEmployeeCreateNestedManyWithoutUserInput
   pharmacistPrescriptions?: Prisma.PrescriptionCreateNestedManyWithoutPharmacistInput
   notifications?: Prisma.NotificationCreateNestedManyWithoutUserInput
+  pharmacy?: Prisma.PharmacyCreateNestedOneWithoutMembersInput
 }
 
 export type UserUncheckedCreateWithoutAuditLogsInput = {
@@ -1222,6 +1624,11 @@ export type UserUncheckedCreateWithoutAuditLogsInput = {
   firstName: string
   lastName: string
   role: $Enums.UserRole
+  position?: string | null
+  permissions?: Prisma.UserCreatepermissionsInput | string[]
+  pharmacyId?: string | null
+  organizationId?: string | null
+  firstLogin?: boolean
   isActive?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -1258,6 +1665,10 @@ export type UserUpdateWithoutAuditLogsInput = {
   firstName?: Prisma.StringFieldUpdateOperationsInput | string
   lastName?: Prisma.StringFieldUpdateOperationsInput | string
   role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
+  position?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  permissions?: Prisma.UserUpdatepermissionsInput | string[]
+  organizationId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  firstLogin?: Prisma.BoolFieldUpdateOperationsInput | boolean
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1268,6 +1679,7 @@ export type UserUpdateWithoutAuditLogsInput = {
   pharmacyEmployees?: Prisma.PharmacyEmployeeUpdateManyWithoutUserNestedInput
   pharmacistPrescriptions?: Prisma.PrescriptionUpdateManyWithoutPharmacistNestedInput
   notifications?: Prisma.NotificationUpdateManyWithoutUserNestedInput
+  pharmacy?: Prisma.PharmacyUpdateOneWithoutMembersNestedInput
 }
 
 export type UserUncheckedUpdateWithoutAuditLogsInput = {
@@ -1278,6 +1690,11 @@ export type UserUncheckedUpdateWithoutAuditLogsInput = {
   firstName?: Prisma.StringFieldUpdateOperationsInput | string
   lastName?: Prisma.StringFieldUpdateOperationsInput | string
   role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
+  position?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  permissions?: Prisma.UserUpdatepermissionsInput | string[]
+  pharmacyId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  organizationId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  firstLogin?: Prisma.BoolFieldUpdateOperationsInput | boolean
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1288,6 +1705,92 @@ export type UserUncheckedUpdateWithoutAuditLogsInput = {
   pharmacyEmployees?: Prisma.PharmacyEmployeeUncheckedUpdateManyWithoutUserNestedInput
   pharmacistPrescriptions?: Prisma.PrescriptionUncheckedUpdateManyWithoutPharmacistNestedInput
   notifications?: Prisma.NotificationUncheckedUpdateManyWithoutUserNestedInput
+}
+
+export type UserCreateManyPharmacyInput = {
+  id?: string
+  email: string
+  phone: string
+  password: string
+  firstName: string
+  lastName: string
+  role: $Enums.UserRole
+  position?: string | null
+  permissions?: Prisma.UserCreatepermissionsInput | string[]
+  organizationId?: string | null
+  firstLogin?: boolean
+  isActive?: boolean
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  deletedAt?: Date | string | null
+}
+
+export type UserUpdateWithoutPharmacyInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  phone?: Prisma.StringFieldUpdateOperationsInput | string
+  password?: Prisma.StringFieldUpdateOperationsInput | string
+  firstName?: Prisma.StringFieldUpdateOperationsInput | string
+  lastName?: Prisma.StringFieldUpdateOperationsInput | string
+  role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
+  position?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  permissions?: Prisma.UserUpdatepermissionsInput | string[]
+  organizationId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  firstLogin?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  refreshTokens?: Prisma.RefreshTokenUpdateManyWithoutUserNestedInput
+  patient?: Prisma.PatientUpdateOneWithoutUserNestedInput
+  pharmacies?: Prisma.PharmacyUpdateManyWithoutOwnerNestedInput
+  pharmacyEmployees?: Prisma.PharmacyEmployeeUpdateManyWithoutUserNestedInput
+  pharmacistPrescriptions?: Prisma.PrescriptionUpdateManyWithoutPharmacistNestedInput
+  auditLogs?: Prisma.AuditLogUpdateManyWithoutUserNestedInput
+  notifications?: Prisma.NotificationUpdateManyWithoutUserNestedInput
+}
+
+export type UserUncheckedUpdateWithoutPharmacyInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  phone?: Prisma.StringFieldUpdateOperationsInput | string
+  password?: Prisma.StringFieldUpdateOperationsInput | string
+  firstName?: Prisma.StringFieldUpdateOperationsInput | string
+  lastName?: Prisma.StringFieldUpdateOperationsInput | string
+  role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
+  position?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  permissions?: Prisma.UserUpdatepermissionsInput | string[]
+  organizationId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  firstLogin?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  refreshTokens?: Prisma.RefreshTokenUncheckedUpdateManyWithoutUserNestedInput
+  patient?: Prisma.PatientUncheckedUpdateOneWithoutUserNestedInput
+  pharmacies?: Prisma.PharmacyUncheckedUpdateManyWithoutOwnerNestedInput
+  pharmacyEmployees?: Prisma.PharmacyEmployeeUncheckedUpdateManyWithoutUserNestedInput
+  pharmacistPrescriptions?: Prisma.PrescriptionUncheckedUpdateManyWithoutPharmacistNestedInput
+  auditLogs?: Prisma.AuditLogUncheckedUpdateManyWithoutUserNestedInput
+  notifications?: Prisma.NotificationUncheckedUpdateManyWithoutUserNestedInput
+}
+
+export type UserUncheckedUpdateManyWithoutPharmacyInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  phone?: Prisma.StringFieldUpdateOperationsInput | string
+  password?: Prisma.StringFieldUpdateOperationsInput | string
+  firstName?: Prisma.StringFieldUpdateOperationsInput | string
+  lastName?: Prisma.StringFieldUpdateOperationsInput | string
+  role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
+  position?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  permissions?: Prisma.UserUpdatepermissionsInput | string[]
+  organizationId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  firstLogin?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
 }
 
 
@@ -1374,6 +1877,11 @@ export type UserSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = r
   firstName?: boolean
   lastName?: boolean
   role?: boolean
+  position?: boolean
+  permissions?: boolean
+  pharmacyId?: boolean
+  organizationId?: boolean
+  firstLogin?: boolean
   isActive?: boolean
   createdAt?: boolean
   updatedAt?: boolean
@@ -1385,6 +1893,7 @@ export type UserSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = r
   pharmacistPrescriptions?: boolean | Prisma.User$pharmacistPrescriptionsArgs<ExtArgs>
   auditLogs?: boolean | Prisma.User$auditLogsArgs<ExtArgs>
   notifications?: boolean | Prisma.User$notificationsArgs<ExtArgs>
+  pharmacy?: boolean | Prisma.User$pharmacyArgs<ExtArgs>
   _count?: boolean | Prisma.UserCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["user"]>
 
@@ -1396,10 +1905,16 @@ export type UserSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensio
   firstName?: boolean
   lastName?: boolean
   role?: boolean
+  position?: boolean
+  permissions?: boolean
+  pharmacyId?: boolean
+  organizationId?: boolean
+  firstLogin?: boolean
   isActive?: boolean
   createdAt?: boolean
   updatedAt?: boolean
   deletedAt?: boolean
+  pharmacy?: boolean | Prisma.User$pharmacyArgs<ExtArgs>
 }, ExtArgs["result"]["user"]>
 
 export type UserSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
@@ -1410,10 +1925,16 @@ export type UserSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensio
   firstName?: boolean
   lastName?: boolean
   role?: boolean
+  position?: boolean
+  permissions?: boolean
+  pharmacyId?: boolean
+  organizationId?: boolean
+  firstLogin?: boolean
   isActive?: boolean
   createdAt?: boolean
   updatedAt?: boolean
   deletedAt?: boolean
+  pharmacy?: boolean | Prisma.User$pharmacyArgs<ExtArgs>
 }, ExtArgs["result"]["user"]>
 
 export type UserSelectScalar = {
@@ -1424,13 +1945,18 @@ export type UserSelectScalar = {
   firstName?: boolean
   lastName?: boolean
   role?: boolean
+  position?: boolean
+  permissions?: boolean
+  pharmacyId?: boolean
+  organizationId?: boolean
+  firstLogin?: boolean
   isActive?: boolean
   createdAt?: boolean
   updatedAt?: boolean
   deletedAt?: boolean
 }
 
-export type UserOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "email" | "phone" | "password" | "firstName" | "lastName" | "role" | "isActive" | "createdAt" | "updatedAt" | "deletedAt", ExtArgs["result"]["user"]>
+export type UserOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "email" | "phone" | "password" | "firstName" | "lastName" | "role" | "position" | "permissions" | "pharmacyId" | "organizationId" | "firstLogin" | "isActive" | "createdAt" | "updatedAt" | "deletedAt", ExtArgs["result"]["user"]>
 export type UserInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   refreshTokens?: boolean | Prisma.User$refreshTokensArgs<ExtArgs>
   patient?: boolean | Prisma.User$patientArgs<ExtArgs>
@@ -1439,10 +1965,15 @@ export type UserInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = 
   pharmacistPrescriptions?: boolean | Prisma.User$pharmacistPrescriptionsArgs<ExtArgs>
   auditLogs?: boolean | Prisma.User$auditLogsArgs<ExtArgs>
   notifications?: boolean | Prisma.User$notificationsArgs<ExtArgs>
+  pharmacy?: boolean | Prisma.User$pharmacyArgs<ExtArgs>
   _count?: boolean | Prisma.UserCountOutputTypeDefaultArgs<ExtArgs>
 }
-export type UserIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {}
-export type UserIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {}
+export type UserIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  pharmacy?: boolean | Prisma.User$pharmacyArgs<ExtArgs>
+}
+export type UserIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  pharmacy?: boolean | Prisma.User$pharmacyArgs<ExtArgs>
+}
 
 export type $UserPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   name: "User"
@@ -1454,6 +1985,7 @@ export type $UserPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs =
     pharmacistPrescriptions: Prisma.$PrescriptionPayload<ExtArgs>[]
     auditLogs: Prisma.$AuditLogPayload<ExtArgs>[]
     notifications: Prisma.$NotificationPayload<ExtArgs>[]
+    pharmacy: Prisma.$PharmacyPayload<ExtArgs> | null
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
@@ -1463,6 +1995,11 @@ export type $UserPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs =
     firstName: string
     lastName: string
     role: $Enums.UserRole
+    position: string | null
+    permissions: string[]
+    pharmacyId: string | null
+    organizationId: string | null
+    firstLogin: boolean
     isActive: boolean
     createdAt: Date
     updatedAt: Date
@@ -1868,6 +2405,7 @@ export interface Prisma__UserClient<T, Null = never, ExtArgs extends runtime.Typ
   pharmacistPrescriptions<T extends Prisma.User$pharmacistPrescriptionsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$pharmacistPrescriptionsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$PrescriptionPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   auditLogs<T extends Prisma.User$auditLogsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$auditLogsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$AuditLogPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   notifications<T extends Prisma.User$notificationsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$notificationsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$NotificationPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  pharmacy<T extends Prisma.User$pharmacyArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$pharmacyArgs<ExtArgs>>): Prisma.Prisma__PharmacyClient<runtime.Types.Result.GetResult<Prisma.$PharmacyPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -1904,6 +2442,11 @@ export interface UserFieldRefs {
   readonly firstName: Prisma.FieldRef<"User", 'String'>
   readonly lastName: Prisma.FieldRef<"User", 'String'>
   readonly role: Prisma.FieldRef<"User", 'UserRole'>
+  readonly position: Prisma.FieldRef<"User", 'String'>
+  readonly permissions: Prisma.FieldRef<"User", 'String[]'>
+  readonly pharmacyId: Prisma.FieldRef<"User", 'String'>
+  readonly organizationId: Prisma.FieldRef<"User", 'String'>
+  readonly firstLogin: Prisma.FieldRef<"User", 'Boolean'>
   readonly isActive: Prisma.FieldRef<"User", 'Boolean'>
   readonly createdAt: Prisma.FieldRef<"User", 'DateTime'>
   readonly updatedAt: Prisma.FieldRef<"User", 'DateTime'>
@@ -2162,6 +2705,10 @@ export type UserCreateManyAndReturnArgs<ExtArgs extends runtime.Types.Extensions
    */
   data: Prisma.UserCreateManyInput | Prisma.UserCreateManyInput[]
   skipDuplicates?: boolean
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.UserIncludeCreateManyAndReturn<ExtArgs> | null
 }
 
 /**
@@ -2232,6 +2779,10 @@ export type UserUpdateManyAndReturnArgs<ExtArgs extends runtime.Types.Extensions
    * Limit how many Users to update.
    */
   limit?: number
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.UserIncludeUpdateManyAndReturn<ExtArgs> | null
 }
 
 /**
@@ -2461,6 +3012,25 @@ export type User$notificationsArgs<ExtArgs extends runtime.Types.Extensions.Inte
   take?: number
   skip?: number
   distinct?: Prisma.NotificationScalarFieldEnum | Prisma.NotificationScalarFieldEnum[]
+}
+
+/**
+ * User.pharmacy
+ */
+export type User$pharmacyArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the Pharmacy
+   */
+  select?: Prisma.PharmacySelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the Pharmacy
+   */
+  omit?: Prisma.PharmacyOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.PharmacyInclude<ExtArgs> | null
+  where?: Prisma.PharmacyWhereInput
 }
 
 /**

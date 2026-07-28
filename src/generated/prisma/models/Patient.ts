@@ -443,10 +443,6 @@ export type PatientUncheckedUpdateOneWithoutUserNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.PatientUpdateToOneWithWhereWithoutUserInput, Prisma.PatientUpdateWithoutUserInput>, Prisma.PatientUncheckedUpdateWithoutUserInput>
 }
 
-export type NullableStringFieldUpdateOperationsInput = {
-  set?: string | null
-}
-
 export type PatientCreateNestedOneWithoutReservationsInput = {
   create?: Prisma.XOR<Prisma.PatientCreateWithoutReservationsInput, Prisma.PatientUncheckedCreateWithoutReservationsInput>
   connectOrCreate?: Prisma.PatientCreateOrConnectWithoutReservationsInput

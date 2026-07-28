@@ -9,8 +9,10 @@ datasource db {
 
 enum UserRole {
   PATIENT
+  PHARMACY
   PHARMACY_OWNER
   PHARMACIST
+  INSURANCE
   GOVERNMENT
   ADMIN
 }
@@ -56,6 +58,11 @@ model User {
   firstName         String
   lastName          String
   role              UserRole
+  position          String?
+  permissions       String[]            @default([])
+  pharmacyId        String?
+  organizationId    String?
+  firstLogin        Boolean             @default(false)
   isActive          Boolean             @default(true)
   createdAt         DateTime            @default(now())
   updatedAt         DateTime            @updatedAt
@@ -68,10 +75,12 @@ model User {
   pharmacistPrescriptions Prescription[]
   auditLogs         AuditLog[]
   notifications     Notification[]
+  pharmacy          Pharmacy?           @relation("PharmacyUsers", fields: [pharmacyId], references: [id], onDelete: SetNull)
 
   @@index([email])
   @@index([phone])
   @@index([role])
+  @@index([pharmacyId])
 }
 
 model RefreshToken {
@@ -114,6 +123,10 @@ model Pharmacy {
   latitude       Decimal?
   longitude      Decimal?
   phone          String
+  licenseNumber  String?
+  district       String?
+  province       String?
+  managerName    String?
   licenseUrl     String?
   status         PharmacyStatus   @default(PENDING)
   isActive       Boolean          @default(true)
@@ -122,6 +135,7 @@ model Pharmacy {
   deletedAt      DateTime?
 
   owner          User             @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+  members        User[]           @relation("PharmacyUsers")
   employees      PharmacyEmployee[]
   inventories    Inventory[]
   reservations   Reservation[]
