@@ -203,6 +203,41 @@ export class ReportsService {
     };
   }
 
+  async insuranceReport(user: AuthenticatedUser) {
+    const prisma = this.prismaService.prisma;
+
+    if (user.role !== UserRole.INSURANCE && user.role !== UserRole.ADMIN) {
+      throw new ForbiddenException('Only INSURANCE or ADMIN can access insurance reports');
+    }
+
+    const [claims, reservations] = await Promise.all([
+      prisma.reservation.findMany({
+        include: { patient: true, pharmacy: true, medicine: true },
+        orderBy: { createdAt: 'desc' },
+        take: 10,
+      }),
+      prisma.reservation.count(),
+    ]);
+
+    return {
+      totalClaims: claims.length,
+      approvedClaims: claims.filter((item) => item.status === 'CONFIRMED').length,
+      pendingClaims: claims.filter((item) => item.status === 'PENDING').length,
+      totalCost: claims.reduce((sum, item) => sum + Number(item.quantity || 0), 0),
+      claims: claims.map((item) => ({
+        id: item.id,
+        pharmacy: item.pharmacy ? { name: item.pharmacy.name } : null,
+        patientNid: item.patient?.userId || null,
+        drug: item.medicine?.name || 'Medication',
+        totalCost: Number(item.quantity || 0),
+        insurancePay: Number(item.quantity || 0),
+        patientPay: 0,
+        status: item.status,
+      })),
+      reservations,
+    };
+  }
+
   async governmentReport(user: AuthenticatedUser, startDate?: string, endDate?: string) {
     const prisma = this.prismaService.prisma;
     const safeStartDate = startDate ? validateDate(startDate, 'startDate') : undefined;

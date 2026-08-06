@@ -62,6 +62,16 @@ export class ReportsController {
     return this.reportsService.patientReport(req.user, startDate, endDate);
   }
 
+  @Get('insurance')
+  @Roles(UserRole.INSURANCE, UserRole.ADMIN)
+  @ApiOperation({
+    summary: 'Generate insurance claims report',
+    description: 'Endpoint: GET /api/v1/reports/insurance\n\nReturns a claims-style summary for insurance dashboard views.',
+  })
+  insuranceReport(@Req() req: any) {
+    return this.reportsService.insuranceReport(req.user);
+  }
+
   @Get('government')
   @Roles(UserRole.GOVERNMENT, UserRole.ADMIN)
   @ApiOperation({
