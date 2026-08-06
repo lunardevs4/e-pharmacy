@@ -17,7 +17,7 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
     return {
       id: payload.sub,
       email: payload.email,
-      role: payload.role,
+      role: payload.role === 'PHARMACY' ? 'PHARMACY_OWNER' : payload.role,
       permissions: payload.permissions || [],
       pharmacyId: payload.pharmacyId || null,
       organizationId: payload.organizationId || null,

@@ -39,6 +39,14 @@ export class CreatePharmacyDto {
   @IsOptional()
   @IsString()
   managerName?: string;
+
+  @IsOptional()
+  @IsString()
+  category?: string;
+
+  @IsOptional()
+  @IsString()
+  ownershipType?: string;
 }
 
 export class UpdatePharmacyDto extends PartialType(CreatePharmacyDto) {}

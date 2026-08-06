@@ -22,7 +22,12 @@ export class RolesGuard implements CanActivate {
     if (!user.role) {
       throw new ForbiddenException('User does not have a valid role assignment');
     }
-    const hasRequiredRole = requiredRoles.some((role) => user.role === role);
+    const hasRequiredRole = requiredRoles.some((role) => {
+      if (user.role === role) return true;
+      if (user.role === 'PHARMACY' && role === 'PHARMACY_OWNER') return true;
+      if (user.role === 'PHARMACY_OWNER' && role === 'PHARMACY') return true;
+      return false;
+    });
     if (!hasRequiredRole) {
       throw new ForbiddenException(`Insufficient permissions. Required role(s): ${requiredRoles.join(', ')}`);
     }

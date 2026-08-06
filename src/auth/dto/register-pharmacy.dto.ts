@@ -1,30 +1,10 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsEmail, IsOptional, IsString, MinLength } from 'class-validator';
+import { IsEmail, IsString, MinLength } from 'class-validator';
 
 export class RegisterPharmacyDto {
   @ApiProperty()
   @IsString()
-  pharmacyName: string;
-
-  @ApiProperty()
-  @IsString()
-  licenseNumber: string;
-
-  @ApiProperty()
-  @IsString()
-  district: string;
-
-  @ApiProperty()
-  @IsString()
-  province: string;
-
-  @ApiProperty()
-  @IsString()
-  address: string;
-
-  @ApiProperty()
-  @IsString()
-  managerName: string;
+  fullname: string;
 
   @ApiProperty()
   @IsEmail()
@@ -38,9 +18,4 @@ export class RegisterPharmacyDto {
   @IsString()
   @MinLength(6)
   password: string;
-
-  @ApiProperty({ required: false })
-  @IsOptional()
-  @IsString()
-  licenseUrl?: string;
 }
