@@ -103,7 +103,7 @@ export class AuthService {
         position: 'Manager',
         permissions: AUTH_PERMISSIONS.manager,
         firstLogin: true,
-        isActive: false,
+        isActive: true,
       },
     });
 
@@ -146,7 +146,10 @@ export class AuthService {
     const prisma = this.prismaService.prisma;
     const safeEmail = validateSafeString(email, 'email', 255);
 
-    const user = await prisma.user.findUnique({ where: { email: safeEmail } });
+    const user = await prisma.user.findUnique({
+      where: { email: safeEmail },
+      include: { pharmacy: true }
+    });
 
     if (!user || !(await bcrypt.compare(password, user.password))) {
       throw new UnauthorizedException('Invalid credentials');
@@ -171,6 +174,7 @@ export class AuthService {
         pharmacyId: user.pharmacyId,
         organizationId: user.organizationId,
         firstLogin: user.firstLogin,
+        pharmacy: user.pharmacy,
       },
       ...tokens,
     };

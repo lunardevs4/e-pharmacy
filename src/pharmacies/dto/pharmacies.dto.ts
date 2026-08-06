@@ -23,6 +23,22 @@ export class CreatePharmacyDto {
   @IsOptional()
   @IsString()
   licenseUrl?: string;
+
+  @IsOptional()
+  @IsString()
+  licenseNumber?: string;
+
+  @IsOptional()
+  @IsString()
+  province?: string;
+
+  @IsOptional()
+  @IsString()
+  district?: string;
+
+  @IsOptional()
+  @IsString()
+  managerName?: string;
 }
 
 export class UpdatePharmacyDto extends PartialType(CreatePharmacyDto) {}

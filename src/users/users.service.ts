@@ -21,6 +21,7 @@ export class UsersService {
         role: true,
         createdAt: true,
         patient: true,
+        pharmacy: true,
       },
     });
 
