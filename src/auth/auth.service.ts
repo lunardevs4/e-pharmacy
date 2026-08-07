@@ -4,6 +4,7 @@ import { ConfigService } from '@nestjs/config';
 import * as bcrypt from 'bcrypt';
 import { randomBytes } from 'crypto';
 import { PrismaService } from '../common/prisma/prisma.service';
+import { EmailService } from '../common/email/email.service';
 import { RegisterDto } from './dto/register.dto';
 import { LoginDto } from './dto/login.dto';
 import { RefreshTokenDto } from './dto/refresh-token.dto';
@@ -21,7 +22,20 @@ export class AuthService {
     private prismaService: PrismaService,
     private jwtService: JwtService,
     private configService: ConfigService,
+    private emailService: EmailService,
   ) { }
+
+  private resolvePharmacyContext(user: {
+    pharmacyOwner?: { pharmacyId: string; pharmacy?: { id: string } | null } | null;
+    pharmacyEmployees?: Array<{ pharmacyId: string; pharmacy?: { id: string } | null }>;
+  }) {
+    const ownedPharmacyId = user.pharmacyOwner?.pharmacyId || null;
+    const employeePharmacyId = user.pharmacyEmployees?.[0]?.pharmacyId || null;
+    const pharmacyId = ownedPharmacyId || employeePharmacyId;
+    const pharmacy = user.pharmacyOwner?.pharmacy || user.pharmacyEmployees?.[0]?.pharmacy || null;
+
+    return { pharmacyId, pharmacy };
+  }
 
   async register(registerDto: RegisterDto) {
     const safeDto = sanitizeDeep(registerDto);
@@ -60,15 +74,13 @@ export class AuthService {
         role: true,
         position: true,
         permissions: true,
-        pharmacyId: true,
-        organizationId: true,
         firstLogin: true,
         isActive: true,
         createdAt: true,
       },
     });
 
-    const tokens = await this.generateTokens(user.id, user.email, user.role, user.permissions, user.pharmacyId, user.organizationId, user.position, user.firstLogin);
+    const tokens = await this.generateTokens(user.id, user.email, user.role, user.permissions, null, user.position, user.firstLogin);
 
     return {
       user,
@@ -123,9 +135,11 @@ export class AuthService {
       },
     });
 
-    await prisma.user.update({
-      where: { id: owner.id },
-      data: { pharmacyId: pharmacy.id, organizationId: pharmacy.id },
+    await prisma.pharmacyOwner.create({
+      data: {
+        userId: owner.id,
+        pharmacyId: pharmacy.id,
+      },
     });
 
     return {
@@ -135,6 +149,7 @@ export class AuthService {
         id: owner.id,
         email: owner.email,
         role: owner.role,
+        pharmacyId: pharmacy.id,
         firstLogin: true,
       },
     };
@@ -148,7 +163,10 @@ export class AuthService {
 
     const user = await prisma.user.findUnique({
       where: { email: safeEmail },
-      include: { pharmacy: true }
+      include: {
+        pharmacyOwner: { include: { pharmacy: true } },
+        pharmacyEmployees: { include: { pharmacy: true } },
+      }
     });
 
     if (!user || !(await bcrypt.compare(password, user.password))) {
@@ -159,7 +177,8 @@ export class AuthService {
       throw new ForbiddenException('This account is not active yet');
     }
 
-    const tokens = await this.generateTokens(user.id, user.email, user.role, user.permissions, user.pharmacyId, user.organizationId, user.position, user.firstLogin);
+    const pharmacyContext = this.resolvePharmacyContext(user);
+    const tokens = await this.generateTokens(user.id, user.email, user.role, user.permissions, pharmacyContext.pharmacyId, user.position, user.firstLogin);
 
     return {
       user: {
@@ -171,10 +190,9 @@ export class AuthService {
         role: user.role,
         position: user.position,
         permissions: user.permissions,
-        pharmacyId: user.pharmacyId,
-        organizationId: user.organizationId,
+        pharmacyId: pharmacyContext.pharmacyId,
         firstLogin: user.firstLogin,
-        pharmacy: user.pharmacy,
+        pharmacy: pharmacyContext.pharmacy,
       },
       ...tokens,
     };
@@ -186,7 +204,14 @@ export class AuthService {
 
     const storedToken = await prisma.refreshToken.findFirst({
       where: { token: refreshToken, expiresAt: { gt: new Date() } },
-      include: { user: true },
+      include: {
+        user: {
+          include: {
+            pharmacyOwner: { include: { pharmacy: true } },
+            pharmacyEmployees: { include: { pharmacy: true } },
+          },
+        },
+      },
     });
 
     if (!storedToken) {
@@ -195,13 +220,13 @@ export class AuthService {
 
     await prisma.refreshToken.delete({ where: { id: storedToken.id } });
 
+    const pharmacyContext = this.resolvePharmacyContext(storedToken.user);
     const tokens = await this.generateTokens(
       storedToken.user.id,
       storedToken.user.email,
       storedToken.user.role,
       storedToken.user.permissions,
-      storedToken.user.pharmacyId,
-      storedToken.user.organizationId,
+      pharmacyContext.pharmacyId,
       storedToken.user.position,
       storedToken.user.firstLogin,
     );
@@ -214,6 +239,7 @@ export class AuthService {
         firstName: storedToken.user.firstName,
         lastName: storedToken.user.lastName,
         role: storedToken.user.role,
+        pharmacyId: pharmacyContext.pharmacyId,
       },
       ...tokens,
     };
@@ -251,7 +277,8 @@ export class AuthService {
     const manager = await prisma.user.findUnique({ where: { id: managerId } });
 
     if (!pharmacy) throw new NotFoundException('Pharmacy not found');
-    if (!manager || manager.pharmacyId !== pharmacy.id || !manager.permissions.includes('MANAGE_STAFF')) {
+    const managerPharmacy = await prisma.pharmacyOwner.findUnique({ where: { userId: managerId } });
+    if (!manager || !managerPharmacy || managerPharmacy.pharmacyId !== pharmacy.id || !manager.permissions.includes('MANAGE_STAFF')) {
       throw new ForbiddenException('Only active pharmacy managers can create staff accounts');
     }
 
@@ -268,10 +295,16 @@ export class AuthService {
         role: safeDto.role,
         position: safeDto.position,
         permissions: STAFF_ROLE_PERMISSIONS[safeDto.position.toUpperCase()] || [],
-        pharmacyId: pharmacy.id,
-        organizationId: pharmacy.id,
         firstLogin: true,
         isActive: true,
+      },
+    });
+
+    await prisma.pharmacyEmployee.create({
+      data: {
+        pharmacyId: pharmacy.id,
+        userId: staff.id,
+        role: safeDto.role,
       },
     });
 
@@ -284,7 +317,7 @@ export class AuthService {
         role: staff.role,
         position: staff.position,
         permissions: staff.permissions,
-        pharmacyId: staff.pharmacyId,
+        pharmacyId: pharmacy.id,
       },
     };
   }
@@ -303,7 +336,8 @@ export class AuthService {
       throw new ConflictException('A user with this email or phone already exists');
     }
 
-    const hashedPassword = await bcrypt.hash(safeDto.password, 10);
+    const tempPassword = randomBytes(8).toString('hex');
+    const hashedPassword = await bcrypt.hash(tempPassword, 10);
     const permissions = userRole === UserRole.INSURANCE
       ? AUTH_PERMISSIONS.insurance
       : userRole === UserRole.GOVERNMENT
@@ -325,7 +359,23 @@ export class AuthService {
       },
     });
 
-    return { message: 'Managed user created successfully', user: { id: user.id, email: user.email, role: user.role } };
+    try {
+      await this.emailService.sendTemporaryPasswordEmail(
+        user.email,
+        `${user.firstName} ${user.lastName}`.trim(),
+        tempPassword,
+      );
+    } catch (error) {
+      console.warn(
+        `Managed user created, but temp password email failed for ${user.email}: ${(error as Error).message}`,
+      );
+    }
+
+    return {
+      message: 'Managed user created successfully',
+      tempPassword,
+      user: { id: user.id, email: user.email, role: user.role },
+    };
   }
 
   async listPendingPharmacies() {
@@ -348,17 +398,20 @@ export class AuthService {
     });
 
     if (approved) {
-      await prisma.user.updateMany({
-        where: { pharmacyId },
-        data: { isActive: true },
-      });
+      const ownerLink = await prisma.pharmacyOwner.findUnique({ where: { pharmacyId } });
+      if (ownerLink) {
+        await prisma.user.update({
+          where: { id: ownerLink.userId },
+          data: { isActive: true },
+        });
+      }
     }
 
     return { message: approved ? 'Pharmacy approved successfully' : 'Pharmacy rejected successfully' };
   }
 
-  private async generateTokens(userId: string, email: string, role: UserRole, permissions: string[], pharmacyId: string | null, organizationId: string | null, position: string | null, firstLogin: boolean) {
-    const payload = { sub: userId, email, role, permissions, pharmacyId, organizationId, position, firstLogin };
+  private async generateTokens(userId: string, email: string, role: UserRole, permissions: string[], pharmacyId: string | null, position: string | null, firstLogin: boolean) {
+    const payload = { sub: userId, email, role, permissions, pharmacyId, position, firstLogin };
     const prisma = this.prismaService.prisma;
 
     const accessToken = this.jwtService.sign(payload);

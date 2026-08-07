@@ -80,11 +80,11 @@ export type PrismaVersion = {
 }
 
 /**
- * Prisma Client JS version: 7.9.1
+ * Prisma Client JS version: 7.9.0
  * Query Engine version: e922089b7d7502aff4249d5da3420f6fa55fc6ad
  */
 export const prismaVersion: PrismaVersion = {
-  client: "7.9.1",
+  client: "7.9.0",
   engine: "e922089b7d7502aff4249d5da3420f6fa55fc6ad"
 }
 
@@ -401,6 +401,7 @@ export const ModelName = {
   RefreshToken: 'RefreshToken',
   Patient: 'Patient',
   Pharmacy: 'Pharmacy',
+  PharmacyOwner: 'PharmacyOwner',
   PharmacyEmployee: 'PharmacyEmployee',
   Category: 'Category',
   Manufacturer: 'Manufacturer',
@@ -431,7 +432,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "user" | "refreshToken" | "patient" | "pharmacy" | "pharmacyEmployee" | "category" | "manufacturer" | "medicine" | "inventory" | "inventoryHistory" | "stockMovement" | "reservation" | "prescription" | "prescriptionMedicine" | "reminderSchedule" | "reminderLog" | "notification" | "auditLog" | "systemSetting"
+    modelProps: "user" | "refreshToken" | "patient" | "pharmacy" | "pharmacyOwner" | "pharmacyEmployee" | "category" | "manufacturer" | "medicine" | "inventory" | "inventoryHistory" | "stockMovement" | "reservation" | "prescription" | "prescriptionMedicine" | "reminderSchedule" | "reminderLog" | "notification" | "auditLog" | "systemSetting"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -728,6 +729,80 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         count: {
           args: Prisma.PharmacyCountArgs<ExtArgs>
           result: runtime.Types.Utils.Optional<Prisma.PharmacyCountAggregateOutputType> | number
+        }
+      }
+    }
+    PharmacyOwner: {
+      payload: Prisma.$PharmacyOwnerPayload<ExtArgs>
+      fields: Prisma.PharmacyOwnerFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.PharmacyOwnerFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PharmacyOwnerPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.PharmacyOwnerFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PharmacyOwnerPayload>
+        }
+        findFirst: {
+          args: Prisma.PharmacyOwnerFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PharmacyOwnerPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.PharmacyOwnerFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PharmacyOwnerPayload>
+        }
+        findMany: {
+          args: Prisma.PharmacyOwnerFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PharmacyOwnerPayload>[]
+        }
+        create: {
+          args: Prisma.PharmacyOwnerCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PharmacyOwnerPayload>
+        }
+        createMany: {
+          args: Prisma.PharmacyOwnerCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.PharmacyOwnerCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PharmacyOwnerPayload>[]
+        }
+        delete: {
+          args: Prisma.PharmacyOwnerDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PharmacyOwnerPayload>
+        }
+        update: {
+          args: Prisma.PharmacyOwnerUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PharmacyOwnerPayload>
+        }
+        deleteMany: {
+          args: Prisma.PharmacyOwnerDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.PharmacyOwnerUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.PharmacyOwnerUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PharmacyOwnerPayload>[]
+        }
+        upsert: {
+          args: Prisma.PharmacyOwnerUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PharmacyOwnerPayload>
+        }
+        aggregate: {
+          args: Prisma.PharmacyOwnerAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregatePharmacyOwner>
+        }
+        groupBy: {
+          args: Prisma.PharmacyOwnerGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.PharmacyOwnerGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.PharmacyOwnerCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.PharmacyOwnerCountAggregateOutputType> | number
         }
       }
     }
@@ -1890,8 +1965,6 @@ export const UserScalarFieldEnum = {
   role: 'role',
   position: 'position',
   permissions: 'permissions',
-  pharmacyId: 'pharmacyId',
-  organizationId: 'organizationId',
   firstLogin: 'firstLogin',
   isActive: 'isActive',
   createdAt: 'createdAt',
@@ -1942,12 +2015,25 @@ export const PharmacyScalarFieldEnum = {
   licenseUrl: 'licenseUrl',
   status: 'status',
   isActive: 'isActive',
+  category: 'category',
+  ownershipType: 'ownershipType',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt',
   deletedAt: 'deletedAt'
 } as const
 
 export type PharmacyScalarFieldEnum = (typeof PharmacyScalarFieldEnum)[keyof typeof PharmacyScalarFieldEnum]
+
+
+export const PharmacyOwnerScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  pharmacyId: 'pharmacyId',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type PharmacyOwnerScalarFieldEnum = (typeof PharmacyOwnerScalarFieldEnum)[keyof typeof PharmacyOwnerScalarFieldEnum]
 
 
 export const PharmacyEmployeeScalarFieldEnum = {
@@ -2540,6 +2626,7 @@ export type GlobalOmitConfig = {
   refreshToken?: Prisma.RefreshTokenOmit
   patient?: Prisma.PatientOmit
   pharmacy?: Prisma.PharmacyOmit
+  pharmacyOwner?: Prisma.PharmacyOwnerOmit
   pharmacyEmployee?: Prisma.PharmacyEmployeeOmit
   category?: Prisma.CategoryOmit
   manufacturer?: Prisma.ManufacturerOmit

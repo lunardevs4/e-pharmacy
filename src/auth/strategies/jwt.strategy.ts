@@ -20,7 +20,6 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
       role: payload.role === 'PHARMACY' ? 'PHARMACY_OWNER' : payload.role,
       permissions: payload.permissions || [],
       pharmacyId: payload.pharmacyId || null,
-      organizationId: payload.organizationId || null,
       position: payload.position || null,
       firstLogin: payload.firstLogin || false,
     };

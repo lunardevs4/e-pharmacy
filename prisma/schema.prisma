@@ -60,8 +60,6 @@ model User {
   role              UserRole
   position          String?
   permissions       String[]            @default([])
-  pharmacyId        String?
-  organizationId    String?
   firstLogin        Boolean             @default(false)
   isActive          Boolean             @default(true)
   createdAt         DateTime            @default(now())
@@ -71,16 +69,15 @@ model User {
   refreshTokens     RefreshToken[]
   patient           Patient?
   pharmacies        Pharmacy[]
+  pharmacyOwner     PharmacyOwner?
   pharmacyEmployees PharmacyEmployee[]
   pharmacistPrescriptions Prescription[]
   auditLogs         AuditLog[]
   notifications     Notification[]
-  pharmacy          Pharmacy?           @relation("PharmacyUsers", fields: [pharmacyId], references: [id], onDelete: SetNull)
 
   @@index([email])
   @@index([phone])
   @@index([role])
-  @@index([pharmacyId])
 }
 
 model RefreshToken {
@@ -137,7 +134,7 @@ model Pharmacy {
   deletedAt      DateTime?
 
   owner          User             @relation(fields: [ownerId], references: [id], onDelete: Cascade)
-  members        User[]           @relation("PharmacyUsers")
+  ownerLink      PharmacyOwner?
   employees      PharmacyEmployee[]
   inventories    Inventory[]
   reservations   Reservation[]
@@ -147,6 +144,20 @@ model Pharmacy {
   @@index([ownerId])
   @@index([status])
   @@index([latitude, longitude])
+}
+
+model PharmacyOwner {
+  id         String   @id @default(uuid())
+  userId     String   @unique
+  pharmacyId String   @unique
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  user     User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  pharmacy Pharmacy @relation(fields: [pharmacyId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([pharmacyId])
 }
 
 model PharmacyEmployee {

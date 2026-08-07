@@ -16,10 +16,30 @@ export class PharmaciesService {
   create(ownerId: string, createPharmacyDto: CreatePharmacyDto) {
     const prisma = this.prismaService.prisma;
     const safeDto = sanitizeDeep(createPharmacyDto);
+    const {
+      name,
+      address,
+      latitude,
+      longitude,
+      phone,
+      licenseNumber,
+      province,
+      district,
+      managerName,
+    } = safeDto;
+
     return prisma.pharmacy.create({
       data: {
         ownerId,
-        ...safeDto,
+        name,
+        address,
+        latitude,
+        longitude,
+        phone,
+        licenseNumber,
+        province,
+        district,
+        managerName,
       },
     });
   }
@@ -75,7 +95,34 @@ export class PharmaciesService {
     if (!pharmacy) throw new NotFoundException('Pharmacy not found');
     if (pharmacy.ownerId !== ownerId) throw new ForbiddenException('You do not own this pharmacy');
 
-    return prisma.pharmacy.update({ where: { id: safeId }, data: safeDto });
+    const {
+      name,
+      address,
+      latitude,
+      longitude,
+      phone,
+      licenseUrl,
+      licenseNumber,
+      province,
+      district,
+      managerName,
+    } = safeDto;
+
+    return prisma.pharmacy.update({
+      where: { id: safeId },
+      data: {
+        name,
+        address,
+        latitude,
+        longitude,
+        phone,
+        licenseUrl,
+        licenseNumber,
+        province,
+        district,
+        managerName,
+      },
+    });
   }
 
   async approve(id: string, approvePharmacyDto: ApprovePharmacyDto) {

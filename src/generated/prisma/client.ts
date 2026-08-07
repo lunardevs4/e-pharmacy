@@ -60,6 +60,11 @@ export type Patient = Prisma.PatientModel
  */
 export type Pharmacy = Prisma.PharmacyModel
 /**
+ * Model PharmacyOwner
+ * 
+ */
+export type PharmacyOwner = Prisma.PharmacyOwnerModel
+/**
  * Model PharmacyEmployee
  * 
  */

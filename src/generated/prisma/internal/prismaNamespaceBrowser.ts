@@ -55,6 +55,7 @@ export const ModelName = {
   RefreshToken: 'RefreshToken',
   Patient: 'Patient',
   Pharmacy: 'Pharmacy',
+  PharmacyOwner: 'PharmacyOwner',
   PharmacyEmployee: 'PharmacyEmployee',
   Category: 'Category',
   Manufacturer: 'Manufacturer',
@@ -98,8 +99,6 @@ export const UserScalarFieldEnum = {
   role: 'role',
   position: 'position',
   permissions: 'permissions',
-  pharmacyId: 'pharmacyId',
-  organizationId: 'organizationId',
   firstLogin: 'firstLogin',
   isActive: 'isActive',
   createdAt: 'createdAt',
@@ -150,12 +149,25 @@ export const PharmacyScalarFieldEnum = {
   licenseUrl: 'licenseUrl',
   status: 'status',
   isActive: 'isActive',
+  category: 'category',
+  ownershipType: 'ownershipType',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt',
   deletedAt: 'deletedAt'
 } as const
 
 export type PharmacyScalarFieldEnum = (typeof PharmacyScalarFieldEnum)[keyof typeof PharmacyScalarFieldEnum]
+
+
+export const PharmacyOwnerScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  pharmacyId: 'pharmacyId',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type PharmacyOwnerScalarFieldEnum = (typeof PharmacyOwnerScalarFieldEnum)[keyof typeof PharmacyOwnerScalarFieldEnum]
 
 
 export const PharmacyEmployeeScalarFieldEnum = {

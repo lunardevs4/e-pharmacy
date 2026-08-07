@@ -51,6 +51,8 @@ export type PharmacyMinAggregateOutputType = {
   licenseUrl: string | null
   status: $Enums.PharmacyStatus | null
   isActive: boolean | null
+  category: string | null
+  ownershipType: string | null
   createdAt: Date | null
   updatedAt: Date | null
   deletedAt: Date | null
@@ -71,6 +73,8 @@ export type PharmacyMaxAggregateOutputType = {
   licenseUrl: string | null
   status: $Enums.PharmacyStatus | null
   isActive: boolean | null
+  category: string | null
+  ownershipType: string | null
   createdAt: Date | null
   updatedAt: Date | null
   deletedAt: Date | null
@@ -91,6 +95,8 @@ export type PharmacyCountAggregateOutputType = {
   licenseUrl: number
   status: number
   isActive: number
+  category: number
+  ownershipType: number
   createdAt: number
   updatedAt: number
   deletedAt: number
@@ -123,6 +129,8 @@ export type PharmacyMinAggregateInputType = {
   licenseUrl?: true
   status?: true
   isActive?: true
+  category?: true
+  ownershipType?: true
   createdAt?: true
   updatedAt?: true
   deletedAt?: true
@@ -143,6 +151,8 @@ export type PharmacyMaxAggregateInputType = {
   licenseUrl?: true
   status?: true
   isActive?: true
+  category?: true
+  ownershipType?: true
   createdAt?: true
   updatedAt?: true
   deletedAt?: true
@@ -163,6 +173,8 @@ export type PharmacyCountAggregateInputType = {
   licenseUrl?: true
   status?: true
   isActive?: true
+  category?: true
+  ownershipType?: true
   createdAt?: true
   updatedAt?: true
   deletedAt?: true
@@ -270,6 +282,8 @@ export type PharmacyGroupByOutputType = {
   licenseUrl: string | null
   status: $Enums.PharmacyStatus
   isActive: boolean
+  category: string | null
+  ownershipType: string | null
   createdAt: Date
   updatedAt: Date
   deletedAt: Date | null
@@ -313,11 +327,13 @@ export type PharmacyWhereInput = {
   licenseUrl?: Prisma.StringNullableFilter<"Pharmacy"> | string | null
   status?: Prisma.EnumPharmacyStatusFilter<"Pharmacy"> | $Enums.PharmacyStatus
   isActive?: Prisma.BoolFilter<"Pharmacy"> | boolean
+  category?: Prisma.StringNullableFilter<"Pharmacy"> | string | null
+  ownershipType?: Prisma.StringNullableFilter<"Pharmacy"> | string | null
   createdAt?: Prisma.DateTimeFilter<"Pharmacy"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Pharmacy"> | Date | string
   deletedAt?: Prisma.DateTimeNullableFilter<"Pharmacy"> | Date | string | null
   owner?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
-  members?: Prisma.UserListRelationFilter
+  ownerLink?: Prisma.XOR<Prisma.PharmacyOwnerNullableScalarRelationFilter, Prisma.PharmacyOwnerWhereInput> | null
   employees?: Prisma.PharmacyEmployeeListRelationFilter
   inventories?: Prisma.InventoryListRelationFilter
   reservations?: Prisma.ReservationListRelationFilter
@@ -340,11 +356,13 @@ export type PharmacyOrderByWithRelationInput = {
   licenseUrl?: Prisma.SortOrderInput | Prisma.SortOrder
   status?: Prisma.SortOrder
   isActive?: Prisma.SortOrder
+  category?: Prisma.SortOrderInput | Prisma.SortOrder
+  ownershipType?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   deletedAt?: Prisma.SortOrderInput | Prisma.SortOrder
   owner?: Prisma.UserOrderByWithRelationInput
-  members?: Prisma.UserOrderByRelationAggregateInput
+  ownerLink?: Prisma.PharmacyOwnerOrderByWithRelationInput
   employees?: Prisma.PharmacyEmployeeOrderByRelationAggregateInput
   inventories?: Prisma.InventoryOrderByRelationAggregateInput
   reservations?: Prisma.ReservationOrderByRelationAggregateInput
@@ -370,11 +388,13 @@ export type PharmacyWhereUniqueInput = Prisma.AtLeast<{
   licenseUrl?: Prisma.StringNullableFilter<"Pharmacy"> | string | null
   status?: Prisma.EnumPharmacyStatusFilter<"Pharmacy"> | $Enums.PharmacyStatus
   isActive?: Prisma.BoolFilter<"Pharmacy"> | boolean
+  category?: Prisma.StringNullableFilter<"Pharmacy"> | string | null
+  ownershipType?: Prisma.StringNullableFilter<"Pharmacy"> | string | null
   createdAt?: Prisma.DateTimeFilter<"Pharmacy"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Pharmacy"> | Date | string
   deletedAt?: Prisma.DateTimeNullableFilter<"Pharmacy"> | Date | string | null
   owner?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
-  members?: Prisma.UserListRelationFilter
+  ownerLink?: Prisma.XOR<Prisma.PharmacyOwnerNullableScalarRelationFilter, Prisma.PharmacyOwnerWhereInput> | null
   employees?: Prisma.PharmacyEmployeeListRelationFilter
   inventories?: Prisma.InventoryListRelationFilter
   reservations?: Prisma.ReservationListRelationFilter
@@ -397,6 +417,8 @@ export type PharmacyOrderByWithAggregationInput = {
   licenseUrl?: Prisma.SortOrderInput | Prisma.SortOrder
   status?: Prisma.SortOrder
   isActive?: Prisma.SortOrder
+  category?: Prisma.SortOrderInput | Prisma.SortOrder
+  ownershipType?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   deletedAt?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -425,6 +447,8 @@ export type PharmacyScalarWhereWithAggregatesInput = {
   licenseUrl?: Prisma.StringNullableWithAggregatesFilter<"Pharmacy"> | string | null
   status?: Prisma.EnumPharmacyStatusWithAggregatesFilter<"Pharmacy"> | $Enums.PharmacyStatus
   isActive?: Prisma.BoolWithAggregatesFilter<"Pharmacy"> | boolean
+  category?: Prisma.StringNullableWithAggregatesFilter<"Pharmacy"> | string | null
+  ownershipType?: Prisma.StringNullableWithAggregatesFilter<"Pharmacy"> | string | null
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"Pharmacy"> | Date | string
   updatedAt?: Prisma.DateTimeWithAggregatesFilter<"Pharmacy"> | Date | string
   deletedAt?: Prisma.DateTimeNullableWithAggregatesFilter<"Pharmacy"> | Date | string | null
@@ -444,11 +468,13 @@ export type PharmacyCreateInput = {
   licenseUrl?: string | null
   status?: $Enums.PharmacyStatus
   isActive?: boolean
+  category?: string | null
+  ownershipType?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   deletedAt?: Date | string | null
   owner: Prisma.UserCreateNestedOneWithoutPharmaciesInput
-  members?: Prisma.UserCreateNestedManyWithoutPharmacyInput
+  ownerLink?: Prisma.PharmacyOwnerCreateNestedOneWithoutPharmacyInput
   employees?: Prisma.PharmacyEmployeeCreateNestedManyWithoutPharmacyInput
   inventories?: Prisma.InventoryCreateNestedManyWithoutPharmacyInput
   reservations?: Prisma.ReservationCreateNestedManyWithoutPharmacyInput
@@ -471,10 +497,12 @@ export type PharmacyUncheckedCreateInput = {
   licenseUrl?: string | null
   status?: $Enums.PharmacyStatus
   isActive?: boolean
+  category?: string | null
+  ownershipType?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   deletedAt?: Date | string | null
-  members?: Prisma.UserUncheckedCreateNestedManyWithoutPharmacyInput
+  ownerLink?: Prisma.PharmacyOwnerUncheckedCreateNestedOneWithoutPharmacyInput
   employees?: Prisma.PharmacyEmployeeUncheckedCreateNestedManyWithoutPharmacyInput
   inventories?: Prisma.InventoryUncheckedCreateNestedManyWithoutPharmacyInput
   reservations?: Prisma.ReservationUncheckedCreateNestedManyWithoutPharmacyInput
@@ -496,11 +524,13 @@ export type PharmacyUpdateInput = {
   licenseUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.EnumPharmacyStatusFieldUpdateOperationsInput | $Enums.PharmacyStatus
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  category?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  ownershipType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   owner?: Prisma.UserUpdateOneRequiredWithoutPharmaciesNestedInput
-  members?: Prisma.UserUpdateManyWithoutPharmacyNestedInput
+  ownerLink?: Prisma.PharmacyOwnerUpdateOneWithoutPharmacyNestedInput
   employees?: Prisma.PharmacyEmployeeUpdateManyWithoutPharmacyNestedInput
   inventories?: Prisma.InventoryUpdateManyWithoutPharmacyNestedInput
   reservations?: Prisma.ReservationUpdateManyWithoutPharmacyNestedInput
@@ -523,10 +553,12 @@ export type PharmacyUncheckedUpdateInput = {
   licenseUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.EnumPharmacyStatusFieldUpdateOperationsInput | $Enums.PharmacyStatus
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  category?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  ownershipType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  members?: Prisma.UserUncheckedUpdateManyWithoutPharmacyNestedInput
+  ownerLink?: Prisma.PharmacyOwnerUncheckedUpdateOneWithoutPharmacyNestedInput
   employees?: Prisma.PharmacyEmployeeUncheckedUpdateManyWithoutPharmacyNestedInput
   inventories?: Prisma.InventoryUncheckedUpdateManyWithoutPharmacyNestedInput
   reservations?: Prisma.ReservationUncheckedUpdateManyWithoutPharmacyNestedInput
@@ -549,6 +581,8 @@ export type PharmacyCreateManyInput = {
   licenseUrl?: string | null
   status?: $Enums.PharmacyStatus
   isActive?: boolean
+  category?: string | null
+  ownershipType?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   deletedAt?: Date | string | null
@@ -568,6 +602,8 @@ export type PharmacyUpdateManyMutationInput = {
   licenseUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.EnumPharmacyStatusFieldUpdateOperationsInput | $Enums.PharmacyStatus
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  category?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  ownershipType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -588,6 +624,8 @@ export type PharmacyUncheckedUpdateManyInput = {
   licenseUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.EnumPharmacyStatusFieldUpdateOperationsInput | $Enums.PharmacyStatus
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  category?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  ownershipType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -597,11 +635,6 @@ export type PharmacyListRelationFilter = {
   every?: Prisma.PharmacyWhereInput
   some?: Prisma.PharmacyWhereInput
   none?: Prisma.PharmacyWhereInput
-}
-
-export type PharmacyNullableScalarRelationFilter = {
-  is?: Prisma.PharmacyWhereInput | null
-  isNot?: Prisma.PharmacyWhereInput | null
 }
 
 export type PharmacyOrderByRelationAggregateInput = {
@@ -623,6 +656,8 @@ export type PharmacyCountOrderByAggregateInput = {
   licenseUrl?: Prisma.SortOrder
   status?: Prisma.SortOrder
   isActive?: Prisma.SortOrder
+  category?: Prisma.SortOrder
+  ownershipType?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   deletedAt?: Prisma.SortOrder
@@ -648,6 +683,8 @@ export type PharmacyMaxOrderByAggregateInput = {
   licenseUrl?: Prisma.SortOrder
   status?: Prisma.SortOrder
   isActive?: Prisma.SortOrder
+  category?: Prisma.SortOrder
+  ownershipType?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   deletedAt?: Prisma.SortOrder
@@ -668,6 +705,8 @@ export type PharmacyMinOrderByAggregateInput = {
   licenseUrl?: Prisma.SortOrder
   status?: Prisma.SortOrder
   isActive?: Prisma.SortOrder
+  category?: Prisma.SortOrder
+  ownershipType?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   deletedAt?: Prisma.SortOrder
@@ -683,17 +722,16 @@ export type PharmacyScalarRelationFilter = {
   isNot?: Prisma.PharmacyWhereInput
 }
 
+export type PharmacyNullableScalarRelationFilter = {
+  is?: Prisma.PharmacyWhereInput | null
+  isNot?: Prisma.PharmacyWhereInput | null
+}
+
 export type PharmacyCreateNestedManyWithoutOwnerInput = {
   create?: Prisma.XOR<Prisma.PharmacyCreateWithoutOwnerInput, Prisma.PharmacyUncheckedCreateWithoutOwnerInput> | Prisma.PharmacyCreateWithoutOwnerInput[] | Prisma.PharmacyUncheckedCreateWithoutOwnerInput[]
   connectOrCreate?: Prisma.PharmacyCreateOrConnectWithoutOwnerInput | Prisma.PharmacyCreateOrConnectWithoutOwnerInput[]
   createMany?: Prisma.PharmacyCreateManyOwnerInputEnvelope
   connect?: Prisma.PharmacyWhereUniqueInput | Prisma.PharmacyWhereUniqueInput[]
-}
-
-export type PharmacyCreateNestedOneWithoutMembersInput = {
-  create?: Prisma.XOR<Prisma.PharmacyCreateWithoutMembersInput, Prisma.PharmacyUncheckedCreateWithoutMembersInput>
-  connectOrCreate?: Prisma.PharmacyCreateOrConnectWithoutMembersInput
-  connect?: Prisma.PharmacyWhereUniqueInput
 }
 
 export type PharmacyUncheckedCreateNestedManyWithoutOwnerInput = {
@@ -715,16 +753,6 @@ export type PharmacyUpdateManyWithoutOwnerNestedInput = {
   update?: Prisma.PharmacyUpdateWithWhereUniqueWithoutOwnerInput | Prisma.PharmacyUpdateWithWhereUniqueWithoutOwnerInput[]
   updateMany?: Prisma.PharmacyUpdateManyWithWhereWithoutOwnerInput | Prisma.PharmacyUpdateManyWithWhereWithoutOwnerInput[]
   deleteMany?: Prisma.PharmacyScalarWhereInput | Prisma.PharmacyScalarWhereInput[]
-}
-
-export type PharmacyUpdateOneWithoutMembersNestedInput = {
-  create?: Prisma.XOR<Prisma.PharmacyCreateWithoutMembersInput, Prisma.PharmacyUncheckedCreateWithoutMembersInput>
-  connectOrCreate?: Prisma.PharmacyCreateOrConnectWithoutMembersInput
-  upsert?: Prisma.PharmacyUpsertWithoutMembersInput
-  disconnect?: Prisma.PharmacyWhereInput | boolean
-  delete?: Prisma.PharmacyWhereInput | boolean
-  connect?: Prisma.PharmacyWhereUniqueInput
-  update?: Prisma.XOR<Prisma.XOR<Prisma.PharmacyUpdateToOneWithWhereWithoutMembersInput, Prisma.PharmacyUpdateWithoutMembersInput>, Prisma.PharmacyUncheckedUpdateWithoutMembersInput>
 }
 
 export type PharmacyUncheckedUpdateManyWithoutOwnerNestedInput = {
@@ -751,6 +779,20 @@ export type NullableDecimalFieldUpdateOperationsInput = {
 
 export type EnumPharmacyStatusFieldUpdateOperationsInput = {
   set?: $Enums.PharmacyStatus
+}
+
+export type PharmacyCreateNestedOneWithoutOwnerLinkInput = {
+  create?: Prisma.XOR<Prisma.PharmacyCreateWithoutOwnerLinkInput, Prisma.PharmacyUncheckedCreateWithoutOwnerLinkInput>
+  connectOrCreate?: Prisma.PharmacyCreateOrConnectWithoutOwnerLinkInput
+  connect?: Prisma.PharmacyWhereUniqueInput
+}
+
+export type PharmacyUpdateOneRequiredWithoutOwnerLinkNestedInput = {
+  create?: Prisma.XOR<Prisma.PharmacyCreateWithoutOwnerLinkInput, Prisma.PharmacyUncheckedCreateWithoutOwnerLinkInput>
+  connectOrCreate?: Prisma.PharmacyCreateOrConnectWithoutOwnerLinkInput
+  upsert?: Prisma.PharmacyUpsertWithoutOwnerLinkInput
+  connect?: Prisma.PharmacyWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.PharmacyUpdateToOneWithWhereWithoutOwnerLinkInput, Prisma.PharmacyUpdateWithoutOwnerLinkInput>, Prisma.PharmacyUncheckedUpdateWithoutOwnerLinkInput>
 }
 
 export type PharmacyCreateNestedOneWithoutEmployeesInput = {
@@ -841,10 +883,12 @@ export type PharmacyCreateWithoutOwnerInput = {
   licenseUrl?: string | null
   status?: $Enums.PharmacyStatus
   isActive?: boolean
+  category?: string | null
+  ownershipType?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   deletedAt?: Date | string | null
-  members?: Prisma.UserCreateNestedManyWithoutPharmacyInput
+  ownerLink?: Prisma.PharmacyOwnerCreateNestedOneWithoutPharmacyInput
   employees?: Prisma.PharmacyEmployeeCreateNestedManyWithoutPharmacyInput
   inventories?: Prisma.InventoryCreateNestedManyWithoutPharmacyInput
   reservations?: Prisma.ReservationCreateNestedManyWithoutPharmacyInput
@@ -866,10 +910,12 @@ export type PharmacyUncheckedCreateWithoutOwnerInput = {
   licenseUrl?: string | null
   status?: $Enums.PharmacyStatus
   isActive?: boolean
+  category?: string | null
+  ownershipType?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   deletedAt?: Date | string | null
-  members?: Prisma.UserUncheckedCreateNestedManyWithoutPharmacyInput
+  ownerLink?: Prisma.PharmacyOwnerUncheckedCreateNestedOneWithoutPharmacyInput
   employees?: Prisma.PharmacyEmployeeUncheckedCreateNestedManyWithoutPharmacyInput
   inventories?: Prisma.InventoryUncheckedCreateNestedManyWithoutPharmacyInput
   reservations?: Prisma.ReservationUncheckedCreateNestedManyWithoutPharmacyInput
@@ -885,61 +931,6 @@ export type PharmacyCreateOrConnectWithoutOwnerInput = {
 export type PharmacyCreateManyOwnerInputEnvelope = {
   data: Prisma.PharmacyCreateManyOwnerInput | Prisma.PharmacyCreateManyOwnerInput[]
   skipDuplicates?: boolean
-}
-
-export type PharmacyCreateWithoutMembersInput = {
-  id?: string
-  name: string
-  address: string
-  latitude?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
-  longitude?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
-  phone: string
-  licenseNumber?: string | null
-  district?: string | null
-  province?: string | null
-  managerName?: string | null
-  licenseUrl?: string | null
-  status?: $Enums.PharmacyStatus
-  isActive?: boolean
-  createdAt?: Date | string
-  updatedAt?: Date | string
-  deletedAt?: Date | string | null
-  owner: Prisma.UserCreateNestedOneWithoutPharmaciesInput
-  employees?: Prisma.PharmacyEmployeeCreateNestedManyWithoutPharmacyInput
-  inventories?: Prisma.InventoryCreateNestedManyWithoutPharmacyInput
-  reservations?: Prisma.ReservationCreateNestedManyWithoutPharmacyInput
-  prescriptions?: Prisma.PrescriptionCreateNestedManyWithoutPharmacyInput
-  auditLogs?: Prisma.AuditLogCreateNestedManyWithoutPharmacyInput
-}
-
-export type PharmacyUncheckedCreateWithoutMembersInput = {
-  id?: string
-  ownerId: string
-  name: string
-  address: string
-  latitude?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
-  longitude?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
-  phone: string
-  licenseNumber?: string | null
-  district?: string | null
-  province?: string | null
-  managerName?: string | null
-  licenseUrl?: string | null
-  status?: $Enums.PharmacyStatus
-  isActive?: boolean
-  createdAt?: Date | string
-  updatedAt?: Date | string
-  deletedAt?: Date | string | null
-  employees?: Prisma.PharmacyEmployeeUncheckedCreateNestedManyWithoutPharmacyInput
-  inventories?: Prisma.InventoryUncheckedCreateNestedManyWithoutPharmacyInput
-  reservations?: Prisma.ReservationUncheckedCreateNestedManyWithoutPharmacyInput
-  prescriptions?: Prisma.PrescriptionUncheckedCreateNestedManyWithoutPharmacyInput
-  auditLogs?: Prisma.AuditLogUncheckedCreateNestedManyWithoutPharmacyInput
-}
-
-export type PharmacyCreateOrConnectWithoutMembersInput = {
-  where: Prisma.PharmacyWhereUniqueInput
-  create: Prisma.XOR<Prisma.PharmacyCreateWithoutMembersInput, Prisma.PharmacyUncheckedCreateWithoutMembersInput>
 }
 
 export type PharmacyUpsertWithWhereUniqueWithoutOwnerInput = {
@@ -976,23 +967,84 @@ export type PharmacyScalarWhereInput = {
   licenseUrl?: Prisma.StringNullableFilter<"Pharmacy"> | string | null
   status?: Prisma.EnumPharmacyStatusFilter<"Pharmacy"> | $Enums.PharmacyStatus
   isActive?: Prisma.BoolFilter<"Pharmacy"> | boolean
+  category?: Prisma.StringNullableFilter<"Pharmacy"> | string | null
+  ownershipType?: Prisma.StringNullableFilter<"Pharmacy"> | string | null
   createdAt?: Prisma.DateTimeFilter<"Pharmacy"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Pharmacy"> | Date | string
   deletedAt?: Prisma.DateTimeNullableFilter<"Pharmacy"> | Date | string | null
 }
 
-export type PharmacyUpsertWithoutMembersInput = {
-  update: Prisma.XOR<Prisma.PharmacyUpdateWithoutMembersInput, Prisma.PharmacyUncheckedUpdateWithoutMembersInput>
-  create: Prisma.XOR<Prisma.PharmacyCreateWithoutMembersInput, Prisma.PharmacyUncheckedCreateWithoutMembersInput>
+export type PharmacyCreateWithoutOwnerLinkInput = {
+  id?: string
+  name: string
+  address: string
+  latitude?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  longitude?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  phone: string
+  licenseNumber?: string | null
+  district?: string | null
+  province?: string | null
+  managerName?: string | null
+  licenseUrl?: string | null
+  status?: $Enums.PharmacyStatus
+  isActive?: boolean
+  category?: string | null
+  ownershipType?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  deletedAt?: Date | string | null
+  owner: Prisma.UserCreateNestedOneWithoutPharmaciesInput
+  employees?: Prisma.PharmacyEmployeeCreateNestedManyWithoutPharmacyInput
+  inventories?: Prisma.InventoryCreateNestedManyWithoutPharmacyInput
+  reservations?: Prisma.ReservationCreateNestedManyWithoutPharmacyInput
+  prescriptions?: Prisma.PrescriptionCreateNestedManyWithoutPharmacyInput
+  auditLogs?: Prisma.AuditLogCreateNestedManyWithoutPharmacyInput
+}
+
+export type PharmacyUncheckedCreateWithoutOwnerLinkInput = {
+  id?: string
+  ownerId: string
+  name: string
+  address: string
+  latitude?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  longitude?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  phone: string
+  licenseNumber?: string | null
+  district?: string | null
+  province?: string | null
+  managerName?: string | null
+  licenseUrl?: string | null
+  status?: $Enums.PharmacyStatus
+  isActive?: boolean
+  category?: string | null
+  ownershipType?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  deletedAt?: Date | string | null
+  employees?: Prisma.PharmacyEmployeeUncheckedCreateNestedManyWithoutPharmacyInput
+  inventories?: Prisma.InventoryUncheckedCreateNestedManyWithoutPharmacyInput
+  reservations?: Prisma.ReservationUncheckedCreateNestedManyWithoutPharmacyInput
+  prescriptions?: Prisma.PrescriptionUncheckedCreateNestedManyWithoutPharmacyInput
+  auditLogs?: Prisma.AuditLogUncheckedCreateNestedManyWithoutPharmacyInput
+}
+
+export type PharmacyCreateOrConnectWithoutOwnerLinkInput = {
+  where: Prisma.PharmacyWhereUniqueInput
+  create: Prisma.XOR<Prisma.PharmacyCreateWithoutOwnerLinkInput, Prisma.PharmacyUncheckedCreateWithoutOwnerLinkInput>
+}
+
+export type PharmacyUpsertWithoutOwnerLinkInput = {
+  update: Prisma.XOR<Prisma.PharmacyUpdateWithoutOwnerLinkInput, Prisma.PharmacyUncheckedUpdateWithoutOwnerLinkInput>
+  create: Prisma.XOR<Prisma.PharmacyCreateWithoutOwnerLinkInput, Prisma.PharmacyUncheckedCreateWithoutOwnerLinkInput>
   where?: Prisma.PharmacyWhereInput
 }
 
-export type PharmacyUpdateToOneWithWhereWithoutMembersInput = {
+export type PharmacyUpdateToOneWithWhereWithoutOwnerLinkInput = {
   where?: Prisma.PharmacyWhereInput
-  data: Prisma.XOR<Prisma.PharmacyUpdateWithoutMembersInput, Prisma.PharmacyUncheckedUpdateWithoutMembersInput>
+  data: Prisma.XOR<Prisma.PharmacyUpdateWithoutOwnerLinkInput, Prisma.PharmacyUncheckedUpdateWithoutOwnerLinkInput>
 }
 
-export type PharmacyUpdateWithoutMembersInput = {
+export type PharmacyUpdateWithoutOwnerLinkInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
   address?: Prisma.StringFieldUpdateOperationsInput | string
@@ -1006,6 +1058,8 @@ export type PharmacyUpdateWithoutMembersInput = {
   licenseUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.EnumPharmacyStatusFieldUpdateOperationsInput | $Enums.PharmacyStatus
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  category?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  ownershipType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -1017,7 +1071,7 @@ export type PharmacyUpdateWithoutMembersInput = {
   auditLogs?: Prisma.AuditLogUpdateManyWithoutPharmacyNestedInput
 }
 
-export type PharmacyUncheckedUpdateWithoutMembersInput = {
+export type PharmacyUncheckedUpdateWithoutOwnerLinkInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   ownerId?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
@@ -1032,6 +1086,8 @@ export type PharmacyUncheckedUpdateWithoutMembersInput = {
   licenseUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.EnumPharmacyStatusFieldUpdateOperationsInput | $Enums.PharmacyStatus
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  category?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  ownershipType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -1056,11 +1112,13 @@ export type PharmacyCreateWithoutEmployeesInput = {
   licenseUrl?: string | null
   status?: $Enums.PharmacyStatus
   isActive?: boolean
+  category?: string | null
+  ownershipType?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   deletedAt?: Date | string | null
   owner: Prisma.UserCreateNestedOneWithoutPharmaciesInput
-  members?: Prisma.UserCreateNestedManyWithoutPharmacyInput
+  ownerLink?: Prisma.PharmacyOwnerCreateNestedOneWithoutPharmacyInput
   inventories?: Prisma.InventoryCreateNestedManyWithoutPharmacyInput
   reservations?: Prisma.ReservationCreateNestedManyWithoutPharmacyInput
   prescriptions?: Prisma.PrescriptionCreateNestedManyWithoutPharmacyInput
@@ -1082,10 +1140,12 @@ export type PharmacyUncheckedCreateWithoutEmployeesInput = {
   licenseUrl?: string | null
   status?: $Enums.PharmacyStatus
   isActive?: boolean
+  category?: string | null
+  ownershipType?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   deletedAt?: Date | string | null
-  members?: Prisma.UserUncheckedCreateNestedManyWithoutPharmacyInput
+  ownerLink?: Prisma.PharmacyOwnerUncheckedCreateNestedOneWithoutPharmacyInput
   inventories?: Prisma.InventoryUncheckedCreateNestedManyWithoutPharmacyInput
   reservations?: Prisma.ReservationUncheckedCreateNestedManyWithoutPharmacyInput
   prescriptions?: Prisma.PrescriptionUncheckedCreateNestedManyWithoutPharmacyInput
@@ -1122,11 +1182,13 @@ export type PharmacyUpdateWithoutEmployeesInput = {
   licenseUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.EnumPharmacyStatusFieldUpdateOperationsInput | $Enums.PharmacyStatus
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  category?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  ownershipType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   owner?: Prisma.UserUpdateOneRequiredWithoutPharmaciesNestedInput
-  members?: Prisma.UserUpdateManyWithoutPharmacyNestedInput
+  ownerLink?: Prisma.PharmacyOwnerUpdateOneWithoutPharmacyNestedInput
   inventories?: Prisma.InventoryUpdateManyWithoutPharmacyNestedInput
   reservations?: Prisma.ReservationUpdateManyWithoutPharmacyNestedInput
   prescriptions?: Prisma.PrescriptionUpdateManyWithoutPharmacyNestedInput
@@ -1148,10 +1210,12 @@ export type PharmacyUncheckedUpdateWithoutEmployeesInput = {
   licenseUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.EnumPharmacyStatusFieldUpdateOperationsInput | $Enums.PharmacyStatus
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  category?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  ownershipType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  members?: Prisma.UserUncheckedUpdateManyWithoutPharmacyNestedInput
+  ownerLink?: Prisma.PharmacyOwnerUncheckedUpdateOneWithoutPharmacyNestedInput
   inventories?: Prisma.InventoryUncheckedUpdateManyWithoutPharmacyNestedInput
   reservations?: Prisma.ReservationUncheckedUpdateManyWithoutPharmacyNestedInput
   prescriptions?: Prisma.PrescriptionUncheckedUpdateManyWithoutPharmacyNestedInput
@@ -1172,11 +1236,13 @@ export type PharmacyCreateWithoutInventoriesInput = {
   licenseUrl?: string | null
   status?: $Enums.PharmacyStatus
   isActive?: boolean
+  category?: string | null
+  ownershipType?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   deletedAt?: Date | string | null
   owner: Prisma.UserCreateNestedOneWithoutPharmaciesInput
-  members?: Prisma.UserCreateNestedManyWithoutPharmacyInput
+  ownerLink?: Prisma.PharmacyOwnerCreateNestedOneWithoutPharmacyInput
   employees?: Prisma.PharmacyEmployeeCreateNestedManyWithoutPharmacyInput
   reservations?: Prisma.ReservationCreateNestedManyWithoutPharmacyInput
   prescriptions?: Prisma.PrescriptionCreateNestedManyWithoutPharmacyInput
@@ -1198,10 +1264,12 @@ export type PharmacyUncheckedCreateWithoutInventoriesInput = {
   licenseUrl?: string | null
   status?: $Enums.PharmacyStatus
   isActive?: boolean
+  category?: string | null
+  ownershipType?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   deletedAt?: Date | string | null
-  members?: Prisma.UserUncheckedCreateNestedManyWithoutPharmacyInput
+  ownerLink?: Prisma.PharmacyOwnerUncheckedCreateNestedOneWithoutPharmacyInput
   employees?: Prisma.PharmacyEmployeeUncheckedCreateNestedManyWithoutPharmacyInput
   reservations?: Prisma.ReservationUncheckedCreateNestedManyWithoutPharmacyInput
   prescriptions?: Prisma.PrescriptionUncheckedCreateNestedManyWithoutPharmacyInput
@@ -1238,11 +1306,13 @@ export type PharmacyUpdateWithoutInventoriesInput = {
   licenseUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.EnumPharmacyStatusFieldUpdateOperationsInput | $Enums.PharmacyStatus
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  category?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  ownershipType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   owner?: Prisma.UserUpdateOneRequiredWithoutPharmaciesNestedInput
-  members?: Prisma.UserUpdateManyWithoutPharmacyNestedInput
+  ownerLink?: Prisma.PharmacyOwnerUpdateOneWithoutPharmacyNestedInput
   employees?: Prisma.PharmacyEmployeeUpdateManyWithoutPharmacyNestedInput
   reservations?: Prisma.ReservationUpdateManyWithoutPharmacyNestedInput
   prescriptions?: Prisma.PrescriptionUpdateManyWithoutPharmacyNestedInput
@@ -1264,10 +1334,12 @@ export type PharmacyUncheckedUpdateWithoutInventoriesInput = {
   licenseUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.EnumPharmacyStatusFieldUpdateOperationsInput | $Enums.PharmacyStatus
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  category?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  ownershipType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  members?: Prisma.UserUncheckedUpdateManyWithoutPharmacyNestedInput
+  ownerLink?: Prisma.PharmacyOwnerUncheckedUpdateOneWithoutPharmacyNestedInput
   employees?: Prisma.PharmacyEmployeeUncheckedUpdateManyWithoutPharmacyNestedInput
   reservations?: Prisma.ReservationUncheckedUpdateManyWithoutPharmacyNestedInput
   prescriptions?: Prisma.PrescriptionUncheckedUpdateManyWithoutPharmacyNestedInput
@@ -1288,11 +1360,13 @@ export type PharmacyCreateWithoutReservationsInput = {
   licenseUrl?: string | null
   status?: $Enums.PharmacyStatus
   isActive?: boolean
+  category?: string | null
+  ownershipType?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   deletedAt?: Date | string | null
   owner: Prisma.UserCreateNestedOneWithoutPharmaciesInput
-  members?: Prisma.UserCreateNestedManyWithoutPharmacyInput
+  ownerLink?: Prisma.PharmacyOwnerCreateNestedOneWithoutPharmacyInput
   employees?: Prisma.PharmacyEmployeeCreateNestedManyWithoutPharmacyInput
   inventories?: Prisma.InventoryCreateNestedManyWithoutPharmacyInput
   prescriptions?: Prisma.PrescriptionCreateNestedManyWithoutPharmacyInput
@@ -1314,10 +1388,12 @@ export type PharmacyUncheckedCreateWithoutReservationsInput = {
   licenseUrl?: string | null
   status?: $Enums.PharmacyStatus
   isActive?: boolean
+  category?: string | null
+  ownershipType?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   deletedAt?: Date | string | null
-  members?: Prisma.UserUncheckedCreateNestedManyWithoutPharmacyInput
+  ownerLink?: Prisma.PharmacyOwnerUncheckedCreateNestedOneWithoutPharmacyInput
   employees?: Prisma.PharmacyEmployeeUncheckedCreateNestedManyWithoutPharmacyInput
   inventories?: Prisma.InventoryUncheckedCreateNestedManyWithoutPharmacyInput
   prescriptions?: Prisma.PrescriptionUncheckedCreateNestedManyWithoutPharmacyInput
@@ -1354,11 +1430,13 @@ export type PharmacyUpdateWithoutReservationsInput = {
   licenseUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.EnumPharmacyStatusFieldUpdateOperationsInput | $Enums.PharmacyStatus
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  category?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  ownershipType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   owner?: Prisma.UserUpdateOneRequiredWithoutPharmaciesNestedInput
-  members?: Prisma.UserUpdateManyWithoutPharmacyNestedInput
+  ownerLink?: Prisma.PharmacyOwnerUpdateOneWithoutPharmacyNestedInput
   employees?: Prisma.PharmacyEmployeeUpdateManyWithoutPharmacyNestedInput
   inventories?: Prisma.InventoryUpdateManyWithoutPharmacyNestedInput
   prescriptions?: Prisma.PrescriptionUpdateManyWithoutPharmacyNestedInput
@@ -1380,10 +1458,12 @@ export type PharmacyUncheckedUpdateWithoutReservationsInput = {
   licenseUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.EnumPharmacyStatusFieldUpdateOperationsInput | $Enums.PharmacyStatus
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  category?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  ownershipType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  members?: Prisma.UserUncheckedUpdateManyWithoutPharmacyNestedInput
+  ownerLink?: Prisma.PharmacyOwnerUncheckedUpdateOneWithoutPharmacyNestedInput
   employees?: Prisma.PharmacyEmployeeUncheckedUpdateManyWithoutPharmacyNestedInput
   inventories?: Prisma.InventoryUncheckedUpdateManyWithoutPharmacyNestedInput
   prescriptions?: Prisma.PrescriptionUncheckedUpdateManyWithoutPharmacyNestedInput
@@ -1404,11 +1484,13 @@ export type PharmacyCreateWithoutPrescriptionsInput = {
   licenseUrl?: string | null
   status?: $Enums.PharmacyStatus
   isActive?: boolean
+  category?: string | null
+  ownershipType?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   deletedAt?: Date | string | null
   owner: Prisma.UserCreateNestedOneWithoutPharmaciesInput
-  members?: Prisma.UserCreateNestedManyWithoutPharmacyInput
+  ownerLink?: Prisma.PharmacyOwnerCreateNestedOneWithoutPharmacyInput
   employees?: Prisma.PharmacyEmployeeCreateNestedManyWithoutPharmacyInput
   inventories?: Prisma.InventoryCreateNestedManyWithoutPharmacyInput
   reservations?: Prisma.ReservationCreateNestedManyWithoutPharmacyInput
@@ -1430,10 +1512,12 @@ export type PharmacyUncheckedCreateWithoutPrescriptionsInput = {
   licenseUrl?: string | null
   status?: $Enums.PharmacyStatus
   isActive?: boolean
+  category?: string | null
+  ownershipType?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   deletedAt?: Date | string | null
-  members?: Prisma.UserUncheckedCreateNestedManyWithoutPharmacyInput
+  ownerLink?: Prisma.PharmacyOwnerUncheckedCreateNestedOneWithoutPharmacyInput
   employees?: Prisma.PharmacyEmployeeUncheckedCreateNestedManyWithoutPharmacyInput
   inventories?: Prisma.InventoryUncheckedCreateNestedManyWithoutPharmacyInput
   reservations?: Prisma.ReservationUncheckedCreateNestedManyWithoutPharmacyInput
@@ -1470,11 +1554,13 @@ export type PharmacyUpdateWithoutPrescriptionsInput = {
   licenseUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.EnumPharmacyStatusFieldUpdateOperationsInput | $Enums.PharmacyStatus
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  category?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  ownershipType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   owner?: Prisma.UserUpdateOneRequiredWithoutPharmaciesNestedInput
-  members?: Prisma.UserUpdateManyWithoutPharmacyNestedInput
+  ownerLink?: Prisma.PharmacyOwnerUpdateOneWithoutPharmacyNestedInput
   employees?: Prisma.PharmacyEmployeeUpdateManyWithoutPharmacyNestedInput
   inventories?: Prisma.InventoryUpdateManyWithoutPharmacyNestedInput
   reservations?: Prisma.ReservationUpdateManyWithoutPharmacyNestedInput
@@ -1496,10 +1582,12 @@ export type PharmacyUncheckedUpdateWithoutPrescriptionsInput = {
   licenseUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.EnumPharmacyStatusFieldUpdateOperationsInput | $Enums.PharmacyStatus
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  category?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  ownershipType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  members?: Prisma.UserUncheckedUpdateManyWithoutPharmacyNestedInput
+  ownerLink?: Prisma.PharmacyOwnerUncheckedUpdateOneWithoutPharmacyNestedInput
   employees?: Prisma.PharmacyEmployeeUncheckedUpdateManyWithoutPharmacyNestedInput
   inventories?: Prisma.InventoryUncheckedUpdateManyWithoutPharmacyNestedInput
   reservations?: Prisma.ReservationUncheckedUpdateManyWithoutPharmacyNestedInput
@@ -1520,11 +1608,13 @@ export type PharmacyCreateWithoutAuditLogsInput = {
   licenseUrl?: string | null
   status?: $Enums.PharmacyStatus
   isActive?: boolean
+  category?: string | null
+  ownershipType?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   deletedAt?: Date | string | null
   owner: Prisma.UserCreateNestedOneWithoutPharmaciesInput
-  members?: Prisma.UserCreateNestedManyWithoutPharmacyInput
+  ownerLink?: Prisma.PharmacyOwnerCreateNestedOneWithoutPharmacyInput
   employees?: Prisma.PharmacyEmployeeCreateNestedManyWithoutPharmacyInput
   inventories?: Prisma.InventoryCreateNestedManyWithoutPharmacyInput
   reservations?: Prisma.ReservationCreateNestedManyWithoutPharmacyInput
@@ -1546,10 +1636,12 @@ export type PharmacyUncheckedCreateWithoutAuditLogsInput = {
   licenseUrl?: string | null
   status?: $Enums.PharmacyStatus
   isActive?: boolean
+  category?: string | null
+  ownershipType?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   deletedAt?: Date | string | null
-  members?: Prisma.UserUncheckedCreateNestedManyWithoutPharmacyInput
+  ownerLink?: Prisma.PharmacyOwnerUncheckedCreateNestedOneWithoutPharmacyInput
   employees?: Prisma.PharmacyEmployeeUncheckedCreateNestedManyWithoutPharmacyInput
   inventories?: Prisma.InventoryUncheckedCreateNestedManyWithoutPharmacyInput
   reservations?: Prisma.ReservationUncheckedCreateNestedManyWithoutPharmacyInput
@@ -1586,11 +1678,13 @@ export type PharmacyUpdateWithoutAuditLogsInput = {
   licenseUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.EnumPharmacyStatusFieldUpdateOperationsInput | $Enums.PharmacyStatus
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  category?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  ownershipType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   owner?: Prisma.UserUpdateOneRequiredWithoutPharmaciesNestedInput
-  members?: Prisma.UserUpdateManyWithoutPharmacyNestedInput
+  ownerLink?: Prisma.PharmacyOwnerUpdateOneWithoutPharmacyNestedInput
   employees?: Prisma.PharmacyEmployeeUpdateManyWithoutPharmacyNestedInput
   inventories?: Prisma.InventoryUpdateManyWithoutPharmacyNestedInput
   reservations?: Prisma.ReservationUpdateManyWithoutPharmacyNestedInput
@@ -1612,10 +1706,12 @@ export type PharmacyUncheckedUpdateWithoutAuditLogsInput = {
   licenseUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.EnumPharmacyStatusFieldUpdateOperationsInput | $Enums.PharmacyStatus
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  category?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  ownershipType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  members?: Prisma.UserUncheckedUpdateManyWithoutPharmacyNestedInput
+  ownerLink?: Prisma.PharmacyOwnerUncheckedUpdateOneWithoutPharmacyNestedInput
   employees?: Prisma.PharmacyEmployeeUncheckedUpdateManyWithoutPharmacyNestedInput
   inventories?: Prisma.InventoryUncheckedUpdateManyWithoutPharmacyNestedInput
   reservations?: Prisma.ReservationUncheckedUpdateManyWithoutPharmacyNestedInput
@@ -1636,6 +1732,8 @@ export type PharmacyCreateManyOwnerInput = {
   licenseUrl?: string | null
   status?: $Enums.PharmacyStatus
   isActive?: boolean
+  category?: string | null
+  ownershipType?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   deletedAt?: Date | string | null
@@ -1655,10 +1753,12 @@ export type PharmacyUpdateWithoutOwnerInput = {
   licenseUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.EnumPharmacyStatusFieldUpdateOperationsInput | $Enums.PharmacyStatus
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  category?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  ownershipType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  members?: Prisma.UserUpdateManyWithoutPharmacyNestedInput
+  ownerLink?: Prisma.PharmacyOwnerUpdateOneWithoutPharmacyNestedInput
   employees?: Prisma.PharmacyEmployeeUpdateManyWithoutPharmacyNestedInput
   inventories?: Prisma.InventoryUpdateManyWithoutPharmacyNestedInput
   reservations?: Prisma.ReservationUpdateManyWithoutPharmacyNestedInput
@@ -1680,10 +1780,12 @@ export type PharmacyUncheckedUpdateWithoutOwnerInput = {
   licenseUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.EnumPharmacyStatusFieldUpdateOperationsInput | $Enums.PharmacyStatus
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  category?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  ownershipType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  members?: Prisma.UserUncheckedUpdateManyWithoutPharmacyNestedInput
+  ownerLink?: Prisma.PharmacyOwnerUncheckedUpdateOneWithoutPharmacyNestedInput
   employees?: Prisma.PharmacyEmployeeUncheckedUpdateManyWithoutPharmacyNestedInput
   inventories?: Prisma.InventoryUncheckedUpdateManyWithoutPharmacyNestedInput
   reservations?: Prisma.ReservationUncheckedUpdateManyWithoutPharmacyNestedInput
@@ -1705,6 +1807,8 @@ export type PharmacyUncheckedUpdateManyWithoutOwnerInput = {
   licenseUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.EnumPharmacyStatusFieldUpdateOperationsInput | $Enums.PharmacyStatus
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  category?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  ownershipType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -1716,7 +1820,6 @@ export type PharmacyUncheckedUpdateManyWithoutOwnerInput = {
  */
 
 export type PharmacyCountOutputType = {
-  members: number
   employees: number
   inventories: number
   reservations: number
@@ -1725,7 +1828,6 @@ export type PharmacyCountOutputType = {
 }
 
 export type PharmacyCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  members?: boolean | PharmacyCountOutputTypeCountMembersArgs
   employees?: boolean | PharmacyCountOutputTypeCountEmployeesArgs
   inventories?: boolean | PharmacyCountOutputTypeCountInventoriesArgs
   reservations?: boolean | PharmacyCountOutputTypeCountReservationsArgs
@@ -1741,13 +1843,6 @@ export type PharmacyCountOutputTypeDefaultArgs<ExtArgs extends runtime.Types.Ext
    * Select specific fields to fetch from the PharmacyCountOutputType
    */
   select?: Prisma.PharmacyCountOutputTypeSelect<ExtArgs> | null
-}
-
-/**
- * PharmacyCountOutputType without action
- */
-export type PharmacyCountOutputTypeCountMembersArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  where?: Prisma.UserWhereInput
 }
 
 /**
@@ -1801,11 +1896,13 @@ export type PharmacySelect<ExtArgs extends runtime.Types.Extensions.InternalArgs
   licenseUrl?: boolean
   status?: boolean
   isActive?: boolean
+  category?: boolean
+  ownershipType?: boolean
   createdAt?: boolean
   updatedAt?: boolean
   deletedAt?: boolean
   owner?: boolean | Prisma.UserDefaultArgs<ExtArgs>
-  members?: boolean | Prisma.Pharmacy$membersArgs<ExtArgs>
+  ownerLink?: boolean | Prisma.Pharmacy$ownerLinkArgs<ExtArgs>
   employees?: boolean | Prisma.Pharmacy$employeesArgs<ExtArgs>
   inventories?: boolean | Prisma.Pharmacy$inventoriesArgs<ExtArgs>
   reservations?: boolean | Prisma.Pharmacy$reservationsArgs<ExtArgs>
@@ -1829,6 +1926,8 @@ export type PharmacySelectCreateManyAndReturn<ExtArgs extends runtime.Types.Exte
   licenseUrl?: boolean
   status?: boolean
   isActive?: boolean
+  category?: boolean
+  ownershipType?: boolean
   createdAt?: boolean
   updatedAt?: boolean
   deletedAt?: boolean
@@ -1850,6 +1949,8 @@ export type PharmacySelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Exte
   licenseUrl?: boolean
   status?: boolean
   isActive?: boolean
+  category?: boolean
+  ownershipType?: boolean
   createdAt?: boolean
   updatedAt?: boolean
   deletedAt?: boolean
@@ -1871,15 +1972,17 @@ export type PharmacySelectScalar = {
   licenseUrl?: boolean
   status?: boolean
   isActive?: boolean
+  category?: boolean
+  ownershipType?: boolean
   createdAt?: boolean
   updatedAt?: boolean
   deletedAt?: boolean
 }
 
-export type PharmacyOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "ownerId" | "name" | "address" | "latitude" | "longitude" | "phone" | "licenseNumber" | "district" | "province" | "managerName" | "licenseUrl" | "status" | "isActive" | "createdAt" | "updatedAt" | "deletedAt", ExtArgs["result"]["pharmacy"]>
+export type PharmacyOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "ownerId" | "name" | "address" | "latitude" | "longitude" | "phone" | "licenseNumber" | "district" | "province" | "managerName" | "licenseUrl" | "status" | "isActive" | "category" | "ownershipType" | "createdAt" | "updatedAt" | "deletedAt", ExtArgs["result"]["pharmacy"]>
 export type PharmacyInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   owner?: boolean | Prisma.UserDefaultArgs<ExtArgs>
-  members?: boolean | Prisma.Pharmacy$membersArgs<ExtArgs>
+  ownerLink?: boolean | Prisma.Pharmacy$ownerLinkArgs<ExtArgs>
   employees?: boolean | Prisma.Pharmacy$employeesArgs<ExtArgs>
   inventories?: boolean | Prisma.Pharmacy$inventoriesArgs<ExtArgs>
   reservations?: boolean | Prisma.Pharmacy$reservationsArgs<ExtArgs>
@@ -1898,7 +2001,7 @@ export type $PharmacyPayload<ExtArgs extends runtime.Types.Extensions.InternalAr
   name: "Pharmacy"
   objects: {
     owner: Prisma.$UserPayload<ExtArgs>
-    members: Prisma.$UserPayload<ExtArgs>[]
+    ownerLink: Prisma.$PharmacyOwnerPayload<ExtArgs> | null
     employees: Prisma.$PharmacyEmployeePayload<ExtArgs>[]
     inventories: Prisma.$InventoryPayload<ExtArgs>[]
     reservations: Prisma.$ReservationPayload<ExtArgs>[]
@@ -1920,6 +2023,8 @@ export type $PharmacyPayload<ExtArgs extends runtime.Types.Extensions.InternalAr
     licenseUrl: string | null
     status: $Enums.PharmacyStatus
     isActive: boolean
+    category: string | null
+    ownershipType: string | null
     createdAt: Date
     updatedAt: Date
     deletedAt: Date | null
@@ -2318,7 +2423,7 @@ readonly fields: PharmacyFieldRefs;
 export interface Prisma__PharmacyClient<T, Null = never, ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
   readonly [Symbol.toStringTag]: "PrismaPromise"
   owner<T extends Prisma.UserDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.UserDefaultArgs<ExtArgs>>): Prisma.Prisma__UserClient<runtime.Types.Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
-  members<T extends Prisma.Pharmacy$membersArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Pharmacy$membersArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  ownerLink<T extends Prisma.Pharmacy$ownerLinkArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Pharmacy$ownerLinkArgs<ExtArgs>>): Prisma.Prisma__PharmacyOwnerClient<runtime.Types.Result.GetResult<Prisma.$PharmacyOwnerPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   employees<T extends Prisma.Pharmacy$employeesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Pharmacy$employeesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$PharmacyEmployeePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   inventories<T extends Prisma.Pharmacy$inventoriesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Pharmacy$inventoriesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$InventoryPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   reservations<T extends Prisma.Pharmacy$reservationsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Pharmacy$reservationsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ReservationPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
@@ -2367,6 +2472,8 @@ export interface PharmacyFieldRefs {
   readonly licenseUrl: Prisma.FieldRef<"Pharmacy", 'String'>
   readonly status: Prisma.FieldRef<"Pharmacy", 'PharmacyStatus'>
   readonly isActive: Prisma.FieldRef<"Pharmacy", 'Boolean'>
+  readonly category: Prisma.FieldRef<"Pharmacy", 'String'>
+  readonly ownershipType: Prisma.FieldRef<"Pharmacy", 'String'>
   readonly createdAt: Prisma.FieldRef<"Pharmacy", 'DateTime'>
   readonly updatedAt: Prisma.FieldRef<"Pharmacy", 'DateTime'>
   readonly deletedAt: Prisma.FieldRef<"Pharmacy", 'DateTime'>
@@ -2771,27 +2878,22 @@ export type PharmacyDeleteManyArgs<ExtArgs extends runtime.Types.Extensions.Inte
 }
 
 /**
- * Pharmacy.members
+ * Pharmacy.ownerLink
  */
-export type Pharmacy$membersArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+export type Pharmacy$ownerLinkArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   /**
-   * Select specific fields to fetch from the User
+   * Select specific fields to fetch from the PharmacyOwner
    */
-  select?: Prisma.UserSelect<ExtArgs> | null
+  select?: Prisma.PharmacyOwnerSelect<ExtArgs> | null
   /**
-   * Omit specific fields from the User
+   * Omit specific fields from the PharmacyOwner
    */
-  omit?: Prisma.UserOmit<ExtArgs> | null
+  omit?: Prisma.PharmacyOwnerOmit<ExtArgs> | null
   /**
    * Choose, which related nodes to fetch as well
    */
-  include?: Prisma.UserInclude<ExtArgs> | null
-  where?: Prisma.UserWhereInput
-  orderBy?: Prisma.UserOrderByWithRelationInput | Prisma.UserOrderByWithRelationInput[]
-  cursor?: Prisma.UserWhereUniqueInput
-  take?: number
-  skip?: number
-  distinct?: Prisma.UserScalarFieldEnum | Prisma.UserScalarFieldEnum[]
+  include?: Prisma.PharmacyOwnerInclude<ExtArgs> | null
+  where?: Prisma.PharmacyOwnerWhereInput
 }
 
 /**
