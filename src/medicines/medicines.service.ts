@@ -13,7 +13,7 @@ export class MedicinesService {
     return prisma.medicine.create({ data: safeDto });
   }
 
-  findAll(page: number = 1, limit: number = 10) {
+  findAll(page: number = 1, limit: number = 10, includeArchived = false) {
     const prisma = this.prismaService.prisma;
     const safePage = validatePositiveInt(page, 'page', 1);
     const safeLimit = validatePositiveInt(limit, 'limit', 10);
@@ -21,7 +21,10 @@ export class MedicinesService {
     return prisma.medicine.findMany({
       skip,
       take: safeLimit,
-      where: { isActive: true, deletedAt: null },
+      where: {
+        deletedAt: null,
+        ...(includeArchived ? {} : { isActive: true }),
+      },
       include: { category: true, manufacturer: true },
     });
   }

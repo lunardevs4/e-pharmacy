@@ -58,6 +58,42 @@ export class UsersService {
     });
   }
 
+  async updateStatus(userId: string, isActive: boolean) {
+    const prisma = this.prismaService.prisma;
+    const safeUserId = validateUuid(userId, 'userId');
+    const user = await prisma.user.findUnique({ where: { id: safeUserId } });
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+    return prisma.user.update({
+      where: { id: safeUserId },
+      data: { isActive },
+      select: {
+        id: true,
+        email: true,
+        phone: true,
+        firstName: true,
+        lastName: true,
+        role: true,
+        isActive: true,
+        createdAt: true,
+      },
+    });
+  }
+
+  async softDeleteByAdmin(userId: string) {
+    const prisma = this.prismaService.prisma;
+    const safeUserId = validateUuid(userId, 'userId');
+    const user = await prisma.user.findUnique({ where: { id: safeUserId } });
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+    return prisma.user.update({
+      where: { id: safeUserId },
+      data: { deletedAt: new Date(), isActive: false },
+    });
+  }
+
   async findAll(page: number = 1, limit: number = 10) {
     const prisma = this.prismaService.prisma;
     const safePage = validatePositiveInt(page, 'page', 1);

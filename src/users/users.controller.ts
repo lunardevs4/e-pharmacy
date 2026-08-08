@@ -1,9 +1,9 @@
-import { Controller, Get, Put, Body, UseGuards, Req, Delete, Query } from '@nestjs/common';
+import { Controller, Get, Put, Body, UseGuards, Req, Delete, Query, Patch, Param } from '@nestjs/common';
 import { ApiTags, ApiBearerAuth, ApiOperation, ApiQuery, ApiBody, ApiParam } from '@nestjs/swagger';
 import { UsersService } from './users.service';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { Roles } from '../common/guards/roles.decorator';
-import { UpdateUserDto } from './dto/users.dto';
+import { UpdateUserDto, UpdateUserStatusDto } from './dto/users.dto';
 import { UserRole } from '@generated/prisma';
 
 @ApiTags('Users')
@@ -61,6 +61,35 @@ export class UsersController {
   })
   softDelete(@Req() req: any) {
     return this.usersService.softDelete(req.user.id);
+  }
+
+  @Patch(':id/status')
+  @Roles(UserRole.ADMIN)
+  @ApiOperation({
+    summary: 'Update user active status (admin only)',
+    description: 'Endpoint: PATCH /api/v1/users/:id/status\n\nUsed by administrators to activate or suspend a user account.',
+  })
+  @ApiParam({ name: 'id', type: 'string', description: 'User UUID', example: '550e8400-e29b-41d4-a716-446655440000' })
+  @ApiBody({
+    type: UpdateUserStatusDto,
+    examples: {
+      activate: { value: { isActive: true } },
+      suspend: { value: { isActive: false } },
+    },
+  })
+  updateStatus(@Param('id') id: string, @Body() body: UpdateUserStatusDto) {
+    return this.usersService.updateStatus(id, body.isActive);
+  }
+
+  @Delete(':id')
+  @Roles(UserRole.ADMIN)
+  @ApiOperation({
+    summary: 'Soft delete user (admin only)',
+    description: 'Endpoint: DELETE /api/v1/users/:id\n\nSoft deletes a user account by setting deletedAt and deactivating the account.',
+  })
+  @ApiParam({ name: 'id', type: 'string', description: 'User UUID', example: '550e8400-e29b-41d4-a716-446655440000' })
+  remove(@Param('id') id: string) {
+    return this.usersService.softDeleteByAdmin(id);
   }
 
   @Get()

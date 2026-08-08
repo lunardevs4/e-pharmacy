@@ -6,6 +6,7 @@ import {
   validateWhitelist,
   ALLOWED_AUDIT_ENTITY_TYPES,
   ALLOWED_AUDIT_ACTIONS,
+  validateUuid,
 } from '../common/security/security.util';
 
 interface AuthenticatedUser {
@@ -124,5 +125,18 @@ export class AuditLogsService {
     }
 
     throw new ForbiddenException('Full audit logs access is restricted to ADMIN (full) and GOVERNMENT (limited) roles');
+  }
+
+  async findByPharmacy(user: AuthenticatedUser, pharmacyId: string, limit = 100) {
+    const prisma = this.prismaService.prisma;
+    const safePharmacyId = validateUuid(pharmacyId, 'pharmacyId');
+    const pharmacy = await prisma.pharmacy.findUnique({ where: { id: safePharmacyId } });
+    if (!pharmacy) throw new ForbiddenException('Pharmacy not found');
+    if (user.role === UserRole.PHARMACY_OWNER && pharmacy.ownerId !== user.id) throw new ForbiddenException('You do not own this pharmacy');
+    if (user.role === UserRole.PHARMACIST) {
+      const employee = await prisma.pharmacyEmployee.findFirst({ where: { pharmacyId: safePharmacyId, userId: user.id, role: UserRole.PHARMACIST } });
+      if (!employee) throw new ForbiddenException('You are not employed at this pharmacy');
+    }
+    return prisma.auditLog.findMany({ where: { pharmacyId: safePharmacyId }, take: Math.min(Number(limit) || 100, 100), include: { user: { select: { firstName: true, lastName: true, email: true, role: true } } }, orderBy: { createdAt: 'desc' } });
   }
 }

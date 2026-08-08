@@ -108,6 +108,15 @@ export class AuthController {
   }
 
   @UseGuards(JwtAuthGuard)
+  @Roles(UserRole.ADMIN)
+  @Post('managed-users')
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Create a managed user (admin only)' })
+  async createManagedUser(@Body() createManagedUserDto: CreateManagedUserDto) {
+    return this.authService.createManagedUser(createManagedUserDto.role, createManagedUserDto);
+  }
+
+  @UseGuards(JwtAuthGuard)
   @Roles(UserRole.ADMIN, UserRole.GOVERNMENT)
   @Get('pharmacies/pending')
   @ApiBearerAuth()

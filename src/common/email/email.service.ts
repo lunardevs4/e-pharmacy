@@ -6,26 +6,22 @@ export class EmailService {
   private readonly logger = new Logger(EmailService.name);
 
   async sendTemporaryPasswordEmail(recipientEmail: string, recipientName: string, temporaryPassword: string) {
-    const host = process.env.SMTP_HOST?.trim();
-    const port = Number(process.env.SMTP_PORT || 587);
-    const username = process.env.SMTP_USER?.trim();
-    const password = process.env.SMTP_PASS?.trim();
-    const fromAddress = process.env.SMTP_FROM?.trim() || username;
+    const gmailUser = process.env.GMAIL_USER?.trim();
+    const gmailAppPassword = process.env.GMAIL_APP_PASSWORD?.trim();
+    const fromAddress = process.env.GMAIL_FROM?.trim() || gmailUser;
 
-    if (!host || !username || !password || !fromAddress) {
+    if (!gmailUser || !gmailAppPassword || !fromAddress) {
       this.logger.warn(
-        `SMTP is not configured. Skipping temp password email to ${recipientEmail}.`,
+        `Gmail app password email is not configured. Skipping temp password email to ${recipientEmail}.`,
       );
       return false;
     }
 
     const transport = nodemailer.createTransport({
-      host,
-      port,
-      secure: port === 465,
+      service: 'gmail',
       auth: {
-        user: username,
-        pass: password,
+        user: gmailUser,
+        pass: gmailAppPassword,
       },
     });
 

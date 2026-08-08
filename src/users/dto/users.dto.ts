@@ -1,5 +1,5 @@
 import { PartialType } from '@nestjs/swagger';
-import { IsString, IsOptional } from 'class-validator';
+import { IsString, IsOptional, IsBoolean } from 'class-validator';
 
 export class CreateUserDto {
   @IsString()
@@ -13,4 +13,9 @@ export class CreateUserDto {
   phone?: string;
 }
 
-export class UpdateUserDto extends PartialType(CreateUserDto) {}
+export class UpdateUserStatusDto {
+  @IsBoolean()
+  isActive: boolean;
+}
+
+export class UpdateUserDto extends PartialType(CreateUserDto) { }

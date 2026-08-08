@@ -1,4 +1,4 @@
-import { Controller, Get, Query, UseGuards, Req } from '@nestjs/common';
+import { Controller, Get, Query, UseGuards, Req, Param } from '@nestjs/common';
 import { ApiTags, ApiBearerAuth, ApiOperation, ApiQuery } from '@nestjs/swagger';
 import { AuditLogsService } from './audit-logs.service';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
@@ -30,5 +30,12 @@ export class AuditLogsController {
     @Query('action') action?: string,
   ) {
     return this.auditLogsService.findAll(req.user, page, limit, entityType, action);
+  }
+
+  @Get('pharmacy/:pharmacyId')
+  @Roles(UserRole.PHARMACY_OWNER, UserRole.PHARMACIST)
+  @ApiOperation({ summary: 'View audit logs for an authorized pharmacy' })
+  findByPharmacy(@Req() req: any, @Param('pharmacyId') pharmacyId: string, @Query('limit') limit?: number) {
+    return this.auditLogsService.findByPharmacy(req.user, pharmacyId, limit);
   }
 }

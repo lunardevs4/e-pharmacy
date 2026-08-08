@@ -308,6 +308,18 @@ export class AuthService {
       },
     });
 
+    try {
+      await this.emailService.sendTemporaryPasswordEmail(
+        staff.email,
+        `${staff.firstName} ${staff.lastName}`.trim(),
+        tempPassword,
+      );
+    } catch (error) {
+      console.warn(
+        `Staff account created, but temp password email failed for ${staff.email}: ${(error as Error).message}`,
+      );
+    }
+
     return {
       message: 'Staff account created successfully',
       tempPassword,
@@ -342,7 +354,11 @@ export class AuthService {
       ? AUTH_PERMISSIONS.insurance
       : userRole === UserRole.GOVERNMENT
         ? AUTH_PERMISSIONS.government
-        : [];
+        : userRole === UserRole.ADMIN
+          ? AUTH_PERMISSIONS.admin
+          : userRole === UserRole.PATIENT
+            ? AUTH_PERMISSIONS.patient
+            : [];
 
     const user = await prisma.user.create({
       data: {

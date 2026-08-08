@@ -47,12 +47,14 @@ export class MedicinesController {
   @Roles(UserRole.PATIENT, UserRole.PHARMACY_OWNER, UserRole.PHARMACIST, UserRole.GOVERNMENT, UserRole.ADMIN)
   @ApiOperation({
     summary: 'List all medicines',
-    description: 'Endpoint: GET /api/v1/medicines?page=1&limit=10\n\nQuery Parameters:\n- page (optional): Page number for pagination\n- limit (optional): Items per page',
+    description: 'Endpoint: GET /api/v1/medicines?page=1&limit=10&includeArchived=false\n\nQuery Parameters:\n- page (optional): Page number for pagination\n- limit (optional): Items per page\n- includeArchived (optional): Return archived medicines when true',
   })
   @ApiQuery({ name: 'page', required: false, type: Number, example: 1 })
   @ApiQuery({ name: 'limit', required: false, type: Number, example: 10 })
-  findAll(@Query('page') page?: number, @Query('limit') limit?: number) {
-    return this.medicinesService.findAll(page, limit);
+  @ApiQuery({ name: 'includeArchived', required: false, type: Boolean, example: false })
+  findAll(@Query('page') page?: number, @Query('limit') limit?: number, @Query('includeArchived') includeArchived?: string) {
+    const includeArchivedFlag = String(includeArchived).toLowerCase() === 'true';
+    return this.medicinesService.findAll(page, limit, includeArchivedFlag);
   }
 
   @Get(':id')

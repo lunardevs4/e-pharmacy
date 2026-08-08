@@ -66,7 +66,7 @@ export class GovernmentDashboardService {
       },
       include: {
         medicine: true,
-        pharmacy: { select: { id: true, name: true, address: true } },
+        pharmacy: { select: { id: true, name: true, address: true, district: true, province: true } },
       },
     });
   }
