@@ -109,10 +109,10 @@ export class PharmaciesController {
 
   @Patch(':id/approve')
   @UseGuards(JwtAuthGuard)
-  @Roles(UserRole.ADMIN)
+  @Roles(UserRole.GOVERNMENT)
   @ApiBearerAuth()
   @ApiOperation({
-    summary: 'Approve/reject pharmacy (admin only)',
+    summary: 'Approve/reject pharmacy (Government only)',
     description: 'Endpoint: PATCH /api/v1/pharmacies/:id/approve\n\nURL Parameters:\n- id (UUID): The unique identifier of the pharmacy',
   })
   @ApiParam({ name: 'id', type: 'string', description: 'Pharmacy UUID', example: '550e8400-e29b-41d4-a716-446655440000' })
