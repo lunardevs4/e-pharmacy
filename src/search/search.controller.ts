@@ -1,7 +1,7 @@
-import { Controller, Get, Query, UseGuards } from '@nestjs/common';
-import { ApiTags, ApiOperation, ApiQuery, ApiBearerAuth } from '@nestjs/swagger';
+import { Controller, Get, Query } from '@nestjs/common';
+import { ApiTags, ApiOperation, ApiQuery } from '@nestjs/swagger';
 import { SearchService } from './search.service';
-import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
+import { Public } from '../common/guards/public.decorator';
 
 @ApiTags('Search')
 @Controller('api/v1/search')
@@ -9,8 +9,7 @@ export class SearchController {
   constructor(private searchService: SearchService) { }
 
   @Get('medicines')
-  @UseGuards(JwtAuthGuard)
-  @ApiBearerAuth()
+  @Public()
   @ApiOperation({
     summary: 'Search medicines with location and filters',
     description: 'Endpoint: GET /api/v1/search/medicines?query=amoxicillin&categoryId=uuid&latitude=6.4281&longitude=3.4214&radius=5000&page=1&limit=10\n\nQuery Parameters:\n- query (optional): Search text to match medicine names\n- categoryId (optional): Filter by category UUID\n- latitude (optional): User latitude for location-based search\n- longitude (optional): User longitude for location-based search\n- radius (optional): Search radius in meters (default varies)\n- page (optional): Page number for pagination\n- limit (optional): Items per page',

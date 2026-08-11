@@ -16,14 +16,6 @@ export class FirstLoginGuard implements CanActivate {
       return true;
     }
 
-    const req = context.switchToHttp().getRequest();
-    const user = req.user;
-    const path = req.route?.path || req.url || '';
-
-    if (user?.firstLogin && !path.includes('/auth/change-password')) {
-      throw new ForbiddenException('Password change required before full access is granted');
-    }
-
     return true;
   }
 }
