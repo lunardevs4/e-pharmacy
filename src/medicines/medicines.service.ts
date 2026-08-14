@@ -52,6 +52,9 @@ export class MedicinesService {
           include: { category: true, manufacturer: true, batches: true },
         });
         return medicine;
+      }, {
+        maxWait: 15_000,
+        timeout: 30_000,
       });
     } catch (error) {
       if ((error as any)?.code === 'P2002') {

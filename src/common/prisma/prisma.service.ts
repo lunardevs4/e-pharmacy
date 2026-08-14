@@ -9,7 +9,12 @@ export class PrismaService implements OnModuleInit, OnModuleDestroy {
 
   constructor() {
     const connectionString = process.env.DATABASE_URL;
-    const pool = new Pool({ connectionString });
+    const pool = new Pool({
+      connectionString,
+      max: 10,
+      connectionTimeoutMillis: 15_000,
+      idleTimeoutMillis: 30_000,
+    });
     const adapter = new PrismaPg(pool);
     this.prisma = new PrismaClient({ adapter }) as PrismaClient;
   }
