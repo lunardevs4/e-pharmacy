@@ -1,8 +1,19 @@
-import { Injectable, NotFoundException, ForbiddenException } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  ForbiddenException,
+} from '@nestjs/common';
 import { PrismaService } from '../common/prisma/prisma.service';
-import { CreateReservationDto, UpdateReservationStatusDto } from './dto/reservations.dto';
+import {
+  CreateReservationDto,
+  UpdateReservationStatusDto,
+} from './dto/reservations.dto';
 import { UserRole, ReservationStatus } from '@generated/prisma';
-import { validateUuid, sanitizeDeep, validateDate } from '../common/security/security.util';
+import {
+  validateUuid,
+  sanitizeDeep,
+  validateDate,
+} from '../common/security/security.util';
 
 interface AuthenticatedUser {
   id: string;
@@ -11,9 +22,12 @@ interface AuthenticatedUser {
 
 @Injectable()
 export class ReservationsService {
-  constructor(private prismaService: PrismaService) { }
+  constructor(private prismaService: PrismaService) {}
 
-  async create(user: AuthenticatedUser, createReservationDto: CreateReservationDto) {
+  async create(
+    user: AuthenticatedUser,
+    createReservationDto: CreateReservationDto,
+  ) {
     const prisma = this.prismaService.prisma;
     const safeUserId = validateUuid(user.id, 'userId');
     const safeDto = sanitizeDeep(createReservationDto);
@@ -22,8 +36,11 @@ export class ReservationsService {
       throw new ForbiddenException('Only patients can create reservations');
     }
 
-    const patient = await prisma.patient.findFirst({ where: { userId: safeUserId } });
-    if (!patient) throw new NotFoundException('Patient profile not found');
+    const patient = await prisma.patient.upsert({
+      where: { userId: safeUserId },
+      update: {},
+      create: { userId: safeUserId },
+    });
 
     const expiresAt = validateDate((safeDto as any).expiresAt, 'expiresAt');
     const { expiresAt: _stripExpiry, ...restDto } = safeDto as any;
@@ -42,10 +59,14 @@ export class ReservationsService {
     const safeUserId = validateUuid(user.id, 'userId');
 
     if (user.role !== UserRole.PATIENT) {
-      throw new ForbiddenException('Only patients can view their personal reservations via this endpoint');
+      throw new ForbiddenException(
+        'Only patients can view their personal reservations via this endpoint',
+      );
     }
 
-    const patient = await prisma.patient.findFirst({ where: { userId: safeUserId } });
+    const patient = await prisma.patient.findFirst({
+      where: { userId: safeUserId },
+    });
     if (!patient) throw new NotFoundException('Patient profile not found');
 
     return prisma.reservation.findMany({
@@ -61,13 +82,19 @@ export class ReservationsService {
     const safeId = validateUuid(id, 'id');
 
     if (user.role !== UserRole.PATIENT) {
-      throw new ForbiddenException('Only patients can cancel their own reservations via this endpoint');
+      throw new ForbiddenException(
+        'Only patients can cancel their own reservations via this endpoint',
+      );
     }
 
-    const patient = await prisma.patient.findFirst({ where: { userId: safeUserId } });
+    const patient = await prisma.patient.findFirst({
+      where: { userId: safeUserId },
+    });
     if (!patient) throw new NotFoundException('Patient profile not found');
 
-    const reservation = await prisma.reservation.findUnique({ where: { id: safeId } });
+    const reservation = await prisma.reservation.findUnique({
+      where: { id: safeId },
+    });
     if (!reservation) throw new NotFoundException('Reservation not found');
     if (reservation.patientId !== patient.id) {
       throw new ForbiddenException('This reservation does not belong to you');
@@ -79,10 +106,15 @@ export class ReservationsService {
     });
   }
 
-  private async ensurePharmacyViewAccess(pharmacyId: string, user: AuthenticatedUser) {
+  private async ensurePharmacyViewAccess(
+    pharmacyId: string,
+    user: AuthenticatedUser,
+  ) {
     const prisma = this.prismaService.prisma;
     const safePharmacyId = validateUuid(pharmacyId, 'pharmacyId');
-    const pharmacy = await prisma.pharmacy.findUnique({ where: { id: safePharmacyId } });
+    const pharmacy = await prisma.pharmacy.findUnique({
+      where: { id: safePharmacyId },
+    });
     if (!pharmacy) throw new NotFoundException('Pharmacy not found');
 
     if (user.role === UserRole.PHARMACY_OWNER) {
@@ -101,22 +133,33 @@ export class ReservationsService {
         },
       });
       if (!employee) {
-        throw new ForbiddenException('You are not employed as a pharmacist at this pharmacy');
+        throw new ForbiddenException(
+          'You are not employed as a pharmacist at this pharmacy',
+        );
       }
       return { pharmacy, safePharmacyId };
     }
 
-    throw new ForbiddenException('Insufficient permissions to access reservations for this pharmacy');
+    throw new ForbiddenException(
+      'Insufficient permissions to access reservations for this pharmacy',
+    );
   }
 
-  private async ensurePharmacyWriteAccess(pharmacyId: string, user: AuthenticatedUser) {
+  private async ensurePharmacyWriteAccess(
+    pharmacyId: string,
+    user: AuthenticatedUser,
+  ) {
     const prisma = this.prismaService.prisma;
     const safePharmacyId = validateUuid(pharmacyId, 'pharmacyId');
-    const pharmacy = await prisma.pharmacy.findUnique({ where: { id: safePharmacyId } });
+    const pharmacy = await prisma.pharmacy.findUnique({
+      where: { id: safePharmacyId },
+    });
     if (!pharmacy) throw new NotFoundException('Pharmacy not found');
 
     if (user.role !== UserRole.PHARMACIST) {
-      throw new ForbiddenException('Only pharmacists can confirm/manage reservation status');
+      throw new ForbiddenException(
+        'Only pharmacists can confirm/manage reservation status',
+      );
     }
 
     const employee = await prisma.pharmacyEmployee.findFirst({
@@ -127,7 +170,9 @@ export class ReservationsService {
       },
     });
     if (!employee) {
-      throw new ForbiddenException('You are not employed as a pharmacist at this pharmacy');
+      throw new ForbiddenException(
+        'You are not employed as a pharmacist at this pharmacy',
+      );
     }
 
     return { pharmacy, safePharmacyId };
@@ -135,7 +180,10 @@ export class ReservationsService {
 
   async findByPharmacy(pharmacyId: string, user: AuthenticatedUser) {
     const prisma = this.prismaService.prisma;
-    const { safePharmacyId } = await this.ensurePharmacyViewAccess(pharmacyId, user);
+    const { safePharmacyId } = await this.ensurePharmacyViewAccess(
+      pharmacyId,
+      user,
+    );
 
     return prisma.reservation.findMany({
       where: { pharmacyId: safePharmacyId },
@@ -154,7 +202,10 @@ export class ReservationsService {
     updateDto: UpdateReservationStatusDto,
   ) {
     const prisma = this.prismaService.prisma;
-    const { safePharmacyId } = await this.ensurePharmacyWriteAccess(pharmacyId, user);
+    const { safePharmacyId } = await this.ensurePharmacyWriteAccess(
+      pharmacyId,
+      user,
+    );
     const safeId = validateUuid(id, 'id');
     const safeDto = sanitizeDeep(updateDto);
 
