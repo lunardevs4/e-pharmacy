@@ -114,7 +114,7 @@ export class AuthService {
         role: UserRole.PHARMACY,
         position: 'Owner',
         permissions: AUTH_PERMISSIONS.manager,
-        firstLogin: true,
+        firstLogin: false,
         isActive: true,
       },
     });
