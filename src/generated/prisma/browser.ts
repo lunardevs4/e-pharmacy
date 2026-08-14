@@ -63,6 +63,11 @@ export type Manufacturer = Prisma.ManufacturerModel
  */
 export type Medicine = Prisma.MedicineModel
 /**
+ * Model MedicineBatch
+ * 
+ */
+export type MedicineBatch = Prisma.MedicineBatchModel
+/**
  * Model Inventory
  * 
  */

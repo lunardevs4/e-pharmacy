@@ -1,5 +1,5 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards } from '@nestjs/common';
-import { ApiTags, ApiBearerAuth, ApiOperation, ApiBody, ApiParam } from '@nestjs/swagger';
+import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, Query } from '@nestjs/common';
+import { ApiTags, ApiBearerAuth, ApiOperation, ApiBody, ApiParam, ApiQuery } from '@nestjs/swagger';
 import { ManufacturersService } from './manufacturers.service';
 import { CreateManufacturerDto, UpdateManufacturerDto } from './dto/manufacturers.dto';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
@@ -43,8 +43,9 @@ export class ManufacturersController {
     summary: 'List all manufacturers',
     description: 'Endpoint: GET /api/v1/manufacturers\n\nReturns a list of all manufacturers in the system.',
   })
-  findAll() {
-    return this.manufacturersService.findAll();
+  @ApiQuery({ name: 'search', required: false, type: String })
+  findAll(@Query('search') search?: string) {
+    return this.manufacturersService.findAll(search);
   }
 
   @Get(':id')

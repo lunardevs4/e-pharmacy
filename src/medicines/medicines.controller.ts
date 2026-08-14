@@ -14,27 +14,26 @@ export class MedicinesController {
   constructor(private medicinesService: MedicinesService) { }
 
   @Post()
-  @Roles(UserRole.ADMIN)
-  @ApiOperation({ summary: 'Create medicine (admin only)' })
+  @Roles(UserRole.PHARMACIST, UserRole.PHARMACY_OWNER)
+  @ApiOperation({ summary: 'Create medicine (Government, Pharmacist, Pharmacy Owner only)', description: 'Endpoint: POST /api/v1/medicines\n\nCreates a new medicine record in the system. Requires authentication and appropriate user role.' })
   @ApiBody({
     type: CreateMedicineDto,
     examples: {
       fullDetails: {
         value: {
-          name: 'Amoxicillin 500mg Capsules',
+          tradeName: 'Amoxicillin 500mg Capsules',
           genericName: 'Amoxicillin',
-          description: 'A penicillin antibiotic used to treat bacterial infections',
           categoryId: '550e8400-e29b-41d4-a716-446655440000',
           manufacturerId: '550e8400-e29b-41d4-a716-446655440001',
-          dosageForm: 'Capsule',
-          strength: '500mg',
-          imageUrl: 'https://example.com/amoxicillin.jpg',
+          initialBatch: { lotNumber: 'LOT-001', batchNumber: 'BATCH-001', expiryDate: '2027-12-31', unitCost: 5, unitSellingPrice: 8, initialStock: 100 },
         },
       },
       minimal: {
         value: {
-          name: 'Paracetamol Tablets',
-          categoryId: '550e8400-e29b-41d4-a716-446655440002',
+          tradeName: 'Paracetamol Tablets',
+          categoryName: 'Analgesics',
+          manufacturerName: 'Generic Manufacturer',
+          initialBatch: { lotNumber: 'LOT-002', batchNumber: 'BATCH-002', expiryDate: '2027-12-31', unitCost: 1, unitSellingPrice: 2, initialStock: 100 },
         },
       },
     },
@@ -44,7 +43,7 @@ export class MedicinesController {
   }
 
   @Get()
-  @Roles(UserRole.PATIENT, UserRole.PHARMACY_OWNER, UserRole.PHARMACIST, UserRole.GOVERNMENT, UserRole.ADMIN)
+  @Roles(UserRole.PATIENT, UserRole.PHARMACY_OWNER, UserRole.PHARMACIST, UserRole.GOVERNMENT)
   @ApiOperation({
     summary: 'List all medicines',
     description: 'Endpoint: GET /api/v1/medicines?page=1&limit=10&includeArchived=false\n\nQuery Parameters:\n- page (optional): Page number for pagination\n- limit (optional): Items per page\n- includeArchived (optional): Return archived medicines when true',
@@ -58,7 +57,7 @@ export class MedicinesController {
   }
 
   @Get(':id')
-  @Roles(UserRole.PATIENT, UserRole.PHARMACY_OWNER, UserRole.PHARMACIST, UserRole.GOVERNMENT, UserRole.ADMIN)
+  @Roles(UserRole.PATIENT, UserRole.PHARMACY_OWNER, UserRole.PHARMACIST, UserRole.GOVERNMENT)
   @ApiOperation({
     summary: 'Get medicine details',
     description: 'Endpoint: GET /api/v1/medicines/:id\n\nURL Parameters:\n- id (UUID): The unique identifier of the medicine',
@@ -69,9 +68,9 @@ export class MedicinesController {
   }
 
   @Patch(':id')
-  @Roles(UserRole.ADMIN)
+  @Roles(UserRole.PHARMACIST, UserRole.PHARMACY_OWNER)
   @ApiOperation({
-    summary: 'Update medicine (admin only)',
+    summary: 'Update medicine (pharmacist and pharmacy_owner)',
     description: 'Endpoint: PATCH /api/v1/medicines/:id\n\nURL Parameters:\n- id (UUID): The unique identifier of the medicine',
   })
   @ApiParam({ name: 'id', type: 'string', description: 'Medicine UUID', example: '550e8400-e29b-41d4-a716-446655440000' })
@@ -102,9 +101,9 @@ export class MedicinesController {
   }
 
   @Delete(':id')
-  @Roles(UserRole.ADMIN)
+  @Roles(UserRole.PHARMACIST, UserRole.PHARMACY_OWNER)
   @ApiOperation({
-    summary: 'Delete medicine (admin only)',
+    summary: 'Delete medicine (pharmacist and pharmacy_owner)',
     description: 'Endpoint: DELETE /api/v1/medicines/:id\n\nURL Parameters:\n- id (UUID): The unique identifier of the medicine to delete',
   })
   @ApiParam({ name: 'id', type: 'string', description: 'Medicine UUID', example: '550e8400-e29b-41d4-a716-446655440000' })

@@ -9,8 +9,25 @@ CREATE TABLE "PharmacyOwner" (
     CONSTRAINT "PharmacyOwner_pkey" PRIMARY KEY ("id")
 );
 
--- Backfill owners from the existing user-to-pharmacy links before dropping the old columns.
-INSERT INTO "PharmacyOwner" ("id", "userId", "pharmacyId", "createdAt", "updatedAt")
+-- CreateIndex
+-- These indexes must exist before the backfill because
+-- the INSERT statements use ON CONFLICT against them.
+CREATE UNIQUE INDEX "PharmacyOwner_userId_key"
+ON "PharmacyOwner"("userId");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "PharmacyOwner_pharmacyId_key"
+ON "PharmacyOwner"("pharmacyId");
+
+-- Backfill owners from the existing user-to-pharmacy links
+-- before dropping the old columns.
+INSERT INTO "PharmacyOwner" (
+    "id",
+    "userId",
+    "pharmacyId",
+    "createdAt",
+    "updatedAt"
+)
 SELECT
     CONCAT('owner_', "id"),
     "id",
@@ -23,7 +40,14 @@ WHERE "pharmacyId" IS NOT NULL
 ON CONFLICT ("userId") DO NOTHING;
 
 -- Preserve existing pharmacist-to-pharmacy membership data.
-INSERT INTO "PharmacyEmployee" ("id", "pharmacyId", "userId", "role", "createdAt", "updatedAt")
+INSERT INTO "PharmacyEmployee" (
+    "id",
+    "pharmacyId",
+    "userId",
+    "role",
+    "createdAt",
+    "updatedAt"
+)
 SELECT
     CONCAT('employee_', "id"),
     "pharmacyId",
@@ -36,24 +60,30 @@ WHERE "pharmacyId" IS NOT NULL
   AND "role" = 'PHARMACIST'
 ON CONFLICT ("pharmacyId", "userId") DO NOTHING;
 
--- CreateIndex
-CREATE UNIQUE INDEX "PharmacyOwner_userId_key" ON "PharmacyOwner"("userId");
-
--- CreateIndex
-CREATE UNIQUE INDEX "PharmacyOwner_pharmacyId_key" ON "PharmacyOwner"("pharmacyId");
+-- AddForeignKey
+ALTER TABLE "PharmacyOwner"
+ADD CONSTRAINT "PharmacyOwner_userId_fkey"
+FOREIGN KEY ("userId")
+REFERENCES "User"("id")
+ON DELETE CASCADE
+ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "PharmacyOwner" ADD CONSTRAINT "PharmacyOwner_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE CASCADE ON UPDATE CASCADE;
-
--- AddForeignKey
-ALTER TABLE "PharmacyOwner" ADD CONSTRAINT "PharmacyOwner_pharmacyId_fkey" FOREIGN KEY ("pharmacyId") REFERENCES "Pharmacy"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE "PharmacyOwner"
+ADD CONSTRAINT "PharmacyOwner_pharmacyId_fkey"
+FOREIGN KEY ("pharmacyId")
+REFERENCES "Pharmacy"("id")
+ON DELETE CASCADE
+ON UPDATE CASCADE;
 
 -- DropForeignKey
-ALTER TABLE "User" DROP CONSTRAINT IF EXISTS "User_pharmacyId_fkey";
+ALTER TABLE "User"
+DROP CONSTRAINT IF EXISTS "User_pharmacyId_fkey";
 
 -- DropIndex
 DROP INDEX IF EXISTS "User_pharmacyId_idx";
 
 -- AlterTable
-ALTER TABLE "User" DROP COLUMN IF EXISTS "pharmacyId",
+ALTER TABLE "User"
+DROP COLUMN IF EXISTS "pharmacyId",
 DROP COLUMN IF EXISTS "organizationId";

@@ -29,7 +29,7 @@ export class GovernmentDashboardService {
     ] = await Promise.all([
       prisma.pharmacy.count({ where: { deletedAt: null } }),
       prisma.pharmacy.count({ where: { status: 'APPROVED', deletedAt: null } }),
-      prisma.medicine.count({ where: { isActive: true, deletedAt: null } }),
+       prisma.medicine.count(),
       prisma.patient.count(),
       prisma.reservation.count(),
       prisma.reservation.count({ where: { status: 'PENDING' } }),
@@ -62,7 +62,7 @@ export class GovernmentDashboardService {
       result.map(async (item) => {
         const medicine = await prisma.medicine.findUnique({
           where: { id: item.medicineId },
-          select: { id: true, name: true, genericName: true },
+           select: { id: true, tradeName: true, genericName: true },
         });
         return {
           medicine,

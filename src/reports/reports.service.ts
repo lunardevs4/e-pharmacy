@@ -83,7 +83,7 @@ export class ReportsService {
 
     if (user.role === UserRole.ADMIN) {
       return prisma.medicine.findMany({
-        where: { isActive: true, deletedAt: null },
+        where: {},
         include: {
           category: true,
           manufacturer: true,
@@ -106,8 +106,6 @@ export class ReportsService {
       const pharmacyIds = ownedPharmacies.map((p) => p.id);
       return prisma.medicine.findMany({
         where: {
-          isActive: true,
-          deletedAt: null,
           inventories: { some: { pharmacyId: { in: pharmacyIds } } },
         },
         include: {
@@ -133,8 +131,6 @@ export class ReportsService {
       const pharmacyIds = staff.map((s) => s.pharmacyId);
       return prisma.medicine.findMany({
         where: {
-          isActive: true,
-          deletedAt: null,
           inventories: { some: { pharmacyId: { in: pharmacyIds } } },
         },
         include: {
@@ -228,7 +224,7 @@ export class ReportsService {
         id: item.id,
         pharmacy: item.pharmacy ? { name: item.pharmacy.name } : null,
         patientNid: item.patient?.userId || null,
-        drug: item.medicine?.name || 'Medication',
+        drug: item.medicine?.tradeName || 'Medication',
         totalCost: Number(item.quantity || 0),
         insurancePay: Number(item.quantity || 0),
         patientPay: 0,
@@ -310,7 +306,7 @@ export class ReportsService {
       prisma.user.groupBy({ by: ['role'], _count: { id: true } }),
       prisma.pharmacy.count({ where: { deletedAt: null } }),
       prisma.pharmacy.groupBy({ by: ['status'], _count: { id: true }, where: { deletedAt: null } }),
-      prisma.medicine.count({ where: { isActive: true, deletedAt: null } }),
+       prisma.medicine.count(),
       prisma.patient.count(),
       prisma.reservation.count({ where: whereCreated }),
       prisma.reservation.groupBy({ by: ['status'], _count: { id: true }, where: whereCreated }),

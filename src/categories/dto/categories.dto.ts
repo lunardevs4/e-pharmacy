@@ -1,17 +1,10 @@
 import { PartialType } from '@nestjs/swagger';
-import { IsString, IsOptional, IsUUID } from 'class-validator';
+import { IsString, MinLength } from 'class-validator';
 
 export class CreateCategoryDto {
   @IsString()
+  @MinLength(1)
   name: string;
-
-  @IsOptional()
-  @IsString()
-  description?: string;
-
-  @IsOptional()
-  @IsUUID()
-  parentId?: string;
 }
 
 export class UpdateCategoryDto extends PartialType(CreateCategoryDto) {}

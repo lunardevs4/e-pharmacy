@@ -73,7 +73,7 @@ export class ReminderSchedulerService {
             include: { user: true },
           },
           medicine: {
-            select: { id: true, name: true },
+            select: { id: true, tradeName: true },
           },
         },
       });
@@ -117,7 +117,7 @@ export class ReminderSchedulerService {
           }
 
           const patientUserId = schedule.patient.user.id;
-          const medicineName = schedule.medicine.name;
+          const medicineName = schedule.medicine.tradeName;
 
           // Create the reminder log and notification in a transaction
           await prisma.$transaction([

@@ -60,6 +60,7 @@ export const ModelName = {
   Category: 'Category',
   Manufacturer: 'Manufacturer',
   Medicine: 'Medicine',
+  MedicineBatch: 'MedicineBatch',
   Inventory: 'Inventory',
   InventoryHistory: 'InventoryHistory',
   StockMovement: 'StockMovement',
@@ -185,12 +186,8 @@ export type PharmacyEmployeeScalarFieldEnum = (typeof PharmacyEmployeeScalarFiel
 export const CategoryScalarFieldEnum = {
   id: 'id',
   name: 'name',
-  parentId: 'parentId',
-  description: 'description',
-  isActive: 'isActive',
   createdAt: 'createdAt',
-  updatedAt: 'updatedAt',
-  deletedAt: 'deletedAt'
+  updatedAt: 'updatedAt'
 } as const
 
 export type CategoryScalarFieldEnum = (typeof CategoryScalarFieldEnum)[keyof typeof CategoryScalarFieldEnum]
@@ -199,11 +196,8 @@ export type CategoryScalarFieldEnum = (typeof CategoryScalarFieldEnum)[keyof typ
 export const ManufacturerScalarFieldEnum = {
   id: 'id',
   name: 'name',
-  country: 'country',
-  isActive: 'isActive',
   createdAt: 'createdAt',
-  updatedAt: 'updatedAt',
-  deletedAt: 'deletedAt'
+  updatedAt: 'updatedAt'
 } as const
 
 export type ManufacturerScalarFieldEnum = (typeof ManufacturerScalarFieldEnum)[keyof typeof ManufacturerScalarFieldEnum]
@@ -211,21 +205,35 @@ export type ManufacturerScalarFieldEnum = (typeof ManufacturerScalarFieldEnum)[k
 
 export const MedicineScalarFieldEnum = {
   id: 'id',
-  name: 'name',
+  tradeName: 'tradeName',
   genericName: 'genericName',
-  description: 'description',
   categoryId: 'categoryId',
   manufacturerId: 'manufacturerId',
-  dosageForm: 'dosageForm',
-  strength: 'strength',
-  imageUrl: 'imageUrl',
-  isActive: 'isActive',
   createdAt: 'createdAt',
-  updatedAt: 'updatedAt',
-  deletedAt: 'deletedAt'
+  updatedAt: 'updatedAt'
 } as const
 
 export type MedicineScalarFieldEnum = (typeof MedicineScalarFieldEnum)[keyof typeof MedicineScalarFieldEnum]
+
+
+export const MedicineBatchScalarFieldEnum = {
+  id: 'id',
+  medicineId: 'medicineId',
+  batchNumber: 'batchNumber',
+  lotNumber: 'lotNumber',
+  expiryDate: 'expiryDate',
+  unitCost: 'unitCost',
+  unitSellingPrice: 'unitSellingPrice',
+  initialStock: 'initialStock',
+  currentStock: 'currentStock',
+  storageConditions: 'storageConditions',
+  minTemperature: 'minTemperature',
+  maxTemperature: 'maxTemperature',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type MedicineBatchScalarFieldEnum = (typeof MedicineBatchScalarFieldEnum)[keyof typeof MedicineBatchScalarFieldEnum]
 
 
 export const InventoryScalarFieldEnum = {
