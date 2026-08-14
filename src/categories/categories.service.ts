@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { ConflictException, Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../common/prisma/prisma.service';
 import { CreateCategoryDto, UpdateCategoryDto } from './dto/categories.dto';
 import { validateUuid, sanitizeDeep } from '../common/security/security.util';
@@ -7,17 +7,18 @@ import { validateUuid, sanitizeDeep } from '../common/security/security.util';
 export class CategoriesService {
   constructor(private prismaService: PrismaService) { }
 
-  create(createCategoryDto: CreateCategoryDto) {
+  async create(createCategoryDto: CreateCategoryDto) {
     const prisma = this.prismaService.prisma;
     const safeDto = sanitizeDeep(createCategoryDto);
-    return prisma.category.create({ data: safeDto });
+    try { return await prisma.category.create({ data: { name: safeDto.name.trim() } }); }
+    catch (error) { if ((error as any)?.code === 'P2002') throw new ConflictException('Category name already exists'); throw error; }
   }
 
-  findAll() {
+  findAll(search?: string) {
     const prisma = this.prismaService.prisma;
     return prisma.category.findMany({
-      where: { isActive: true, deletedAt: null },
-      include: { children: true },
+      where: search ? { name: { contains: search.trim(), mode: 'insensitive' } } : {},
+      orderBy: { name: 'asc' },
     });
   }
 
@@ -26,7 +27,7 @@ export class CategoriesService {
     const safeId = validateUuid(id, 'id');
     return prisma.category.findUnique({
       where: { id: safeId },
-      include: { children: true, parent: true, medicines: true },
+      include: { medicines: true },
     });
   }
 
@@ -36,7 +37,8 @@ export class CategoriesService {
     const safeDto = sanitizeDeep(updateCategoryDto);
     const category = await prisma.category.findUnique({ where: { id: safeId } });
     if (!category) throw new NotFoundException('Category not found');
-    return prisma.category.update({ where: { id: safeId }, data: safeDto });
+    try { return await prisma.category.update({ where: { id: safeId }, data: { name: safeDto.name?.trim() } }); }
+    catch (error) { if ((error as any)?.code === 'P2002') throw new ConflictException('Category name already exists'); throw error; }
   }
 
   async remove(id: string) {
@@ -44,6 +46,6 @@ export class CategoriesService {
     const safeId = validateUuid(id, 'id');
     const category = await prisma.category.findUnique({ where: { id: safeId } });
     if (!category) throw new NotFoundException('Category not found');
-    return prisma.category.update({ where: { id: safeId }, data: { deletedAt: new Date(), isActive: false } });
+    return prisma.category.delete({ where: { id: safeId } });
   }
 }

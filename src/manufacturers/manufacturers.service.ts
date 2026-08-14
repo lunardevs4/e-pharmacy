@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { ConflictException, Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../common/prisma/prisma.service';
 import { CreateManufacturerDto, UpdateManufacturerDto } from './dto/manufacturers.dto';
 import { validateUuid, sanitizeDeep } from '../common/security/security.util';
@@ -7,15 +7,16 @@ import { validateUuid, sanitizeDeep } from '../common/security/security.util';
 export class ManufacturersService {
   constructor(private prismaService: PrismaService) { }
 
-  create(createManufacturerDto: CreateManufacturerDto) {
+  async create(createManufacturerDto: CreateManufacturerDto) {
     const prisma = this.prismaService.prisma;
     const safeDto = sanitizeDeep(createManufacturerDto);
-    return prisma.manufacturer.create({ data: safeDto });
+    try { return await prisma.manufacturer.create({ data: { name: safeDto.name.trim() } }); }
+    catch (error) { if ((error as any)?.code === 'P2002') throw new ConflictException('Manufacturer name already exists'); throw error; }
   }
 
-  findAll() {
+  findAll(search?: string) {
     const prisma = this.prismaService.prisma;
-    return prisma.manufacturer.findMany({ where: { isActive: true, deletedAt: null } });
+    return prisma.manufacturer.findMany({ where: search ? { name: { contains: search.trim(), mode: 'insensitive' } } : {}, orderBy: { name: 'asc' } });
   }
 
   findOne(id: string) {
@@ -30,7 +31,8 @@ export class ManufacturersService {
     const safeDto = sanitizeDeep(updateManufacturerDto);
     const manufacturer = await prisma.manufacturer.findUnique({ where: { id: safeId } });
     if (!manufacturer) throw new NotFoundException('Manufacturer not found');
-    return prisma.manufacturer.update({ where: { id: safeId }, data: safeDto });
+    try { return await prisma.manufacturer.update({ where: { id: safeId }, data: { name: safeDto.name?.trim() } }); }
+    catch (error) { if ((error as any)?.code === 'P2002') throw new ConflictException('Manufacturer name already exists'); throw error; }
   }
 
   async remove(id: string) {
@@ -38,6 +40,6 @@ export class ManufacturersService {
     const safeId = validateUuid(id, 'id');
     const manufacturer = await prisma.manufacturer.findUnique({ where: { id: safeId } });
     if (!manufacturer) throw new NotFoundException('Manufacturer not found');
-    return prisma.manufacturer.update({ where: { id: safeId }, data: { deletedAt: new Date(), isActive: false } });
+    return prisma.manufacturer.delete({ where: { id: safeId } });
   }
 }

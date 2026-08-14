@@ -406,6 +406,7 @@ export const ModelName = {
   Category: 'Category',
   Manufacturer: 'Manufacturer',
   Medicine: 'Medicine',
+  MedicineBatch: 'MedicineBatch',
   Inventory: 'Inventory',
   InventoryHistory: 'InventoryHistory',
   StockMovement: 'StockMovement',
@@ -432,7 +433,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "user" | "refreshToken" | "patient" | "pharmacy" | "pharmacyOwner" | "pharmacyEmployee" | "category" | "manufacturer" | "medicine" | "inventory" | "inventoryHistory" | "stockMovement" | "reservation" | "prescription" | "prescriptionMedicine" | "reminderSchedule" | "reminderLog" | "notification" | "auditLog" | "systemSetting"
+    modelProps: "user" | "refreshToken" | "patient" | "pharmacy" | "pharmacyOwner" | "pharmacyEmployee" | "category" | "manufacturer" | "medicine" | "medicineBatch" | "inventory" | "inventoryHistory" | "stockMovement" | "reservation" | "prescription" | "prescriptionMedicine" | "reminderSchedule" | "reminderLog" | "notification" | "auditLog" | "systemSetting"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -1099,6 +1100,80 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         count: {
           args: Prisma.MedicineCountArgs<ExtArgs>
           result: runtime.Types.Utils.Optional<Prisma.MedicineCountAggregateOutputType> | number
+        }
+      }
+    }
+    MedicineBatch: {
+      payload: Prisma.$MedicineBatchPayload<ExtArgs>
+      fields: Prisma.MedicineBatchFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.MedicineBatchFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$MedicineBatchPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.MedicineBatchFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$MedicineBatchPayload>
+        }
+        findFirst: {
+          args: Prisma.MedicineBatchFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$MedicineBatchPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.MedicineBatchFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$MedicineBatchPayload>
+        }
+        findMany: {
+          args: Prisma.MedicineBatchFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$MedicineBatchPayload>[]
+        }
+        create: {
+          args: Prisma.MedicineBatchCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$MedicineBatchPayload>
+        }
+        createMany: {
+          args: Prisma.MedicineBatchCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.MedicineBatchCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$MedicineBatchPayload>[]
+        }
+        delete: {
+          args: Prisma.MedicineBatchDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$MedicineBatchPayload>
+        }
+        update: {
+          args: Prisma.MedicineBatchUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$MedicineBatchPayload>
+        }
+        deleteMany: {
+          args: Prisma.MedicineBatchDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.MedicineBatchUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.MedicineBatchUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$MedicineBatchPayload>[]
+        }
+        upsert: {
+          args: Prisma.MedicineBatchUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$MedicineBatchPayload>
+        }
+        aggregate: {
+          args: Prisma.MedicineBatchAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateMedicineBatch>
+        }
+        groupBy: {
+          args: Prisma.MedicineBatchGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.MedicineBatchGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.MedicineBatchCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.MedicineBatchCountAggregateOutputType> | number
         }
       }
     }
@@ -2051,12 +2126,8 @@ export type PharmacyEmployeeScalarFieldEnum = (typeof PharmacyEmployeeScalarFiel
 export const CategoryScalarFieldEnum = {
   id: 'id',
   name: 'name',
-  parentId: 'parentId',
-  description: 'description',
-  isActive: 'isActive',
   createdAt: 'createdAt',
-  updatedAt: 'updatedAt',
-  deletedAt: 'deletedAt'
+  updatedAt: 'updatedAt'
 } as const
 
 export type CategoryScalarFieldEnum = (typeof CategoryScalarFieldEnum)[keyof typeof CategoryScalarFieldEnum]
@@ -2065,11 +2136,8 @@ export type CategoryScalarFieldEnum = (typeof CategoryScalarFieldEnum)[keyof typ
 export const ManufacturerScalarFieldEnum = {
   id: 'id',
   name: 'name',
-  country: 'country',
-  isActive: 'isActive',
   createdAt: 'createdAt',
-  updatedAt: 'updatedAt',
-  deletedAt: 'deletedAt'
+  updatedAt: 'updatedAt'
 } as const
 
 export type ManufacturerScalarFieldEnum = (typeof ManufacturerScalarFieldEnum)[keyof typeof ManufacturerScalarFieldEnum]
@@ -2077,21 +2145,35 @@ export type ManufacturerScalarFieldEnum = (typeof ManufacturerScalarFieldEnum)[k
 
 export const MedicineScalarFieldEnum = {
   id: 'id',
-  name: 'name',
+  tradeName: 'tradeName',
   genericName: 'genericName',
-  description: 'description',
   categoryId: 'categoryId',
   manufacturerId: 'manufacturerId',
-  dosageForm: 'dosageForm',
-  strength: 'strength',
-  imageUrl: 'imageUrl',
-  isActive: 'isActive',
   createdAt: 'createdAt',
-  updatedAt: 'updatedAt',
-  deletedAt: 'deletedAt'
+  updatedAt: 'updatedAt'
 } as const
 
 export type MedicineScalarFieldEnum = (typeof MedicineScalarFieldEnum)[keyof typeof MedicineScalarFieldEnum]
+
+
+export const MedicineBatchScalarFieldEnum = {
+  id: 'id',
+  medicineId: 'medicineId',
+  batchNumber: 'batchNumber',
+  lotNumber: 'lotNumber',
+  expiryDate: 'expiryDate',
+  unitCost: 'unitCost',
+  unitSellingPrice: 'unitSellingPrice',
+  initialStock: 'initialStock',
+  currentStock: 'currentStock',
+  storageConditions: 'storageConditions',
+  minTemperature: 'minTemperature',
+  maxTemperature: 'maxTemperature',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type MedicineBatchScalarFieldEnum = (typeof MedicineBatchScalarFieldEnum)[keyof typeof MedicineBatchScalarFieldEnum]
 
 
 export const InventoryScalarFieldEnum = {
@@ -2631,6 +2713,7 @@ export type GlobalOmitConfig = {
   category?: Prisma.CategoryOmit
   manufacturer?: Prisma.ManufacturerOmit
   medicine?: Prisma.MedicineOmit
+  medicineBatch?: Prisma.MedicineBatchOmit
   inventory?: Prisma.InventoryOmit
   inventoryHistory?: Prisma.InventoryHistoryOmit
   stockMovement?: Prisma.StockMovementOmit

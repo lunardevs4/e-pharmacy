@@ -1,36 +1,72 @@
 import { PartialType } from '@nestjs/swagger';
-import { IsString, IsOptional, IsUUID, IsBoolean } from 'class-validator';
+import { Type } from 'class-transformer';
+import { IsString, IsOptional, IsUUID, IsBoolean, IsDateString, IsInt, IsNumber, Min, ValidateNested, ValidateIf } from 'class-validator';
+
+export class CreateMedicineBatchDto {
+  @IsString()
+  lotNumber: string;
+
+  @IsString()
+  batchNumber: string;
+
+  @IsDateString()
+  expiryDate: string;
+
+  @IsNumber({ maxDecimalPlaces: 2 })
+  @Min(0)
+  unitCost: number;
+
+  @IsNumber({ maxDecimalPlaces: 2 })
+  @Min(0)
+  unitSellingPrice: number;
+
+  @IsInt()
+  @Min(0)
+  initialStock: number;
+
+  @IsOptional()
+  @IsString()
+  storageConditions?: string;
+
+  @IsOptional()
+  @IsNumber({ maxDecimalPlaces: 2 })
+  minTemperature?: number;
+
+  @IsOptional()
+  @IsNumber({ maxDecimalPlaces: 2 })
+  maxTemperature?: number;
+}
 
 export class CreateMedicineDto {
   @IsString()
-  name: string;
+  tradeName: string;
 
-  @IsOptional()
   @IsString()
-  genericName?: string;
+  genericName: string;
 
+  @ValidateIf((dto) => !dto.categoryName)
+  @IsUUID()
   @IsOptional()
+  categoryId?: string;
+
+  @ValidateIf((dto) => !dto.categoryId)
   @IsString()
-  description?: string;
-
-  @IsUUID()
-  categoryId: string;
-
   @IsOptional()
+  categoryName?: string;
+
+  @ValidateIf((dto) => !dto.manufacturerName)
   @IsUUID()
+  @IsOptional()
   manufacturerId?: string;
 
-  @IsOptional()
+  @ValidateIf((dto) => !dto.manufacturerId)
   @IsString()
-  dosageForm?: string;
+  @IsOptional()
+  manufacturerName?: string;
 
-  @IsOptional()
-  @IsString()
-  strength?: string;
-
-  @IsOptional()
-  @IsString()
-  imageUrl?: string;
+  @ValidateNested()
+  @Type(() => CreateMedicineBatchDto)
+  initialBatch: CreateMedicineBatchDto;
 }
 
 export class UpdateMedicineDto extends PartialType(CreateMedicineDto) {

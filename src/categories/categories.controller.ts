@@ -1,5 +1,5 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards } from '@nestjs/common';
-import { ApiTags, ApiBearerAuth, ApiOperation, ApiBody, ApiParam } from '@nestjs/swagger';
+import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, Query } from '@nestjs/common';
+import { ApiTags, ApiBearerAuth, ApiOperation, ApiBody, ApiParam, ApiQuery } from '@nestjs/swagger';
 import { CategoriesService } from './categories.service';
 import { CreateCategoryDto, UpdateCategoryDto } from './dto/categories.dto';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
@@ -14,9 +14,9 @@ export class CategoriesController {
   constructor(private categoriesService: CategoriesService) { }
 
   @Post()
-  @Roles(UserRole.ADMIN)
+  @Roles(UserRole.GOVERNMENT)
   @ApiBearerAuth()
-  @ApiOperation({ summary: 'Create category (admin only)' })
+  @ApiOperation({ summary: 'Create category (government only)' })
   @ApiBody({
     type: CreateCategoryDto,
     examples: {
@@ -45,8 +45,9 @@ export class CategoriesController {
     summary: 'List all categories',
     description: 'Endpoint: GET /api/v1/categories\n\nReturns a list of all categories in the system.',
   })
-  findAll() {
-    return this.categoriesService.findAll();
+  @ApiQuery({ name: 'search', required: false, type: String })
+  findAll(@Query('search') search?: string) {
+    return this.categoriesService.findAll(search);
   }
 
   @Get(':id')

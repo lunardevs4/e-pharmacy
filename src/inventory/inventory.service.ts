@@ -120,7 +120,11 @@ export class InventoryService {
 
     return prisma.inventory.findMany({
       where: { pharmacyId: safePharmacyId, deletedAt: null },
-      include: { medicine: true },
+      include: {
+        medicine: {
+          include: { category: true, manufacturer: true, batches: true },
+        },
+      },
     });
   }
 
@@ -133,7 +137,13 @@ export class InventoryService {
 
     const inventory = await prisma.inventory.findUnique({
       where: { id: safeId },
-      include: { medicine: true, inventoryHistory: true, stockMovements: true },
+      include: {
+        medicine: {
+          include: { category: true, manufacturer: true, batches: true },
+        },
+        inventoryHistory: true,
+        stockMovements: true,
+      },
     });
     if (!inventory) throw new NotFoundException('Inventory not found');
     return inventory;

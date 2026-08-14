@@ -1,13 +1,10 @@
 import { PartialType } from '@nestjs/swagger';
-import { IsString, IsOptional } from 'class-validator';
+import { IsString, MinLength } from 'class-validator';
 
 export class CreateManufacturerDto {
   @IsString()
+  @MinLength(1)
   name: string;
-
-  @IsOptional()
-  @IsString()
-  country?: string;
 }
 
 export class UpdateManufacturerDto extends PartialType(CreateManufacturerDto) {}

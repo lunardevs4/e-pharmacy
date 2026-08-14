@@ -177,62 +177,79 @@ model PharmacyEmployee {
 }
 
 model Category {
-  id          String     @id @default(uuid())
-  name        String
-  parentId    String?
-  description String?
-  isActive    Boolean    @default(true)
-  createdAt   DateTime   @default(now())
-  updatedAt   DateTime   @updatedAt
-  deletedAt   DateTime?
+  id        String     @id @default(uuid())
+  name      String     @unique
 
-  parent      Category?  @relation("CategoryParent", fields: [parentId], references: [id], onDelete: SetNull)
-  children    Category[] @relation("CategoryParent")
-  medicines   Medicine[]
+  medicines Medicine[]
 
-  @@index([parentId])
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
 }
 
 model Manufacturer {
-  id          String    @id @default(uuid())
-  name        String
-  country     String?
-  isActive    Boolean   @default(true)
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
-  deletedAt   DateTime?
+  id        String     @id @default(uuid())
+  name      String     @unique
 
-  medicines   Medicine[]
+  medicines Medicine[]
 
-  @@index([name])
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
 }
 
 model Medicine {
-  id                    String            @id @default(uuid())
-  name                  String
-  genericName           String?
-  description           String?
-  categoryId            String
-  manufacturerId        String?
-  dosageForm            String?
-  strength              String?
-  imageUrl              String?
-  isActive              Boolean           @default(true)
-  createdAt             DateTime          @default(now())
-  updatedAt             DateTime          @updatedAt
-  deletedAt             DateTime?
+  id             String       @id @default(uuid())
 
-  category              Category          @relation(fields: [categoryId], references: [id], onDelete: Cascade)
-  manufacturer          Manufacturer?     @relation(fields: [manufacturerId], references: [id], onDelete: SetNull)
-  inventories           Inventory[]
-  reservations          Reservation[]
+  tradeName      String
+  genericName    String
+
+  categoryId     String
+  manufacturerId String
+
+  category       Category     @relation(fields: [categoryId], references: [id])
+  manufacturer   Manufacturer @relation(fields: [manufacturerId], references: [id])
+
+  batches        MedicineBatch[]
+  inventories    Inventory[]
+  reservations   Reservation[]
   prescriptionMedicines PrescriptionMedicine[]
-  reminderSchedules     ReminderSchedule[]
+  reminderSchedules ReminderSchedule[]
 
-  @@index([name])
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
+
+  @@index([tradeName])
   @@index([genericName])
   @@index([categoryId])
   @@index([manufacturerId])
+}
+
+model MedicineBatch {
+  id               String   @id @default(uuid())
+
+  medicineId       String
+  batchNumber      String
+  lotNumber        String
+  expiryDate       DateTime
+
+  unitCost         Decimal  @db.Decimal(12, 2)
+  unitSellingPrice Decimal  @db.Decimal(12, 2)
+
+  initialStock     Int
+  currentStock     Int
+
+  storageConditions String?
+  minTemperature   Decimal? @db.Decimal(5, 2)
+  maxTemperature   Decimal? @db.Decimal(5, 2)
+
+  medicine         Medicine @relation(fields: [medicineId], references: [id], onDelete: Cascade)
+
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+
+  @@index([medicineId])
+  @@index([expiryDate])
+  @@unique([medicineId, batchNumber])
+  @@unique([medicineId, lotNumber])
 }
 
 model Inventory {
