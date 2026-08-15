@@ -79,12 +79,69 @@ export class GovernmentDashboardService {
       where: {
         quantity: { lt: safeThreshold },
         deletedAt: null,
+        pharmacy: { status: 'APPROVED', deletedAt: null },
       },
       include: {
         medicine: true,
         pharmacy: { select: { id: true, name: true, address: true, district: true, province: true } },
       },
     });
+  }
+
+  async getDistrictCoverage() {
+    const prisma = this.prismaService.prisma;
+    const [totalMedicines, pharmacies] = await Promise.all([
+      prisma.medicine.count(),
+      prisma.pharmacy.findMany({
+        where: { status: 'APPROVED', deletedAt: null },
+        select: {
+          id: true,
+          district: true,
+          province: true,
+          inventories: {
+            where: { deletedAt: null },
+            select: { medicineId: true, quantity: true },
+          },
+          _count: { select: { reservations: true } },
+        },
+      }),
+    ]);
+
+    const districts = new Map<string, {
+      district: string;
+      province: string;
+      approvedPharmacies: number;
+      stockedMedicineEntries: number;
+      reservations: number;
+    }>();
+
+    pharmacies.forEach((pharmacy) => {
+      const district = pharmacy.district || 'Unknown';
+      const existing = districts.get(district) || {
+        district,
+        province: pharmacy.province || 'Unknown',
+        approvedPharmacies: 0,
+        stockedMedicineEntries: 0,
+        reservations: 0,
+      };
+
+      existing.approvedPharmacies += 1;
+      existing.stockedMedicineEntries += pharmacy.inventories.filter((item) => item.quantity > 0).length;
+      existing.reservations += pharmacy._count.reservations;
+      districts.set(district, existing);
+    });
+
+    return Array.from(districts.values()).map((district) => ({
+      district: district.district,
+      province: district.province,
+      approvedPharmacies: district.approvedPharmacies,
+      stockedMedicineEntries: district.stockedMedicineEntries,
+      totalMedicineEntries: district.approvedPharmacies * totalMedicines,
+      coverage: totalMedicines > 0
+        ? Math.round((district.stockedMedicineEntries / (district.approvedPharmacies * totalMedicines)) * 100)
+        : 0,
+      reservations: district.reservations,
+    }));
   }
 
   async getReservationStats() {

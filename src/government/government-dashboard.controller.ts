@@ -43,6 +43,15 @@ export class GovernmentDashboardController {
     );
   }
 
+  @Get('district-coverage')
+  @ApiOperation({
+    summary: 'Get approved pharmacy coverage by district',
+    description: 'Returns active medicine coverage and reservation counts for approved pharmacies grouped by district.',
+  })
+  getDistrictCoverage() {
+    return this.governmentDashboardService.getDistrictCoverage();
+  }
+
   @Get('reservation-stats')
   @ApiOperation({
     summary: 'Get reservation statistics',

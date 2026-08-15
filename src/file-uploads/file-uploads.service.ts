@@ -29,6 +29,9 @@ export class FileUploadsService {
   }
 
   validateFile(file: Express.Multer.File, allowedTypes: string[], maxSize: number = 5 * 1024 * 1024) {
+    if (!file) {
+      throw new BadRequestException('A file is required');
+    }
     if (!allowedTypes.includes(file.mimetype)) {
       throw new BadRequestException(`Invalid file type. Allowed: ${allowedTypes.join(', ')}`);
     }

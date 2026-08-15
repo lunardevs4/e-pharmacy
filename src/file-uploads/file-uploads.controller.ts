@@ -47,11 +47,13 @@ export class FileUploadsController {
       ['application/pdf', 'image/jpeg', 'image/png', 'image/jpg'],
       10 * 1024 * 1024,
     );
-    const storage = this.fileUploadsService.getStorage('prescriptions');
-    const randomName = `${Date.now()}-${Math.random().toString(36).substring(7)}.${file.originalname.split('.').pop()}`;
     const fs = require('fs');
     const path = require('path');
-    const fullPath = path.join(process.cwd(), 'uploads', 'prescriptions', randomName);
+    const uploadDirectory = path.join(process.cwd(), 'uploads', 'prescriptions');
+    fs.mkdirSync(uploadDirectory, { recursive: true });
+    const extension = path.extname(file.originalname).toLowerCase();
+    const randomName = `${Date.now()}-${Math.random().toString(36).substring(7)}${extension}`;
+    const fullPath = path.join(uploadDirectory, randomName);
     fs.writeFileSync(fullPath, file.buffer);
     return { fileUrl: `/uploads/prescriptions/${randomName}` };
   }
