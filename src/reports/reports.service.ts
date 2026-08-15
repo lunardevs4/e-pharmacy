@@ -164,7 +164,7 @@ export class ReportsService {
     if (safeStartDate) dateFilter.gte = safeStartDate;
     if (safeEndDate) dateFilter.lte = safeEndDate;
 
-    const [reservations, prescriptions] = await Promise.all([
+    const [reservationRows, prescriptions] = await Promise.all([
       prisma.reservation.findMany({
         where: {
           patientId: patient.id,
@@ -182,6 +182,28 @@ export class ReportsService {
         orderBy: { createdAt: 'desc' },
       }),
     ]);
+
+    const inventoryPrices = await prisma.inventory.findMany({
+      where: {
+        pharmacyId: { in: reservationRows.map((reservation) => reservation.pharmacyId) },
+        medicineId: { in: reservationRows.map((reservation) => reservation.medicineId) },
+        deletedAt: null,
+      },
+      select: { pharmacyId: true, medicineId: true, price: true },
+    });
+
+    const reservations = reservationRows.map((reservation) => {
+      const inventory = inventoryPrices.find(
+        (item) => item.pharmacyId === reservation.pharmacyId && item.medicineId === reservation.medicineId,
+      );
+      const unitPrice = inventory ? Number(inventory.price) : 0;
+
+      return {
+        ...reservation,
+        unitPrice,
+        totalPrice: unitPrice * reservation.quantity,
+      };
+    });
 
     const reservationSummary = {
       total: reservations.length,
