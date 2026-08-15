@@ -53,6 +53,7 @@ export class AuditInterceptor implements NestInterceptor {
               action: match.action,
               entityType: match.entityType,
               entityId,
+              pharmacyId: this.extractPharmacyId(req),
               changes: this.sanitizeChanges(req.body),
               ipAddress: this.extractIp(req),
               userAgent: req.headers?.['user-agent'] ?? null,
@@ -83,6 +84,12 @@ export class AuditInterceptor implements NestInterceptor {
     }
 
     return null;
+  }
+
+  /** Attach pharmacy-scoped mutations to the pharmacy activity feed. */
+  private extractPharmacyId(req: any): string | null {
+    const pharmacyId = req.params?.pharmacyId;
+    return typeof pharmacyId === 'string' ? pharmacyId : null;
   }
 
   /** Strip any password/token fields before storing the request body as changes */

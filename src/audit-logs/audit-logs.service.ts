@@ -137,6 +137,28 @@ export class AuditLogsService {
       const employee = await prisma.pharmacyEmployee.findFirst({ where: { pharmacyId: safePharmacyId, userId: user.id, role: UserRole.PHARMACIST } });
       if (!employee) throw new ForbiddenException('You are not employed at this pharmacy');
     }
-    return prisma.auditLog.findMany({ where: { pharmacyId: safePharmacyId }, take: Math.min(Number(limit) || 100, 100), include: { user: { select: { firstName: true, lastName: true, email: true, role: true } } }, orderBy: { createdAt: 'desc' } });
+    // Older audit rows were created before pharmacyId was attached by the
+    // interceptor. Resolve those rows through the pharmacy-scoped entities so
+    // they still appear in the pharmacy activity feed.
+    const [reservations, inventory] = await Promise.all([
+      prisma.reservation.findMany({ where: { pharmacyId: safePharmacyId }, select: { id: true } }),
+      prisma.inventory.findMany({ where: { pharmacyId: safePharmacyId }, select: { id: true } }),
+    ]);
+    const entityIds = {
+      reservation: reservations.map((item) => item.id),
+      inventory: inventory.map((item) => item.id),
+    };
+    const where: any = {
+      OR: [
+        { pharmacyId: safePharmacyId },
+        ...(entityIds.reservation.length > 0
+          ? [{ entityType: 'Reservation', entityId: { in: entityIds.reservation } }]
+          : []),
+        ...(entityIds.inventory.length > 0
+          ? [{ entityType: 'Inventory', entityId: { in: entityIds.inventory } }]
+          : []),
+      ],
+    };
+    return prisma.auditLog.findMany({ where, take: Math.min(Number(limit) || 100, 100), include: { user: { select: { firstName: true, lastName: true, email: true, role: true } } }, orderBy: { createdAt: 'desc' } });
   }
 }
