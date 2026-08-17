@@ -144,3 +144,28 @@ export type AuditLog = Prisma.AuditLogModel
  * 
  */
 export type SystemSetting = Prisma.SystemSettingModel
+/**
+ * Model InsuranceProvider
+ * 
+ */
+export type InsuranceProvider = Prisma.InsuranceProviderModel
+/**
+ * Model InsuredPatient
+ * 
+ */
+export type InsuredPatient = Prisma.InsuredPatientModel
+/**
+ * Model PharmacyInsuranceAgreement
+ * 
+ */
+export type PharmacyInsuranceAgreement = Prisma.PharmacyInsuranceAgreementModel
+/**
+ * Model InsuranceMedicineTariff
+ * 
+ */
+export type InsuranceMedicineTariff = Prisma.InsuranceMedicineTariffModel
+/**
+ * Model InsuranceClaim
+ * 
+ */
+export type InsuranceClaim = Prisma.InsuranceClaimModel

@@ -209,6 +209,8 @@ export type PatientWhereInput = {
   user?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
   reservations?: Prisma.ReservationListRelationFilter
   prescriptions?: Prisma.PrescriptionListRelationFilter
+  insuredPolicies?: Prisma.InsuredPatientListRelationFilter
+  insuranceClaims?: Prisma.InsuranceClaimListRelationFilter
   reminderSchedules?: Prisma.ReminderScheduleListRelationFilter
   reminderLogs?: Prisma.ReminderLogListRelationFilter
 }
@@ -225,6 +227,8 @@ export type PatientOrderByWithRelationInput = {
   user?: Prisma.UserOrderByWithRelationInput
   reservations?: Prisma.ReservationOrderByRelationAggregateInput
   prescriptions?: Prisma.PrescriptionOrderByRelationAggregateInput
+  insuredPolicies?: Prisma.InsuredPatientOrderByRelationAggregateInput
+  insuranceClaims?: Prisma.InsuranceClaimOrderByRelationAggregateInput
   reminderSchedules?: Prisma.ReminderScheduleOrderByRelationAggregateInput
   reminderLogs?: Prisma.ReminderLogOrderByRelationAggregateInput
 }
@@ -244,6 +248,8 @@ export type PatientWhereUniqueInput = Prisma.AtLeast<{
   user?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
   reservations?: Prisma.ReservationListRelationFilter
   prescriptions?: Prisma.PrescriptionListRelationFilter
+  insuredPolicies?: Prisma.InsuredPatientListRelationFilter
+  insuranceClaims?: Prisma.InsuranceClaimListRelationFilter
   reminderSchedules?: Prisma.ReminderScheduleListRelationFilter
   reminderLogs?: Prisma.ReminderLogListRelationFilter
 }, "id" | "userId">
@@ -287,6 +293,8 @@ export type PatientCreateInput = {
   user: Prisma.UserCreateNestedOneWithoutPatientInput
   reservations?: Prisma.ReservationCreateNestedManyWithoutPatientInput
   prescriptions?: Prisma.PrescriptionCreateNestedManyWithoutPatientInput
+  insuredPolicies?: Prisma.InsuredPatientCreateNestedManyWithoutPatientInput
+  insuranceClaims?: Prisma.InsuranceClaimCreateNestedManyWithoutPatientInput
   reminderSchedules?: Prisma.ReminderScheduleCreateNestedManyWithoutPatientInput
   reminderLogs?: Prisma.ReminderLogCreateNestedManyWithoutPatientInput
 }
@@ -302,6 +310,8 @@ export type PatientUncheckedCreateInput = {
   updatedAt?: Date | string
   reservations?: Prisma.ReservationUncheckedCreateNestedManyWithoutPatientInput
   prescriptions?: Prisma.PrescriptionUncheckedCreateNestedManyWithoutPatientInput
+  insuredPolicies?: Prisma.InsuredPatientUncheckedCreateNestedManyWithoutPatientInput
+  insuranceClaims?: Prisma.InsuranceClaimUncheckedCreateNestedManyWithoutPatientInput
   reminderSchedules?: Prisma.ReminderScheduleUncheckedCreateNestedManyWithoutPatientInput
   reminderLogs?: Prisma.ReminderLogUncheckedCreateNestedManyWithoutPatientInput
 }
@@ -317,6 +327,8 @@ export type PatientUpdateInput = {
   user?: Prisma.UserUpdateOneRequiredWithoutPatientNestedInput
   reservations?: Prisma.ReservationUpdateManyWithoutPatientNestedInput
   prescriptions?: Prisma.PrescriptionUpdateManyWithoutPatientNestedInput
+  insuredPolicies?: Prisma.InsuredPatientUpdateManyWithoutPatientNestedInput
+  insuranceClaims?: Prisma.InsuranceClaimUpdateManyWithoutPatientNestedInput
   reminderSchedules?: Prisma.ReminderScheduleUpdateManyWithoutPatientNestedInput
   reminderLogs?: Prisma.ReminderLogUpdateManyWithoutPatientNestedInput
 }
@@ -332,6 +344,8 @@ export type PatientUncheckedUpdateInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   reservations?: Prisma.ReservationUncheckedUpdateManyWithoutPatientNestedInput
   prescriptions?: Prisma.PrescriptionUncheckedUpdateManyWithoutPatientNestedInput
+  insuredPolicies?: Prisma.InsuredPatientUncheckedUpdateManyWithoutPatientNestedInput
+  insuranceClaims?: Prisma.InsuranceClaimUncheckedUpdateManyWithoutPatientNestedInput
   reminderSchedules?: Prisma.ReminderScheduleUncheckedUpdateManyWithoutPatientNestedInput
   reminderLogs?: Prisma.ReminderLogUncheckedUpdateManyWithoutPatientNestedInput
 }
@@ -499,6 +513,38 @@ export type PatientUpdateOneRequiredWithoutReminderLogsNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.PatientUpdateToOneWithWhereWithoutReminderLogsInput, Prisma.PatientUpdateWithoutReminderLogsInput>, Prisma.PatientUncheckedUpdateWithoutReminderLogsInput>
 }
 
+export type PatientCreateNestedOneWithoutInsuredPoliciesInput = {
+  create?: Prisma.XOR<Prisma.PatientCreateWithoutInsuredPoliciesInput, Prisma.PatientUncheckedCreateWithoutInsuredPoliciesInput>
+  connectOrCreate?: Prisma.PatientCreateOrConnectWithoutInsuredPoliciesInput
+  connect?: Prisma.PatientWhereUniqueInput
+}
+
+export type PatientUpdateOneWithoutInsuredPoliciesNestedInput = {
+  create?: Prisma.XOR<Prisma.PatientCreateWithoutInsuredPoliciesInput, Prisma.PatientUncheckedCreateWithoutInsuredPoliciesInput>
+  connectOrCreate?: Prisma.PatientCreateOrConnectWithoutInsuredPoliciesInput
+  upsert?: Prisma.PatientUpsertWithoutInsuredPoliciesInput
+  disconnect?: Prisma.PatientWhereInput | boolean
+  delete?: Prisma.PatientWhereInput | boolean
+  connect?: Prisma.PatientWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.PatientUpdateToOneWithWhereWithoutInsuredPoliciesInput, Prisma.PatientUpdateWithoutInsuredPoliciesInput>, Prisma.PatientUncheckedUpdateWithoutInsuredPoliciesInput>
+}
+
+export type PatientCreateNestedOneWithoutInsuranceClaimsInput = {
+  create?: Prisma.XOR<Prisma.PatientCreateWithoutInsuranceClaimsInput, Prisma.PatientUncheckedCreateWithoutInsuranceClaimsInput>
+  connectOrCreate?: Prisma.PatientCreateOrConnectWithoutInsuranceClaimsInput
+  connect?: Prisma.PatientWhereUniqueInput
+}
+
+export type PatientUpdateOneWithoutInsuranceClaimsNestedInput = {
+  create?: Prisma.XOR<Prisma.PatientCreateWithoutInsuranceClaimsInput, Prisma.PatientUncheckedCreateWithoutInsuranceClaimsInput>
+  connectOrCreate?: Prisma.PatientCreateOrConnectWithoutInsuranceClaimsInput
+  upsert?: Prisma.PatientUpsertWithoutInsuranceClaimsInput
+  disconnect?: Prisma.PatientWhereInput | boolean
+  delete?: Prisma.PatientWhereInput | boolean
+  connect?: Prisma.PatientWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.PatientUpdateToOneWithWhereWithoutInsuranceClaimsInput, Prisma.PatientUpdateWithoutInsuranceClaimsInput>, Prisma.PatientUncheckedUpdateWithoutInsuranceClaimsInput>
+}
+
 export type PatientCreateWithoutUserInput = {
   id?: string
   medicalProfile?: string | null
@@ -509,6 +555,8 @@ export type PatientCreateWithoutUserInput = {
   updatedAt?: Date | string
   reservations?: Prisma.ReservationCreateNestedManyWithoutPatientInput
   prescriptions?: Prisma.PrescriptionCreateNestedManyWithoutPatientInput
+  insuredPolicies?: Prisma.InsuredPatientCreateNestedManyWithoutPatientInput
+  insuranceClaims?: Prisma.InsuranceClaimCreateNestedManyWithoutPatientInput
   reminderSchedules?: Prisma.ReminderScheduleCreateNestedManyWithoutPatientInput
   reminderLogs?: Prisma.ReminderLogCreateNestedManyWithoutPatientInput
 }
@@ -523,6 +571,8 @@ export type PatientUncheckedCreateWithoutUserInput = {
   updatedAt?: Date | string
   reservations?: Prisma.ReservationUncheckedCreateNestedManyWithoutPatientInput
   prescriptions?: Prisma.PrescriptionUncheckedCreateNestedManyWithoutPatientInput
+  insuredPolicies?: Prisma.InsuredPatientUncheckedCreateNestedManyWithoutPatientInput
+  insuranceClaims?: Prisma.InsuranceClaimUncheckedCreateNestedManyWithoutPatientInput
   reminderSchedules?: Prisma.ReminderScheduleUncheckedCreateNestedManyWithoutPatientInput
   reminderLogs?: Prisma.ReminderLogUncheckedCreateNestedManyWithoutPatientInput
 }
@@ -553,6 +603,8 @@ export type PatientUpdateWithoutUserInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   reservations?: Prisma.ReservationUpdateManyWithoutPatientNestedInput
   prescriptions?: Prisma.PrescriptionUpdateManyWithoutPatientNestedInput
+  insuredPolicies?: Prisma.InsuredPatientUpdateManyWithoutPatientNestedInput
+  insuranceClaims?: Prisma.InsuranceClaimUpdateManyWithoutPatientNestedInput
   reminderSchedules?: Prisma.ReminderScheduleUpdateManyWithoutPatientNestedInput
   reminderLogs?: Prisma.ReminderLogUpdateManyWithoutPatientNestedInput
 }
@@ -567,6 +619,8 @@ export type PatientUncheckedUpdateWithoutUserInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   reservations?: Prisma.ReservationUncheckedUpdateManyWithoutPatientNestedInput
   prescriptions?: Prisma.PrescriptionUncheckedUpdateManyWithoutPatientNestedInput
+  insuredPolicies?: Prisma.InsuredPatientUncheckedUpdateManyWithoutPatientNestedInput
+  insuranceClaims?: Prisma.InsuranceClaimUncheckedUpdateManyWithoutPatientNestedInput
   reminderSchedules?: Prisma.ReminderScheduleUncheckedUpdateManyWithoutPatientNestedInput
   reminderLogs?: Prisma.ReminderLogUncheckedUpdateManyWithoutPatientNestedInput
 }
@@ -581,6 +635,8 @@ export type PatientCreateWithoutReservationsInput = {
   updatedAt?: Date | string
   user: Prisma.UserCreateNestedOneWithoutPatientInput
   prescriptions?: Prisma.PrescriptionCreateNestedManyWithoutPatientInput
+  insuredPolicies?: Prisma.InsuredPatientCreateNestedManyWithoutPatientInput
+  insuranceClaims?: Prisma.InsuranceClaimCreateNestedManyWithoutPatientInput
   reminderSchedules?: Prisma.ReminderScheduleCreateNestedManyWithoutPatientInput
   reminderLogs?: Prisma.ReminderLogCreateNestedManyWithoutPatientInput
 }
@@ -595,6 +651,8 @@ export type PatientUncheckedCreateWithoutReservationsInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   prescriptions?: Prisma.PrescriptionUncheckedCreateNestedManyWithoutPatientInput
+  insuredPolicies?: Prisma.InsuredPatientUncheckedCreateNestedManyWithoutPatientInput
+  insuranceClaims?: Prisma.InsuranceClaimUncheckedCreateNestedManyWithoutPatientInput
   reminderSchedules?: Prisma.ReminderScheduleUncheckedCreateNestedManyWithoutPatientInput
   reminderLogs?: Prisma.ReminderLogUncheckedCreateNestedManyWithoutPatientInput
 }
@@ -625,6 +683,8 @@ export type PatientUpdateWithoutReservationsInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   user?: Prisma.UserUpdateOneRequiredWithoutPatientNestedInput
   prescriptions?: Prisma.PrescriptionUpdateManyWithoutPatientNestedInput
+  insuredPolicies?: Prisma.InsuredPatientUpdateManyWithoutPatientNestedInput
+  insuranceClaims?: Prisma.InsuranceClaimUpdateManyWithoutPatientNestedInput
   reminderSchedules?: Prisma.ReminderScheduleUpdateManyWithoutPatientNestedInput
   reminderLogs?: Prisma.ReminderLogUpdateManyWithoutPatientNestedInput
 }
@@ -639,6 +699,8 @@ export type PatientUncheckedUpdateWithoutReservationsInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   prescriptions?: Prisma.PrescriptionUncheckedUpdateManyWithoutPatientNestedInput
+  insuredPolicies?: Prisma.InsuredPatientUncheckedUpdateManyWithoutPatientNestedInput
+  insuranceClaims?: Prisma.InsuranceClaimUncheckedUpdateManyWithoutPatientNestedInput
   reminderSchedules?: Prisma.ReminderScheduleUncheckedUpdateManyWithoutPatientNestedInput
   reminderLogs?: Prisma.ReminderLogUncheckedUpdateManyWithoutPatientNestedInput
 }
@@ -653,6 +715,8 @@ export type PatientCreateWithoutPrescriptionsInput = {
   updatedAt?: Date | string
   user: Prisma.UserCreateNestedOneWithoutPatientInput
   reservations?: Prisma.ReservationCreateNestedManyWithoutPatientInput
+  insuredPolicies?: Prisma.InsuredPatientCreateNestedManyWithoutPatientInput
+  insuranceClaims?: Prisma.InsuranceClaimCreateNestedManyWithoutPatientInput
   reminderSchedules?: Prisma.ReminderScheduleCreateNestedManyWithoutPatientInput
   reminderLogs?: Prisma.ReminderLogCreateNestedManyWithoutPatientInput
 }
@@ -667,6 +731,8 @@ export type PatientUncheckedCreateWithoutPrescriptionsInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   reservations?: Prisma.ReservationUncheckedCreateNestedManyWithoutPatientInput
+  insuredPolicies?: Prisma.InsuredPatientUncheckedCreateNestedManyWithoutPatientInput
+  insuranceClaims?: Prisma.InsuranceClaimUncheckedCreateNestedManyWithoutPatientInput
   reminderSchedules?: Prisma.ReminderScheduleUncheckedCreateNestedManyWithoutPatientInput
   reminderLogs?: Prisma.ReminderLogUncheckedCreateNestedManyWithoutPatientInput
 }
@@ -697,6 +763,8 @@ export type PatientUpdateWithoutPrescriptionsInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   user?: Prisma.UserUpdateOneRequiredWithoutPatientNestedInput
   reservations?: Prisma.ReservationUpdateManyWithoutPatientNestedInput
+  insuredPolicies?: Prisma.InsuredPatientUpdateManyWithoutPatientNestedInput
+  insuranceClaims?: Prisma.InsuranceClaimUpdateManyWithoutPatientNestedInput
   reminderSchedules?: Prisma.ReminderScheduleUpdateManyWithoutPatientNestedInput
   reminderLogs?: Prisma.ReminderLogUpdateManyWithoutPatientNestedInput
 }
@@ -711,6 +779,8 @@ export type PatientUncheckedUpdateWithoutPrescriptionsInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   reservations?: Prisma.ReservationUncheckedUpdateManyWithoutPatientNestedInput
+  insuredPolicies?: Prisma.InsuredPatientUncheckedUpdateManyWithoutPatientNestedInput
+  insuranceClaims?: Prisma.InsuranceClaimUncheckedUpdateManyWithoutPatientNestedInput
   reminderSchedules?: Prisma.ReminderScheduleUncheckedUpdateManyWithoutPatientNestedInput
   reminderLogs?: Prisma.ReminderLogUncheckedUpdateManyWithoutPatientNestedInput
 }
@@ -726,6 +796,8 @@ export type PatientCreateWithoutReminderSchedulesInput = {
   user: Prisma.UserCreateNestedOneWithoutPatientInput
   reservations?: Prisma.ReservationCreateNestedManyWithoutPatientInput
   prescriptions?: Prisma.PrescriptionCreateNestedManyWithoutPatientInput
+  insuredPolicies?: Prisma.InsuredPatientCreateNestedManyWithoutPatientInput
+  insuranceClaims?: Prisma.InsuranceClaimCreateNestedManyWithoutPatientInput
   reminderLogs?: Prisma.ReminderLogCreateNestedManyWithoutPatientInput
 }
 
@@ -740,6 +812,8 @@ export type PatientUncheckedCreateWithoutReminderSchedulesInput = {
   updatedAt?: Date | string
   reservations?: Prisma.ReservationUncheckedCreateNestedManyWithoutPatientInput
   prescriptions?: Prisma.PrescriptionUncheckedCreateNestedManyWithoutPatientInput
+  insuredPolicies?: Prisma.InsuredPatientUncheckedCreateNestedManyWithoutPatientInput
+  insuranceClaims?: Prisma.InsuranceClaimUncheckedCreateNestedManyWithoutPatientInput
   reminderLogs?: Prisma.ReminderLogUncheckedCreateNestedManyWithoutPatientInput
 }
 
@@ -770,6 +844,8 @@ export type PatientUpdateWithoutReminderSchedulesInput = {
   user?: Prisma.UserUpdateOneRequiredWithoutPatientNestedInput
   reservations?: Prisma.ReservationUpdateManyWithoutPatientNestedInput
   prescriptions?: Prisma.PrescriptionUpdateManyWithoutPatientNestedInput
+  insuredPolicies?: Prisma.InsuredPatientUpdateManyWithoutPatientNestedInput
+  insuranceClaims?: Prisma.InsuranceClaimUpdateManyWithoutPatientNestedInput
   reminderLogs?: Prisma.ReminderLogUpdateManyWithoutPatientNestedInput
 }
 
@@ -784,6 +860,8 @@ export type PatientUncheckedUpdateWithoutReminderSchedulesInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   reservations?: Prisma.ReservationUncheckedUpdateManyWithoutPatientNestedInput
   prescriptions?: Prisma.PrescriptionUncheckedUpdateManyWithoutPatientNestedInput
+  insuredPolicies?: Prisma.InsuredPatientUncheckedUpdateManyWithoutPatientNestedInput
+  insuranceClaims?: Prisma.InsuranceClaimUncheckedUpdateManyWithoutPatientNestedInput
   reminderLogs?: Prisma.ReminderLogUncheckedUpdateManyWithoutPatientNestedInput
 }
 
@@ -798,6 +876,8 @@ export type PatientCreateWithoutReminderLogsInput = {
   user: Prisma.UserCreateNestedOneWithoutPatientInput
   reservations?: Prisma.ReservationCreateNestedManyWithoutPatientInput
   prescriptions?: Prisma.PrescriptionCreateNestedManyWithoutPatientInput
+  insuredPolicies?: Prisma.InsuredPatientCreateNestedManyWithoutPatientInput
+  insuranceClaims?: Prisma.InsuranceClaimCreateNestedManyWithoutPatientInput
   reminderSchedules?: Prisma.ReminderScheduleCreateNestedManyWithoutPatientInput
 }
 
@@ -812,6 +892,8 @@ export type PatientUncheckedCreateWithoutReminderLogsInput = {
   updatedAt?: Date | string
   reservations?: Prisma.ReservationUncheckedCreateNestedManyWithoutPatientInput
   prescriptions?: Prisma.PrescriptionUncheckedCreateNestedManyWithoutPatientInput
+  insuredPolicies?: Prisma.InsuredPatientUncheckedCreateNestedManyWithoutPatientInput
+  insuranceClaims?: Prisma.InsuranceClaimUncheckedCreateNestedManyWithoutPatientInput
   reminderSchedules?: Prisma.ReminderScheduleUncheckedCreateNestedManyWithoutPatientInput
 }
 
@@ -842,6 +924,8 @@ export type PatientUpdateWithoutReminderLogsInput = {
   user?: Prisma.UserUpdateOneRequiredWithoutPatientNestedInput
   reservations?: Prisma.ReservationUpdateManyWithoutPatientNestedInput
   prescriptions?: Prisma.PrescriptionUpdateManyWithoutPatientNestedInput
+  insuredPolicies?: Prisma.InsuredPatientUpdateManyWithoutPatientNestedInput
+  insuranceClaims?: Prisma.InsuranceClaimUpdateManyWithoutPatientNestedInput
   reminderSchedules?: Prisma.ReminderScheduleUpdateManyWithoutPatientNestedInput
 }
 
@@ -856,7 +940,169 @@ export type PatientUncheckedUpdateWithoutReminderLogsInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   reservations?: Prisma.ReservationUncheckedUpdateManyWithoutPatientNestedInput
   prescriptions?: Prisma.PrescriptionUncheckedUpdateManyWithoutPatientNestedInput
+  insuredPolicies?: Prisma.InsuredPatientUncheckedUpdateManyWithoutPatientNestedInput
+  insuranceClaims?: Prisma.InsuranceClaimUncheckedUpdateManyWithoutPatientNestedInput
   reminderSchedules?: Prisma.ReminderScheduleUncheckedUpdateManyWithoutPatientNestedInput
+}
+
+export type PatientCreateWithoutInsuredPoliciesInput = {
+  id?: string
+  medicalProfile?: string | null
+  address?: string | null
+  dateOfBirth?: Date | string | null
+  gender?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  user: Prisma.UserCreateNestedOneWithoutPatientInput
+  reservations?: Prisma.ReservationCreateNestedManyWithoutPatientInput
+  prescriptions?: Prisma.PrescriptionCreateNestedManyWithoutPatientInput
+  insuranceClaims?: Prisma.InsuranceClaimCreateNestedManyWithoutPatientInput
+  reminderSchedules?: Prisma.ReminderScheduleCreateNestedManyWithoutPatientInput
+  reminderLogs?: Prisma.ReminderLogCreateNestedManyWithoutPatientInput
+}
+
+export type PatientUncheckedCreateWithoutInsuredPoliciesInput = {
+  id?: string
+  userId: string
+  medicalProfile?: string | null
+  address?: string | null
+  dateOfBirth?: Date | string | null
+  gender?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  reservations?: Prisma.ReservationUncheckedCreateNestedManyWithoutPatientInput
+  prescriptions?: Prisma.PrescriptionUncheckedCreateNestedManyWithoutPatientInput
+  insuranceClaims?: Prisma.InsuranceClaimUncheckedCreateNestedManyWithoutPatientInput
+  reminderSchedules?: Prisma.ReminderScheduleUncheckedCreateNestedManyWithoutPatientInput
+  reminderLogs?: Prisma.ReminderLogUncheckedCreateNestedManyWithoutPatientInput
+}
+
+export type PatientCreateOrConnectWithoutInsuredPoliciesInput = {
+  where: Prisma.PatientWhereUniqueInput
+  create: Prisma.XOR<Prisma.PatientCreateWithoutInsuredPoliciesInput, Prisma.PatientUncheckedCreateWithoutInsuredPoliciesInput>
+}
+
+export type PatientUpsertWithoutInsuredPoliciesInput = {
+  update: Prisma.XOR<Prisma.PatientUpdateWithoutInsuredPoliciesInput, Prisma.PatientUncheckedUpdateWithoutInsuredPoliciesInput>
+  create: Prisma.XOR<Prisma.PatientCreateWithoutInsuredPoliciesInput, Prisma.PatientUncheckedCreateWithoutInsuredPoliciesInput>
+  where?: Prisma.PatientWhereInput
+}
+
+export type PatientUpdateToOneWithWhereWithoutInsuredPoliciesInput = {
+  where?: Prisma.PatientWhereInput
+  data: Prisma.XOR<Prisma.PatientUpdateWithoutInsuredPoliciesInput, Prisma.PatientUncheckedUpdateWithoutInsuredPoliciesInput>
+}
+
+export type PatientUpdateWithoutInsuredPoliciesInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  medicalProfile?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  dateOfBirth?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  gender?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  user?: Prisma.UserUpdateOneRequiredWithoutPatientNestedInput
+  reservations?: Prisma.ReservationUpdateManyWithoutPatientNestedInput
+  prescriptions?: Prisma.PrescriptionUpdateManyWithoutPatientNestedInput
+  insuranceClaims?: Prisma.InsuranceClaimUpdateManyWithoutPatientNestedInput
+  reminderSchedules?: Prisma.ReminderScheduleUpdateManyWithoutPatientNestedInput
+  reminderLogs?: Prisma.ReminderLogUpdateManyWithoutPatientNestedInput
+}
+
+export type PatientUncheckedUpdateWithoutInsuredPoliciesInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  userId?: Prisma.StringFieldUpdateOperationsInput | string
+  medicalProfile?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  dateOfBirth?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  gender?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  reservations?: Prisma.ReservationUncheckedUpdateManyWithoutPatientNestedInput
+  prescriptions?: Prisma.PrescriptionUncheckedUpdateManyWithoutPatientNestedInput
+  insuranceClaims?: Prisma.InsuranceClaimUncheckedUpdateManyWithoutPatientNestedInput
+  reminderSchedules?: Prisma.ReminderScheduleUncheckedUpdateManyWithoutPatientNestedInput
+  reminderLogs?: Prisma.ReminderLogUncheckedUpdateManyWithoutPatientNestedInput
+}
+
+export type PatientCreateWithoutInsuranceClaimsInput = {
+  id?: string
+  medicalProfile?: string | null
+  address?: string | null
+  dateOfBirth?: Date | string | null
+  gender?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  user: Prisma.UserCreateNestedOneWithoutPatientInput
+  reservations?: Prisma.ReservationCreateNestedManyWithoutPatientInput
+  prescriptions?: Prisma.PrescriptionCreateNestedManyWithoutPatientInput
+  insuredPolicies?: Prisma.InsuredPatientCreateNestedManyWithoutPatientInput
+  reminderSchedules?: Prisma.ReminderScheduleCreateNestedManyWithoutPatientInput
+  reminderLogs?: Prisma.ReminderLogCreateNestedManyWithoutPatientInput
+}
+
+export type PatientUncheckedCreateWithoutInsuranceClaimsInput = {
+  id?: string
+  userId: string
+  medicalProfile?: string | null
+  address?: string | null
+  dateOfBirth?: Date | string | null
+  gender?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  reservations?: Prisma.ReservationUncheckedCreateNestedManyWithoutPatientInput
+  prescriptions?: Prisma.PrescriptionUncheckedCreateNestedManyWithoutPatientInput
+  insuredPolicies?: Prisma.InsuredPatientUncheckedCreateNestedManyWithoutPatientInput
+  reminderSchedules?: Prisma.ReminderScheduleUncheckedCreateNestedManyWithoutPatientInput
+  reminderLogs?: Prisma.ReminderLogUncheckedCreateNestedManyWithoutPatientInput
+}
+
+export type PatientCreateOrConnectWithoutInsuranceClaimsInput = {
+  where: Prisma.PatientWhereUniqueInput
+  create: Prisma.XOR<Prisma.PatientCreateWithoutInsuranceClaimsInput, Prisma.PatientUncheckedCreateWithoutInsuranceClaimsInput>
+}
+
+export type PatientUpsertWithoutInsuranceClaimsInput = {
+  update: Prisma.XOR<Prisma.PatientUpdateWithoutInsuranceClaimsInput, Prisma.PatientUncheckedUpdateWithoutInsuranceClaimsInput>
+  create: Prisma.XOR<Prisma.PatientCreateWithoutInsuranceClaimsInput, Prisma.PatientUncheckedCreateWithoutInsuranceClaimsInput>
+  where?: Prisma.PatientWhereInput
+}
+
+export type PatientUpdateToOneWithWhereWithoutInsuranceClaimsInput = {
+  where?: Prisma.PatientWhereInput
+  data: Prisma.XOR<Prisma.PatientUpdateWithoutInsuranceClaimsInput, Prisma.PatientUncheckedUpdateWithoutInsuranceClaimsInput>
+}
+
+export type PatientUpdateWithoutInsuranceClaimsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  medicalProfile?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  dateOfBirth?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  gender?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  user?: Prisma.UserUpdateOneRequiredWithoutPatientNestedInput
+  reservations?: Prisma.ReservationUpdateManyWithoutPatientNestedInput
+  prescriptions?: Prisma.PrescriptionUpdateManyWithoutPatientNestedInput
+  insuredPolicies?: Prisma.InsuredPatientUpdateManyWithoutPatientNestedInput
+  reminderSchedules?: Prisma.ReminderScheduleUpdateManyWithoutPatientNestedInput
+  reminderLogs?: Prisma.ReminderLogUpdateManyWithoutPatientNestedInput
+}
+
+export type PatientUncheckedUpdateWithoutInsuranceClaimsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  userId?: Prisma.StringFieldUpdateOperationsInput | string
+  medicalProfile?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  dateOfBirth?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  gender?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  reservations?: Prisma.ReservationUncheckedUpdateManyWithoutPatientNestedInput
+  prescriptions?: Prisma.PrescriptionUncheckedUpdateManyWithoutPatientNestedInput
+  insuredPolicies?: Prisma.InsuredPatientUncheckedUpdateManyWithoutPatientNestedInput
+  reminderSchedules?: Prisma.ReminderScheduleUncheckedUpdateManyWithoutPatientNestedInput
+  reminderLogs?: Prisma.ReminderLogUncheckedUpdateManyWithoutPatientNestedInput
 }
 
 
@@ -867,6 +1113,8 @@ export type PatientUncheckedUpdateWithoutReminderLogsInput = {
 export type PatientCountOutputType = {
   reservations: number
   prescriptions: number
+  insuredPolicies: number
+  insuranceClaims: number
   reminderSchedules: number
   reminderLogs: number
 }
@@ -874,6 +1122,8 @@ export type PatientCountOutputType = {
 export type PatientCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   reservations?: boolean | PatientCountOutputTypeCountReservationsArgs
   prescriptions?: boolean | PatientCountOutputTypeCountPrescriptionsArgs
+  insuredPolicies?: boolean | PatientCountOutputTypeCountInsuredPoliciesArgs
+  insuranceClaims?: boolean | PatientCountOutputTypeCountInsuranceClaimsArgs
   reminderSchedules?: boolean | PatientCountOutputTypeCountReminderSchedulesArgs
   reminderLogs?: boolean | PatientCountOutputTypeCountReminderLogsArgs
 }
@@ -905,6 +1155,20 @@ export type PatientCountOutputTypeCountPrescriptionsArgs<ExtArgs extends runtime
 /**
  * PatientCountOutputType without action
  */
+export type PatientCountOutputTypeCountInsuredPoliciesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.InsuredPatientWhereInput
+}
+
+/**
+ * PatientCountOutputType without action
+ */
+export type PatientCountOutputTypeCountInsuranceClaimsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.InsuranceClaimWhereInput
+}
+
+/**
+ * PatientCountOutputType without action
+ */
 export type PatientCountOutputTypeCountReminderSchedulesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   where?: Prisma.ReminderScheduleWhereInput
 }
@@ -929,6 +1193,8 @@ export type PatientSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs 
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
   reservations?: boolean | Prisma.Patient$reservationsArgs<ExtArgs>
   prescriptions?: boolean | Prisma.Patient$prescriptionsArgs<ExtArgs>
+  insuredPolicies?: boolean | Prisma.Patient$insuredPoliciesArgs<ExtArgs>
+  insuranceClaims?: boolean | Prisma.Patient$insuranceClaimsArgs<ExtArgs>
   reminderSchedules?: boolean | Prisma.Patient$reminderSchedulesArgs<ExtArgs>
   reminderLogs?: boolean | Prisma.Patient$reminderLogsArgs<ExtArgs>
   _count?: boolean | Prisma.PatientCountOutputTypeDefaultArgs<ExtArgs>
@@ -974,6 +1240,8 @@ export type PatientInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
   reservations?: boolean | Prisma.Patient$reservationsArgs<ExtArgs>
   prescriptions?: boolean | Prisma.Patient$prescriptionsArgs<ExtArgs>
+  insuredPolicies?: boolean | Prisma.Patient$insuredPoliciesArgs<ExtArgs>
+  insuranceClaims?: boolean | Prisma.Patient$insuranceClaimsArgs<ExtArgs>
   reminderSchedules?: boolean | Prisma.Patient$reminderSchedulesArgs<ExtArgs>
   reminderLogs?: boolean | Prisma.Patient$reminderLogsArgs<ExtArgs>
   _count?: boolean | Prisma.PatientCountOutputTypeDefaultArgs<ExtArgs>
@@ -991,6 +1259,8 @@ export type $PatientPayload<ExtArgs extends runtime.Types.Extensions.InternalArg
     user: Prisma.$UserPayload<ExtArgs>
     reservations: Prisma.$ReservationPayload<ExtArgs>[]
     prescriptions: Prisma.$PrescriptionPayload<ExtArgs>[]
+    insuredPolicies: Prisma.$InsuredPatientPayload<ExtArgs>[]
+    insuranceClaims: Prisma.$InsuranceClaimPayload<ExtArgs>[]
     reminderSchedules: Prisma.$ReminderSchedulePayload<ExtArgs>[]
     reminderLogs: Prisma.$ReminderLogPayload<ExtArgs>[]
   }
@@ -1400,6 +1670,8 @@ export interface Prisma__PatientClient<T, Null = never, ExtArgs extends runtime.
   user<T extends Prisma.UserDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.UserDefaultArgs<ExtArgs>>): Prisma.Prisma__UserClient<runtime.Types.Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
   reservations<T extends Prisma.Patient$reservationsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Patient$reservationsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ReservationPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   prescriptions<T extends Prisma.Patient$prescriptionsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Patient$prescriptionsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$PrescriptionPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  insuredPolicies<T extends Prisma.Patient$insuredPoliciesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Patient$insuredPoliciesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$InsuredPatientPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  insuranceClaims<T extends Prisma.Patient$insuranceClaimsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Patient$insuranceClaimsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$InsuranceClaimPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   reminderSchedules<T extends Prisma.Patient$reminderSchedulesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Patient$reminderSchedulesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ReminderSchedulePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   reminderLogs<T extends Prisma.Patient$reminderLogsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Patient$reminderLogsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ReminderLogPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
@@ -1885,6 +2157,54 @@ export type Patient$prescriptionsArgs<ExtArgs extends runtime.Types.Extensions.I
   take?: number
   skip?: number
   distinct?: Prisma.PrescriptionScalarFieldEnum | Prisma.PrescriptionScalarFieldEnum[]
+}
+
+/**
+ * Patient.insuredPolicies
+ */
+export type Patient$insuredPoliciesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the InsuredPatient
+   */
+  select?: Prisma.InsuredPatientSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the InsuredPatient
+   */
+  omit?: Prisma.InsuredPatientOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.InsuredPatientInclude<ExtArgs> | null
+  where?: Prisma.InsuredPatientWhereInput
+  orderBy?: Prisma.InsuredPatientOrderByWithRelationInput | Prisma.InsuredPatientOrderByWithRelationInput[]
+  cursor?: Prisma.InsuredPatientWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.InsuredPatientScalarFieldEnum | Prisma.InsuredPatientScalarFieldEnum[]
+}
+
+/**
+ * Patient.insuranceClaims
+ */
+export type Patient$insuranceClaimsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the InsuranceClaim
+   */
+  select?: Prisma.InsuranceClaimSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the InsuranceClaim
+   */
+  omit?: Prisma.InsuranceClaimOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.InsuranceClaimInclude<ExtArgs> | null
+  where?: Prisma.InsuranceClaimWhereInput
+  orderBy?: Prisma.InsuranceClaimOrderByWithRelationInput | Prisma.InsuranceClaimOrderByWithRelationInput[]
+  cursor?: Prisma.InsuranceClaimWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.InsuranceClaimScalarFieldEnum | Prisma.InsuranceClaimScalarFieldEnum[]
 }
 
 /**

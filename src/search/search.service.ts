@@ -19,6 +19,7 @@ export class SearchService {
     radius: number = 5,
     page: number = 1,
     limit: number = 10,
+    insuranceId?: string,
   ) {
     const prisma = this.prismaService.prisma;
     const safePage = validatePositiveInt(page, 'page', 1);
@@ -69,24 +70,40 @@ export class SearchService {
       },
     });
 
-    const results = inventories.map((inv) => ({
-      medicine: inv.medicine,
-      pharmacy: inv.pharmacy,
-      price: inv.price,
-      quantity: inv.quantity,
-      expiryDate: inv.expiryDate,
-      distance:
-        safeLat !== undefined &&
-        safeLon !== undefined &&
-        inv.pharmacy.latitude &&
-        inv.pharmacy.longitude
-          ? this.calculateDistance(
-              safeLat,
-              safeLon,
-              parseFloat(inv.pharmacy.latitude.toString()),
-              parseFloat(inv.pharmacy.longitude.toString()),
-            )
-          : null,
+    const results = await Promise.all(inventories.map(async (inv) => {
+      const baseResult = {
+        medicine: inv.medicine,
+        pharmacy: inv.pharmacy,
+        price: inv.price,
+        quantity: inv.quantity,
+        expiryDate: inv.expiryDate,
+        distance:
+          safeLat !== undefined &&
+          safeLon !== undefined &&
+          inv.pharmacy.latitude &&
+          inv.pharmacy.longitude
+            ? this.calculateDistance(
+                safeLat,
+                safeLon,
+                parseFloat(inv.pharmacy.latitude.toString()),
+                parseFloat(inv.pharmacy.longitude.toString()),
+              )
+            : null,
+      };
+
+      // Add insurance coverage if insuranceId is provided
+      if (insuranceId) {
+        const insuranceCoverage = await this.calculateInsuranceCoverage(
+          insuranceId,
+          inv.pharmacyId,
+          inv.medicineId,
+          Number(inv.price),
+          prisma,
+        );
+        return { ...baseResult, insuranceCoverage };
+      }
+
+      return baseResult;
     }));
 
     const hasLocation = safeLat !== undefined && safeLon !== undefined;
@@ -162,5 +179,83 @@ export class SearchService {
 
   private toRad(Value: number): number {
     return (Value * Math.PI) / 180;
+  }
+
+  private async calculateInsuranceCoverage(
+    insuranceId: string,
+    pharmacyId: string,
+    medicineId: string,
+    retailPrice: number,
+    prisma: any,
+  ) {
+    // Check if pharmacy has active agreement with insurance
+    const agreement = await prisma.pharmacyInsuranceAgreement.findUnique({
+      where: {
+        insuranceId_pharmacyId: {
+          insuranceId,
+          pharmacyId,
+        },
+      },
+    });
+
+    if (!agreement || agreement.status !== 'ACTIVE') {
+      return {
+        isCovered: false,
+        hasAgreement: false,
+        insurancePays: 0,
+        patientPays: retailPrice,
+        message: 'No active agreement between pharmacy and insurance',
+      };
+    }
+
+    // Get medicine tariff
+    const tariff = await prisma.insuranceMedicineTariff.findUnique({
+      where: {
+        insuranceId_medicineId: {
+          insuranceId,
+          medicineId,
+        },
+      },
+    });
+
+    if (!tariff || !tariff.isCovered || tariff.status !== 'ACTIVE') {
+      return {
+        isCovered: false,
+        hasAgreement: true,
+        insurancePays: 0,
+        patientPays: retailPrice,
+        message: 'Medicine not covered by insurance tariff',
+      };
+    }
+
+    // Use custom coverage rate from agreement if available, otherwise use tariff rate
+    const coveragePercentage = agreement.customCoverageRate
+      ? Number(agreement.customCoverageRate)
+      : Number(tariff.coveragePercentage);
+
+    let insurancePays: number;
+    let patientPays: number;
+
+    if (tariff.fixedCopayAmount) {
+      // Fixed copay amount
+      insurancePays = Math.max(0, retailPrice - Number(tariff.fixedCopayAmount));
+      patientPays = Number(tariff.fixedCopayAmount);
+    } else {
+      // Percentage-based copay
+      insurancePays = retailPrice * (coveragePercentage / 100);
+      patientPays = retailPrice - insurancePays;
+    }
+
+    return {
+      isCovered: true,
+      hasAgreement: true,
+      insurancePays: Math.round(insurancePays * 100) / 100,
+      patientPays: Math.round(patientPays * 100) / 100,
+      coveragePercentage,
+      copayPercentage: 100 - coveragePercentage,
+      requiresPreAuth: tariff.requiresPreAuth,
+      coveredPrice: Number(tariff.coveredPrice),
+      insuranceName: agreement.insuranceId, // Would need to join to get name
+    };
   }
 }

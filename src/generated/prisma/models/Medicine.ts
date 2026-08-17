@@ -205,6 +205,8 @@ export type MedicineWhereInput = {
   reservations?: Prisma.ReservationListRelationFilter
   prescriptionMedicines?: Prisma.PrescriptionMedicineListRelationFilter
   reminderSchedules?: Prisma.ReminderScheduleListRelationFilter
+  insuranceTariffs?: Prisma.InsuranceMedicineTariffListRelationFilter
+  insuranceClaims?: Prisma.InsuranceClaimListRelationFilter
 }
 
 export type MedicineOrderByWithRelationInput = {
@@ -222,6 +224,8 @@ export type MedicineOrderByWithRelationInput = {
   reservations?: Prisma.ReservationOrderByRelationAggregateInput
   prescriptionMedicines?: Prisma.PrescriptionMedicineOrderByRelationAggregateInput
   reminderSchedules?: Prisma.ReminderScheduleOrderByRelationAggregateInput
+  insuranceTariffs?: Prisma.InsuranceMedicineTariffOrderByRelationAggregateInput
+  insuranceClaims?: Prisma.InsuranceClaimOrderByRelationAggregateInput
 }
 
 export type MedicineWhereUniqueInput = Prisma.AtLeast<{
@@ -242,6 +246,8 @@ export type MedicineWhereUniqueInput = Prisma.AtLeast<{
   reservations?: Prisma.ReservationListRelationFilter
   prescriptionMedicines?: Prisma.PrescriptionMedicineListRelationFilter
   reminderSchedules?: Prisma.ReminderScheduleListRelationFilter
+  insuranceTariffs?: Prisma.InsuranceMedicineTariffListRelationFilter
+  insuranceClaims?: Prisma.InsuranceClaimListRelationFilter
 }, "id">
 
 export type MedicineOrderByWithAggregationInput = {
@@ -283,6 +289,8 @@ export type MedicineCreateInput = {
   reservations?: Prisma.ReservationCreateNestedManyWithoutMedicineInput
   prescriptionMedicines?: Prisma.PrescriptionMedicineCreateNestedManyWithoutMedicineInput
   reminderSchedules?: Prisma.ReminderScheduleCreateNestedManyWithoutMedicineInput
+  insuranceTariffs?: Prisma.InsuranceMedicineTariffCreateNestedManyWithoutMedicineInput
+  insuranceClaims?: Prisma.InsuranceClaimCreateNestedManyWithoutMedicineInput
 }
 
 export type MedicineUncheckedCreateInput = {
@@ -298,6 +306,8 @@ export type MedicineUncheckedCreateInput = {
   reservations?: Prisma.ReservationUncheckedCreateNestedManyWithoutMedicineInput
   prescriptionMedicines?: Prisma.PrescriptionMedicineUncheckedCreateNestedManyWithoutMedicineInput
   reminderSchedules?: Prisma.ReminderScheduleUncheckedCreateNestedManyWithoutMedicineInput
+  insuranceTariffs?: Prisma.InsuranceMedicineTariffUncheckedCreateNestedManyWithoutMedicineInput
+  insuranceClaims?: Prisma.InsuranceClaimUncheckedCreateNestedManyWithoutMedicineInput
 }
 
 export type MedicineUpdateInput = {
@@ -313,6 +323,8 @@ export type MedicineUpdateInput = {
   reservations?: Prisma.ReservationUpdateManyWithoutMedicineNestedInput
   prescriptionMedicines?: Prisma.PrescriptionMedicineUpdateManyWithoutMedicineNestedInput
   reminderSchedules?: Prisma.ReminderScheduleUpdateManyWithoutMedicineNestedInput
+  insuranceTariffs?: Prisma.InsuranceMedicineTariffUpdateManyWithoutMedicineNestedInput
+  insuranceClaims?: Prisma.InsuranceClaimUpdateManyWithoutMedicineNestedInput
 }
 
 export type MedicineUncheckedUpdateInput = {
@@ -328,6 +340,8 @@ export type MedicineUncheckedUpdateInput = {
   reservations?: Prisma.ReservationUncheckedUpdateManyWithoutMedicineNestedInput
   prescriptionMedicines?: Prisma.PrescriptionMedicineUncheckedUpdateManyWithoutMedicineNestedInput
   reminderSchedules?: Prisma.ReminderScheduleUncheckedUpdateManyWithoutMedicineNestedInput
+  insuranceTariffs?: Prisma.InsuranceMedicineTariffUncheckedUpdateManyWithoutMedicineNestedInput
+  insuranceClaims?: Prisma.InsuranceClaimUncheckedUpdateManyWithoutMedicineNestedInput
 }
 
 export type MedicineCreateManyInput = {
@@ -401,6 +415,11 @@ export type MedicineMinOrderByAggregateInput = {
 export type MedicineScalarRelationFilter = {
   is?: Prisma.MedicineWhereInput
   isNot?: Prisma.MedicineWhereInput
+}
+
+export type MedicineNullableScalarRelationFilter = {
+  is?: Prisma.MedicineWhereInput | null
+  isNot?: Prisma.MedicineWhereInput | null
 }
 
 export type MedicineCreateNestedManyWithoutCategoryInput = {
@@ -557,6 +576,36 @@ export type MedicineUpdateOneRequiredWithoutReminderSchedulesNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.MedicineUpdateToOneWithWhereWithoutReminderSchedulesInput, Prisma.MedicineUpdateWithoutReminderSchedulesInput>, Prisma.MedicineUncheckedUpdateWithoutReminderSchedulesInput>
 }
 
+export type MedicineCreateNestedOneWithoutInsuranceTariffsInput = {
+  create?: Prisma.XOR<Prisma.MedicineCreateWithoutInsuranceTariffsInput, Prisma.MedicineUncheckedCreateWithoutInsuranceTariffsInput>
+  connectOrCreate?: Prisma.MedicineCreateOrConnectWithoutInsuranceTariffsInput
+  connect?: Prisma.MedicineWhereUniqueInput
+}
+
+export type MedicineUpdateOneRequiredWithoutInsuranceTariffsNestedInput = {
+  create?: Prisma.XOR<Prisma.MedicineCreateWithoutInsuranceTariffsInput, Prisma.MedicineUncheckedCreateWithoutInsuranceTariffsInput>
+  connectOrCreate?: Prisma.MedicineCreateOrConnectWithoutInsuranceTariffsInput
+  upsert?: Prisma.MedicineUpsertWithoutInsuranceTariffsInput
+  connect?: Prisma.MedicineWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.MedicineUpdateToOneWithWhereWithoutInsuranceTariffsInput, Prisma.MedicineUpdateWithoutInsuranceTariffsInput>, Prisma.MedicineUncheckedUpdateWithoutInsuranceTariffsInput>
+}
+
+export type MedicineCreateNestedOneWithoutInsuranceClaimsInput = {
+  create?: Prisma.XOR<Prisma.MedicineCreateWithoutInsuranceClaimsInput, Prisma.MedicineUncheckedCreateWithoutInsuranceClaimsInput>
+  connectOrCreate?: Prisma.MedicineCreateOrConnectWithoutInsuranceClaimsInput
+  connect?: Prisma.MedicineWhereUniqueInput
+}
+
+export type MedicineUpdateOneWithoutInsuranceClaimsNestedInput = {
+  create?: Prisma.XOR<Prisma.MedicineCreateWithoutInsuranceClaimsInput, Prisma.MedicineUncheckedCreateWithoutInsuranceClaimsInput>
+  connectOrCreate?: Prisma.MedicineCreateOrConnectWithoutInsuranceClaimsInput
+  upsert?: Prisma.MedicineUpsertWithoutInsuranceClaimsInput
+  disconnect?: Prisma.MedicineWhereInput | boolean
+  delete?: Prisma.MedicineWhereInput | boolean
+  connect?: Prisma.MedicineWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.MedicineUpdateToOneWithWhereWithoutInsuranceClaimsInput, Prisma.MedicineUpdateWithoutInsuranceClaimsInput>, Prisma.MedicineUncheckedUpdateWithoutInsuranceClaimsInput>
+}
+
 export type MedicineCreateWithoutCategoryInput = {
   id?: string
   tradeName: string
@@ -569,6 +618,8 @@ export type MedicineCreateWithoutCategoryInput = {
   reservations?: Prisma.ReservationCreateNestedManyWithoutMedicineInput
   prescriptionMedicines?: Prisma.PrescriptionMedicineCreateNestedManyWithoutMedicineInput
   reminderSchedules?: Prisma.ReminderScheduleCreateNestedManyWithoutMedicineInput
+  insuranceTariffs?: Prisma.InsuranceMedicineTariffCreateNestedManyWithoutMedicineInput
+  insuranceClaims?: Prisma.InsuranceClaimCreateNestedManyWithoutMedicineInput
 }
 
 export type MedicineUncheckedCreateWithoutCategoryInput = {
@@ -583,6 +634,8 @@ export type MedicineUncheckedCreateWithoutCategoryInput = {
   reservations?: Prisma.ReservationUncheckedCreateNestedManyWithoutMedicineInput
   prescriptionMedicines?: Prisma.PrescriptionMedicineUncheckedCreateNestedManyWithoutMedicineInput
   reminderSchedules?: Prisma.ReminderScheduleUncheckedCreateNestedManyWithoutMedicineInput
+  insuranceTariffs?: Prisma.InsuranceMedicineTariffUncheckedCreateNestedManyWithoutMedicineInput
+  insuranceClaims?: Prisma.InsuranceClaimUncheckedCreateNestedManyWithoutMedicineInput
 }
 
 export type MedicineCreateOrConnectWithoutCategoryInput = {
@@ -636,6 +689,8 @@ export type MedicineCreateWithoutManufacturerInput = {
   reservations?: Prisma.ReservationCreateNestedManyWithoutMedicineInput
   prescriptionMedicines?: Prisma.PrescriptionMedicineCreateNestedManyWithoutMedicineInput
   reminderSchedules?: Prisma.ReminderScheduleCreateNestedManyWithoutMedicineInput
+  insuranceTariffs?: Prisma.InsuranceMedicineTariffCreateNestedManyWithoutMedicineInput
+  insuranceClaims?: Prisma.InsuranceClaimCreateNestedManyWithoutMedicineInput
 }
 
 export type MedicineUncheckedCreateWithoutManufacturerInput = {
@@ -650,6 +705,8 @@ export type MedicineUncheckedCreateWithoutManufacturerInput = {
   reservations?: Prisma.ReservationUncheckedCreateNestedManyWithoutMedicineInput
   prescriptionMedicines?: Prisma.PrescriptionMedicineUncheckedCreateNestedManyWithoutMedicineInput
   reminderSchedules?: Prisma.ReminderScheduleUncheckedCreateNestedManyWithoutMedicineInput
+  insuranceTariffs?: Prisma.InsuranceMedicineTariffUncheckedCreateNestedManyWithoutMedicineInput
+  insuranceClaims?: Prisma.InsuranceClaimUncheckedCreateNestedManyWithoutMedicineInput
 }
 
 export type MedicineCreateOrConnectWithoutManufacturerInput = {
@@ -690,6 +747,8 @@ export type MedicineCreateWithoutBatchesInput = {
   reservations?: Prisma.ReservationCreateNestedManyWithoutMedicineInput
   prescriptionMedicines?: Prisma.PrescriptionMedicineCreateNestedManyWithoutMedicineInput
   reminderSchedules?: Prisma.ReminderScheduleCreateNestedManyWithoutMedicineInput
+  insuranceTariffs?: Prisma.InsuranceMedicineTariffCreateNestedManyWithoutMedicineInput
+  insuranceClaims?: Prisma.InsuranceClaimCreateNestedManyWithoutMedicineInput
 }
 
 export type MedicineUncheckedCreateWithoutBatchesInput = {
@@ -704,6 +763,8 @@ export type MedicineUncheckedCreateWithoutBatchesInput = {
   reservations?: Prisma.ReservationUncheckedCreateNestedManyWithoutMedicineInput
   prescriptionMedicines?: Prisma.PrescriptionMedicineUncheckedCreateNestedManyWithoutMedicineInput
   reminderSchedules?: Prisma.ReminderScheduleUncheckedCreateNestedManyWithoutMedicineInput
+  insuranceTariffs?: Prisma.InsuranceMedicineTariffUncheckedCreateNestedManyWithoutMedicineInput
+  insuranceClaims?: Prisma.InsuranceClaimUncheckedCreateNestedManyWithoutMedicineInput
 }
 
 export type MedicineCreateOrConnectWithoutBatchesInput = {
@@ -734,6 +795,8 @@ export type MedicineUpdateWithoutBatchesInput = {
   reservations?: Prisma.ReservationUpdateManyWithoutMedicineNestedInput
   prescriptionMedicines?: Prisma.PrescriptionMedicineUpdateManyWithoutMedicineNestedInput
   reminderSchedules?: Prisma.ReminderScheduleUpdateManyWithoutMedicineNestedInput
+  insuranceTariffs?: Prisma.InsuranceMedicineTariffUpdateManyWithoutMedicineNestedInput
+  insuranceClaims?: Prisma.InsuranceClaimUpdateManyWithoutMedicineNestedInput
 }
 
 export type MedicineUncheckedUpdateWithoutBatchesInput = {
@@ -748,6 +811,8 @@ export type MedicineUncheckedUpdateWithoutBatchesInput = {
   reservations?: Prisma.ReservationUncheckedUpdateManyWithoutMedicineNestedInput
   prescriptionMedicines?: Prisma.PrescriptionMedicineUncheckedUpdateManyWithoutMedicineNestedInput
   reminderSchedules?: Prisma.ReminderScheduleUncheckedUpdateManyWithoutMedicineNestedInput
+  insuranceTariffs?: Prisma.InsuranceMedicineTariffUncheckedUpdateManyWithoutMedicineNestedInput
+  insuranceClaims?: Prisma.InsuranceClaimUncheckedUpdateManyWithoutMedicineNestedInput
 }
 
 export type MedicineCreateWithoutInventoriesInput = {
@@ -762,6 +827,8 @@ export type MedicineCreateWithoutInventoriesInput = {
   reservations?: Prisma.ReservationCreateNestedManyWithoutMedicineInput
   prescriptionMedicines?: Prisma.PrescriptionMedicineCreateNestedManyWithoutMedicineInput
   reminderSchedules?: Prisma.ReminderScheduleCreateNestedManyWithoutMedicineInput
+  insuranceTariffs?: Prisma.InsuranceMedicineTariffCreateNestedManyWithoutMedicineInput
+  insuranceClaims?: Prisma.InsuranceClaimCreateNestedManyWithoutMedicineInput
 }
 
 export type MedicineUncheckedCreateWithoutInventoriesInput = {
@@ -776,6 +843,8 @@ export type MedicineUncheckedCreateWithoutInventoriesInput = {
   reservations?: Prisma.ReservationUncheckedCreateNestedManyWithoutMedicineInput
   prescriptionMedicines?: Prisma.PrescriptionMedicineUncheckedCreateNestedManyWithoutMedicineInput
   reminderSchedules?: Prisma.ReminderScheduleUncheckedCreateNestedManyWithoutMedicineInput
+  insuranceTariffs?: Prisma.InsuranceMedicineTariffUncheckedCreateNestedManyWithoutMedicineInput
+  insuranceClaims?: Prisma.InsuranceClaimUncheckedCreateNestedManyWithoutMedicineInput
 }
 
 export type MedicineCreateOrConnectWithoutInventoriesInput = {
@@ -806,6 +875,8 @@ export type MedicineUpdateWithoutInventoriesInput = {
   reservations?: Prisma.ReservationUpdateManyWithoutMedicineNestedInput
   prescriptionMedicines?: Prisma.PrescriptionMedicineUpdateManyWithoutMedicineNestedInput
   reminderSchedules?: Prisma.ReminderScheduleUpdateManyWithoutMedicineNestedInput
+  insuranceTariffs?: Prisma.InsuranceMedicineTariffUpdateManyWithoutMedicineNestedInput
+  insuranceClaims?: Prisma.InsuranceClaimUpdateManyWithoutMedicineNestedInput
 }
 
 export type MedicineUncheckedUpdateWithoutInventoriesInput = {
@@ -820,6 +891,8 @@ export type MedicineUncheckedUpdateWithoutInventoriesInput = {
   reservations?: Prisma.ReservationUncheckedUpdateManyWithoutMedicineNestedInput
   prescriptionMedicines?: Prisma.PrescriptionMedicineUncheckedUpdateManyWithoutMedicineNestedInput
   reminderSchedules?: Prisma.ReminderScheduleUncheckedUpdateManyWithoutMedicineNestedInput
+  insuranceTariffs?: Prisma.InsuranceMedicineTariffUncheckedUpdateManyWithoutMedicineNestedInput
+  insuranceClaims?: Prisma.InsuranceClaimUncheckedUpdateManyWithoutMedicineNestedInput
 }
 
 export type MedicineCreateWithoutReservationsInput = {
@@ -834,6 +907,8 @@ export type MedicineCreateWithoutReservationsInput = {
   inventories?: Prisma.InventoryCreateNestedManyWithoutMedicineInput
   prescriptionMedicines?: Prisma.PrescriptionMedicineCreateNestedManyWithoutMedicineInput
   reminderSchedules?: Prisma.ReminderScheduleCreateNestedManyWithoutMedicineInput
+  insuranceTariffs?: Prisma.InsuranceMedicineTariffCreateNestedManyWithoutMedicineInput
+  insuranceClaims?: Prisma.InsuranceClaimCreateNestedManyWithoutMedicineInput
 }
 
 export type MedicineUncheckedCreateWithoutReservationsInput = {
@@ -848,6 +923,8 @@ export type MedicineUncheckedCreateWithoutReservationsInput = {
   inventories?: Prisma.InventoryUncheckedCreateNestedManyWithoutMedicineInput
   prescriptionMedicines?: Prisma.PrescriptionMedicineUncheckedCreateNestedManyWithoutMedicineInput
   reminderSchedules?: Prisma.ReminderScheduleUncheckedCreateNestedManyWithoutMedicineInput
+  insuranceTariffs?: Prisma.InsuranceMedicineTariffUncheckedCreateNestedManyWithoutMedicineInput
+  insuranceClaims?: Prisma.InsuranceClaimUncheckedCreateNestedManyWithoutMedicineInput
 }
 
 export type MedicineCreateOrConnectWithoutReservationsInput = {
@@ -878,6 +955,8 @@ export type MedicineUpdateWithoutReservationsInput = {
   inventories?: Prisma.InventoryUpdateManyWithoutMedicineNestedInput
   prescriptionMedicines?: Prisma.PrescriptionMedicineUpdateManyWithoutMedicineNestedInput
   reminderSchedules?: Prisma.ReminderScheduleUpdateManyWithoutMedicineNestedInput
+  insuranceTariffs?: Prisma.InsuranceMedicineTariffUpdateManyWithoutMedicineNestedInput
+  insuranceClaims?: Prisma.InsuranceClaimUpdateManyWithoutMedicineNestedInput
 }
 
 export type MedicineUncheckedUpdateWithoutReservationsInput = {
@@ -892,6 +971,8 @@ export type MedicineUncheckedUpdateWithoutReservationsInput = {
   inventories?: Prisma.InventoryUncheckedUpdateManyWithoutMedicineNestedInput
   prescriptionMedicines?: Prisma.PrescriptionMedicineUncheckedUpdateManyWithoutMedicineNestedInput
   reminderSchedules?: Prisma.ReminderScheduleUncheckedUpdateManyWithoutMedicineNestedInput
+  insuranceTariffs?: Prisma.InsuranceMedicineTariffUncheckedUpdateManyWithoutMedicineNestedInput
+  insuranceClaims?: Prisma.InsuranceClaimUncheckedUpdateManyWithoutMedicineNestedInput
 }
 
 export type MedicineCreateWithoutPrescriptionMedicinesInput = {
@@ -906,6 +987,8 @@ export type MedicineCreateWithoutPrescriptionMedicinesInput = {
   inventories?: Prisma.InventoryCreateNestedManyWithoutMedicineInput
   reservations?: Prisma.ReservationCreateNestedManyWithoutMedicineInput
   reminderSchedules?: Prisma.ReminderScheduleCreateNestedManyWithoutMedicineInput
+  insuranceTariffs?: Prisma.InsuranceMedicineTariffCreateNestedManyWithoutMedicineInput
+  insuranceClaims?: Prisma.InsuranceClaimCreateNestedManyWithoutMedicineInput
 }
 
 export type MedicineUncheckedCreateWithoutPrescriptionMedicinesInput = {
@@ -920,6 +1003,8 @@ export type MedicineUncheckedCreateWithoutPrescriptionMedicinesInput = {
   inventories?: Prisma.InventoryUncheckedCreateNestedManyWithoutMedicineInput
   reservations?: Prisma.ReservationUncheckedCreateNestedManyWithoutMedicineInput
   reminderSchedules?: Prisma.ReminderScheduleUncheckedCreateNestedManyWithoutMedicineInput
+  insuranceTariffs?: Prisma.InsuranceMedicineTariffUncheckedCreateNestedManyWithoutMedicineInput
+  insuranceClaims?: Prisma.InsuranceClaimUncheckedCreateNestedManyWithoutMedicineInput
 }
 
 export type MedicineCreateOrConnectWithoutPrescriptionMedicinesInput = {
@@ -950,6 +1035,8 @@ export type MedicineUpdateWithoutPrescriptionMedicinesInput = {
   inventories?: Prisma.InventoryUpdateManyWithoutMedicineNestedInput
   reservations?: Prisma.ReservationUpdateManyWithoutMedicineNestedInput
   reminderSchedules?: Prisma.ReminderScheduleUpdateManyWithoutMedicineNestedInput
+  insuranceTariffs?: Prisma.InsuranceMedicineTariffUpdateManyWithoutMedicineNestedInput
+  insuranceClaims?: Prisma.InsuranceClaimUpdateManyWithoutMedicineNestedInput
 }
 
 export type MedicineUncheckedUpdateWithoutPrescriptionMedicinesInput = {
@@ -964,6 +1051,8 @@ export type MedicineUncheckedUpdateWithoutPrescriptionMedicinesInput = {
   inventories?: Prisma.InventoryUncheckedUpdateManyWithoutMedicineNestedInput
   reservations?: Prisma.ReservationUncheckedUpdateManyWithoutMedicineNestedInput
   reminderSchedules?: Prisma.ReminderScheduleUncheckedUpdateManyWithoutMedicineNestedInput
+  insuranceTariffs?: Prisma.InsuranceMedicineTariffUncheckedUpdateManyWithoutMedicineNestedInput
+  insuranceClaims?: Prisma.InsuranceClaimUncheckedUpdateManyWithoutMedicineNestedInput
 }
 
 export type MedicineCreateWithoutReminderSchedulesInput = {
@@ -978,6 +1067,8 @@ export type MedicineCreateWithoutReminderSchedulesInput = {
   inventories?: Prisma.InventoryCreateNestedManyWithoutMedicineInput
   reservations?: Prisma.ReservationCreateNestedManyWithoutMedicineInput
   prescriptionMedicines?: Prisma.PrescriptionMedicineCreateNestedManyWithoutMedicineInput
+  insuranceTariffs?: Prisma.InsuranceMedicineTariffCreateNestedManyWithoutMedicineInput
+  insuranceClaims?: Prisma.InsuranceClaimCreateNestedManyWithoutMedicineInput
 }
 
 export type MedicineUncheckedCreateWithoutReminderSchedulesInput = {
@@ -992,6 +1083,8 @@ export type MedicineUncheckedCreateWithoutReminderSchedulesInput = {
   inventories?: Prisma.InventoryUncheckedCreateNestedManyWithoutMedicineInput
   reservations?: Prisma.ReservationUncheckedCreateNestedManyWithoutMedicineInput
   prescriptionMedicines?: Prisma.PrescriptionMedicineUncheckedCreateNestedManyWithoutMedicineInput
+  insuranceTariffs?: Prisma.InsuranceMedicineTariffUncheckedCreateNestedManyWithoutMedicineInput
+  insuranceClaims?: Prisma.InsuranceClaimUncheckedCreateNestedManyWithoutMedicineInput
 }
 
 export type MedicineCreateOrConnectWithoutReminderSchedulesInput = {
@@ -1022,6 +1115,8 @@ export type MedicineUpdateWithoutReminderSchedulesInput = {
   inventories?: Prisma.InventoryUpdateManyWithoutMedicineNestedInput
   reservations?: Prisma.ReservationUpdateManyWithoutMedicineNestedInput
   prescriptionMedicines?: Prisma.PrescriptionMedicineUpdateManyWithoutMedicineNestedInput
+  insuranceTariffs?: Prisma.InsuranceMedicineTariffUpdateManyWithoutMedicineNestedInput
+  insuranceClaims?: Prisma.InsuranceClaimUpdateManyWithoutMedicineNestedInput
 }
 
 export type MedicineUncheckedUpdateWithoutReminderSchedulesInput = {
@@ -1036,6 +1131,168 @@ export type MedicineUncheckedUpdateWithoutReminderSchedulesInput = {
   inventories?: Prisma.InventoryUncheckedUpdateManyWithoutMedicineNestedInput
   reservations?: Prisma.ReservationUncheckedUpdateManyWithoutMedicineNestedInput
   prescriptionMedicines?: Prisma.PrescriptionMedicineUncheckedUpdateManyWithoutMedicineNestedInput
+  insuranceTariffs?: Prisma.InsuranceMedicineTariffUncheckedUpdateManyWithoutMedicineNestedInput
+  insuranceClaims?: Prisma.InsuranceClaimUncheckedUpdateManyWithoutMedicineNestedInput
+}
+
+export type MedicineCreateWithoutInsuranceTariffsInput = {
+  id?: string
+  tradeName: string
+  genericName: string
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  category: Prisma.CategoryCreateNestedOneWithoutMedicinesInput
+  manufacturer: Prisma.ManufacturerCreateNestedOneWithoutMedicinesInput
+  batches?: Prisma.MedicineBatchCreateNestedManyWithoutMedicineInput
+  inventories?: Prisma.InventoryCreateNestedManyWithoutMedicineInput
+  reservations?: Prisma.ReservationCreateNestedManyWithoutMedicineInput
+  prescriptionMedicines?: Prisma.PrescriptionMedicineCreateNestedManyWithoutMedicineInput
+  reminderSchedules?: Prisma.ReminderScheduleCreateNestedManyWithoutMedicineInput
+  insuranceClaims?: Prisma.InsuranceClaimCreateNestedManyWithoutMedicineInput
+}
+
+export type MedicineUncheckedCreateWithoutInsuranceTariffsInput = {
+  id?: string
+  tradeName: string
+  genericName: string
+  categoryId: string
+  manufacturerId: string
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  batches?: Prisma.MedicineBatchUncheckedCreateNestedManyWithoutMedicineInput
+  inventories?: Prisma.InventoryUncheckedCreateNestedManyWithoutMedicineInput
+  reservations?: Prisma.ReservationUncheckedCreateNestedManyWithoutMedicineInput
+  prescriptionMedicines?: Prisma.PrescriptionMedicineUncheckedCreateNestedManyWithoutMedicineInput
+  reminderSchedules?: Prisma.ReminderScheduleUncheckedCreateNestedManyWithoutMedicineInput
+  insuranceClaims?: Prisma.InsuranceClaimUncheckedCreateNestedManyWithoutMedicineInput
+}
+
+export type MedicineCreateOrConnectWithoutInsuranceTariffsInput = {
+  where: Prisma.MedicineWhereUniqueInput
+  create: Prisma.XOR<Prisma.MedicineCreateWithoutInsuranceTariffsInput, Prisma.MedicineUncheckedCreateWithoutInsuranceTariffsInput>
+}
+
+export type MedicineUpsertWithoutInsuranceTariffsInput = {
+  update: Prisma.XOR<Prisma.MedicineUpdateWithoutInsuranceTariffsInput, Prisma.MedicineUncheckedUpdateWithoutInsuranceTariffsInput>
+  create: Prisma.XOR<Prisma.MedicineCreateWithoutInsuranceTariffsInput, Prisma.MedicineUncheckedCreateWithoutInsuranceTariffsInput>
+  where?: Prisma.MedicineWhereInput
+}
+
+export type MedicineUpdateToOneWithWhereWithoutInsuranceTariffsInput = {
+  where?: Prisma.MedicineWhereInput
+  data: Prisma.XOR<Prisma.MedicineUpdateWithoutInsuranceTariffsInput, Prisma.MedicineUncheckedUpdateWithoutInsuranceTariffsInput>
+}
+
+export type MedicineUpdateWithoutInsuranceTariffsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  tradeName?: Prisma.StringFieldUpdateOperationsInput | string
+  genericName?: Prisma.StringFieldUpdateOperationsInput | string
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  category?: Prisma.CategoryUpdateOneRequiredWithoutMedicinesNestedInput
+  manufacturer?: Prisma.ManufacturerUpdateOneRequiredWithoutMedicinesNestedInput
+  batches?: Prisma.MedicineBatchUpdateManyWithoutMedicineNestedInput
+  inventories?: Prisma.InventoryUpdateManyWithoutMedicineNestedInput
+  reservations?: Prisma.ReservationUpdateManyWithoutMedicineNestedInput
+  prescriptionMedicines?: Prisma.PrescriptionMedicineUpdateManyWithoutMedicineNestedInput
+  reminderSchedules?: Prisma.ReminderScheduleUpdateManyWithoutMedicineNestedInput
+  insuranceClaims?: Prisma.InsuranceClaimUpdateManyWithoutMedicineNestedInput
+}
+
+export type MedicineUncheckedUpdateWithoutInsuranceTariffsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  tradeName?: Prisma.StringFieldUpdateOperationsInput | string
+  genericName?: Prisma.StringFieldUpdateOperationsInput | string
+  categoryId?: Prisma.StringFieldUpdateOperationsInput | string
+  manufacturerId?: Prisma.StringFieldUpdateOperationsInput | string
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  batches?: Prisma.MedicineBatchUncheckedUpdateManyWithoutMedicineNestedInput
+  inventories?: Prisma.InventoryUncheckedUpdateManyWithoutMedicineNestedInput
+  reservations?: Prisma.ReservationUncheckedUpdateManyWithoutMedicineNestedInput
+  prescriptionMedicines?: Prisma.PrescriptionMedicineUncheckedUpdateManyWithoutMedicineNestedInput
+  reminderSchedules?: Prisma.ReminderScheduleUncheckedUpdateManyWithoutMedicineNestedInput
+  insuranceClaims?: Prisma.InsuranceClaimUncheckedUpdateManyWithoutMedicineNestedInput
+}
+
+export type MedicineCreateWithoutInsuranceClaimsInput = {
+  id?: string
+  tradeName: string
+  genericName: string
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  category: Prisma.CategoryCreateNestedOneWithoutMedicinesInput
+  manufacturer: Prisma.ManufacturerCreateNestedOneWithoutMedicinesInput
+  batches?: Prisma.MedicineBatchCreateNestedManyWithoutMedicineInput
+  inventories?: Prisma.InventoryCreateNestedManyWithoutMedicineInput
+  reservations?: Prisma.ReservationCreateNestedManyWithoutMedicineInput
+  prescriptionMedicines?: Prisma.PrescriptionMedicineCreateNestedManyWithoutMedicineInput
+  reminderSchedules?: Prisma.ReminderScheduleCreateNestedManyWithoutMedicineInput
+  insuranceTariffs?: Prisma.InsuranceMedicineTariffCreateNestedManyWithoutMedicineInput
+}
+
+export type MedicineUncheckedCreateWithoutInsuranceClaimsInput = {
+  id?: string
+  tradeName: string
+  genericName: string
+  categoryId: string
+  manufacturerId: string
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  batches?: Prisma.MedicineBatchUncheckedCreateNestedManyWithoutMedicineInput
+  inventories?: Prisma.InventoryUncheckedCreateNestedManyWithoutMedicineInput
+  reservations?: Prisma.ReservationUncheckedCreateNestedManyWithoutMedicineInput
+  prescriptionMedicines?: Prisma.PrescriptionMedicineUncheckedCreateNestedManyWithoutMedicineInput
+  reminderSchedules?: Prisma.ReminderScheduleUncheckedCreateNestedManyWithoutMedicineInput
+  insuranceTariffs?: Prisma.InsuranceMedicineTariffUncheckedCreateNestedManyWithoutMedicineInput
+}
+
+export type MedicineCreateOrConnectWithoutInsuranceClaimsInput = {
+  where: Prisma.MedicineWhereUniqueInput
+  create: Prisma.XOR<Prisma.MedicineCreateWithoutInsuranceClaimsInput, Prisma.MedicineUncheckedCreateWithoutInsuranceClaimsInput>
+}
+
+export type MedicineUpsertWithoutInsuranceClaimsInput = {
+  update: Prisma.XOR<Prisma.MedicineUpdateWithoutInsuranceClaimsInput, Prisma.MedicineUncheckedUpdateWithoutInsuranceClaimsInput>
+  create: Prisma.XOR<Prisma.MedicineCreateWithoutInsuranceClaimsInput, Prisma.MedicineUncheckedCreateWithoutInsuranceClaimsInput>
+  where?: Prisma.MedicineWhereInput
+}
+
+export type MedicineUpdateToOneWithWhereWithoutInsuranceClaimsInput = {
+  where?: Prisma.MedicineWhereInput
+  data: Prisma.XOR<Prisma.MedicineUpdateWithoutInsuranceClaimsInput, Prisma.MedicineUncheckedUpdateWithoutInsuranceClaimsInput>
+}
+
+export type MedicineUpdateWithoutInsuranceClaimsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  tradeName?: Prisma.StringFieldUpdateOperationsInput | string
+  genericName?: Prisma.StringFieldUpdateOperationsInput | string
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  category?: Prisma.CategoryUpdateOneRequiredWithoutMedicinesNestedInput
+  manufacturer?: Prisma.ManufacturerUpdateOneRequiredWithoutMedicinesNestedInput
+  batches?: Prisma.MedicineBatchUpdateManyWithoutMedicineNestedInput
+  inventories?: Prisma.InventoryUpdateManyWithoutMedicineNestedInput
+  reservations?: Prisma.ReservationUpdateManyWithoutMedicineNestedInput
+  prescriptionMedicines?: Prisma.PrescriptionMedicineUpdateManyWithoutMedicineNestedInput
+  reminderSchedules?: Prisma.ReminderScheduleUpdateManyWithoutMedicineNestedInput
+  insuranceTariffs?: Prisma.InsuranceMedicineTariffUpdateManyWithoutMedicineNestedInput
+}
+
+export type MedicineUncheckedUpdateWithoutInsuranceClaimsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  tradeName?: Prisma.StringFieldUpdateOperationsInput | string
+  genericName?: Prisma.StringFieldUpdateOperationsInput | string
+  categoryId?: Prisma.StringFieldUpdateOperationsInput | string
+  manufacturerId?: Prisma.StringFieldUpdateOperationsInput | string
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  batches?: Prisma.MedicineBatchUncheckedUpdateManyWithoutMedicineNestedInput
+  inventories?: Prisma.InventoryUncheckedUpdateManyWithoutMedicineNestedInput
+  reservations?: Prisma.ReservationUncheckedUpdateManyWithoutMedicineNestedInput
+  prescriptionMedicines?: Prisma.PrescriptionMedicineUncheckedUpdateManyWithoutMedicineNestedInput
+  reminderSchedules?: Prisma.ReminderScheduleUncheckedUpdateManyWithoutMedicineNestedInput
+  insuranceTariffs?: Prisma.InsuranceMedicineTariffUncheckedUpdateManyWithoutMedicineNestedInput
 }
 
 export type MedicineCreateManyCategoryInput = {
@@ -1059,6 +1316,8 @@ export type MedicineUpdateWithoutCategoryInput = {
   reservations?: Prisma.ReservationUpdateManyWithoutMedicineNestedInput
   prescriptionMedicines?: Prisma.PrescriptionMedicineUpdateManyWithoutMedicineNestedInput
   reminderSchedules?: Prisma.ReminderScheduleUpdateManyWithoutMedicineNestedInput
+  insuranceTariffs?: Prisma.InsuranceMedicineTariffUpdateManyWithoutMedicineNestedInput
+  insuranceClaims?: Prisma.InsuranceClaimUpdateManyWithoutMedicineNestedInput
 }
 
 export type MedicineUncheckedUpdateWithoutCategoryInput = {
@@ -1073,6 +1332,8 @@ export type MedicineUncheckedUpdateWithoutCategoryInput = {
   reservations?: Prisma.ReservationUncheckedUpdateManyWithoutMedicineNestedInput
   prescriptionMedicines?: Prisma.PrescriptionMedicineUncheckedUpdateManyWithoutMedicineNestedInput
   reminderSchedules?: Prisma.ReminderScheduleUncheckedUpdateManyWithoutMedicineNestedInput
+  insuranceTariffs?: Prisma.InsuranceMedicineTariffUncheckedUpdateManyWithoutMedicineNestedInput
+  insuranceClaims?: Prisma.InsuranceClaimUncheckedUpdateManyWithoutMedicineNestedInput
 }
 
 export type MedicineUncheckedUpdateManyWithoutCategoryInput = {
@@ -1105,6 +1366,8 @@ export type MedicineUpdateWithoutManufacturerInput = {
   reservations?: Prisma.ReservationUpdateManyWithoutMedicineNestedInput
   prescriptionMedicines?: Prisma.PrescriptionMedicineUpdateManyWithoutMedicineNestedInput
   reminderSchedules?: Prisma.ReminderScheduleUpdateManyWithoutMedicineNestedInput
+  insuranceTariffs?: Prisma.InsuranceMedicineTariffUpdateManyWithoutMedicineNestedInput
+  insuranceClaims?: Prisma.InsuranceClaimUpdateManyWithoutMedicineNestedInput
 }
 
 export type MedicineUncheckedUpdateWithoutManufacturerInput = {
@@ -1119,6 +1382,8 @@ export type MedicineUncheckedUpdateWithoutManufacturerInput = {
   reservations?: Prisma.ReservationUncheckedUpdateManyWithoutMedicineNestedInput
   prescriptionMedicines?: Prisma.PrescriptionMedicineUncheckedUpdateManyWithoutMedicineNestedInput
   reminderSchedules?: Prisma.ReminderScheduleUncheckedUpdateManyWithoutMedicineNestedInput
+  insuranceTariffs?: Prisma.InsuranceMedicineTariffUncheckedUpdateManyWithoutMedicineNestedInput
+  insuranceClaims?: Prisma.InsuranceClaimUncheckedUpdateManyWithoutMedicineNestedInput
 }
 
 export type MedicineUncheckedUpdateManyWithoutManufacturerInput = {
@@ -1141,6 +1406,8 @@ export type MedicineCountOutputType = {
   reservations: number
   prescriptionMedicines: number
   reminderSchedules: number
+  insuranceTariffs: number
+  insuranceClaims: number
 }
 
 export type MedicineCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -1149,6 +1416,8 @@ export type MedicineCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensio
   reservations?: boolean | MedicineCountOutputTypeCountReservationsArgs
   prescriptionMedicines?: boolean | MedicineCountOutputTypeCountPrescriptionMedicinesArgs
   reminderSchedules?: boolean | MedicineCountOutputTypeCountReminderSchedulesArgs
+  insuranceTariffs?: boolean | MedicineCountOutputTypeCountInsuranceTariffsArgs
+  insuranceClaims?: boolean | MedicineCountOutputTypeCountInsuranceClaimsArgs
 }
 
 /**
@@ -1196,6 +1465,20 @@ export type MedicineCountOutputTypeCountReminderSchedulesArgs<ExtArgs extends ru
   where?: Prisma.ReminderScheduleWhereInput
 }
 
+/**
+ * MedicineCountOutputType without action
+ */
+export type MedicineCountOutputTypeCountInsuranceTariffsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.InsuranceMedicineTariffWhereInput
+}
+
+/**
+ * MedicineCountOutputType without action
+ */
+export type MedicineCountOutputTypeCountInsuranceClaimsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.InsuranceClaimWhereInput
+}
+
 
 export type MedicineSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
@@ -1212,6 +1495,8 @@ export type MedicineSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs
   reservations?: boolean | Prisma.Medicine$reservationsArgs<ExtArgs>
   prescriptionMedicines?: boolean | Prisma.Medicine$prescriptionMedicinesArgs<ExtArgs>
   reminderSchedules?: boolean | Prisma.Medicine$reminderSchedulesArgs<ExtArgs>
+  insuranceTariffs?: boolean | Prisma.Medicine$insuranceTariffsArgs<ExtArgs>
+  insuranceClaims?: boolean | Prisma.Medicine$insuranceClaimsArgs<ExtArgs>
   _count?: boolean | Prisma.MedicineCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["medicine"]>
 
@@ -1258,6 +1543,8 @@ export type MedicineInclude<ExtArgs extends runtime.Types.Extensions.InternalArg
   reservations?: boolean | Prisma.Medicine$reservationsArgs<ExtArgs>
   prescriptionMedicines?: boolean | Prisma.Medicine$prescriptionMedicinesArgs<ExtArgs>
   reminderSchedules?: boolean | Prisma.Medicine$reminderSchedulesArgs<ExtArgs>
+  insuranceTariffs?: boolean | Prisma.Medicine$insuranceTariffsArgs<ExtArgs>
+  insuranceClaims?: boolean | Prisma.Medicine$insuranceClaimsArgs<ExtArgs>
   _count?: boolean | Prisma.MedicineCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type MedicineIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -1279,6 +1566,8 @@ export type $MedicinePayload<ExtArgs extends runtime.Types.Extensions.InternalAr
     reservations: Prisma.$ReservationPayload<ExtArgs>[]
     prescriptionMedicines: Prisma.$PrescriptionMedicinePayload<ExtArgs>[]
     reminderSchedules: Prisma.$ReminderSchedulePayload<ExtArgs>[]
+    insuranceTariffs: Prisma.$InsuranceMedicineTariffPayload<ExtArgs>[]
+    insuranceClaims: Prisma.$InsuranceClaimPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
@@ -1689,6 +1978,8 @@ export interface Prisma__MedicineClient<T, Null = never, ExtArgs extends runtime
   reservations<T extends Prisma.Medicine$reservationsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Medicine$reservationsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ReservationPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   prescriptionMedicines<T extends Prisma.Medicine$prescriptionMedicinesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Medicine$prescriptionMedicinesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$PrescriptionMedicinePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   reminderSchedules<T extends Prisma.Medicine$reminderSchedulesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Medicine$reminderSchedulesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ReminderSchedulePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  insuranceTariffs<T extends Prisma.Medicine$insuranceTariffsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Medicine$insuranceTariffsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$InsuranceMedicineTariffPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  insuranceClaims<T extends Prisma.Medicine$insuranceClaimsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Medicine$insuranceClaimsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$InsuranceClaimPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -2243,6 +2534,54 @@ export type Medicine$reminderSchedulesArgs<ExtArgs extends runtime.Types.Extensi
   take?: number
   skip?: number
   distinct?: Prisma.ReminderScheduleScalarFieldEnum | Prisma.ReminderScheduleScalarFieldEnum[]
+}
+
+/**
+ * Medicine.insuranceTariffs
+ */
+export type Medicine$insuranceTariffsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the InsuranceMedicineTariff
+   */
+  select?: Prisma.InsuranceMedicineTariffSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the InsuranceMedicineTariff
+   */
+  omit?: Prisma.InsuranceMedicineTariffOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.InsuranceMedicineTariffInclude<ExtArgs> | null
+  where?: Prisma.InsuranceMedicineTariffWhereInput
+  orderBy?: Prisma.InsuranceMedicineTariffOrderByWithRelationInput | Prisma.InsuranceMedicineTariffOrderByWithRelationInput[]
+  cursor?: Prisma.InsuranceMedicineTariffWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.InsuranceMedicineTariffScalarFieldEnum | Prisma.InsuranceMedicineTariffScalarFieldEnum[]
+}
+
+/**
+ * Medicine.insuranceClaims
+ */
+export type Medicine$insuranceClaimsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the InsuranceClaim
+   */
+  select?: Prisma.InsuranceClaimSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the InsuranceClaim
+   */
+  omit?: Prisma.InsuranceClaimOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.InsuranceClaimInclude<ExtArgs> | null
+  where?: Prisma.InsuranceClaimWhereInput
+  orderBy?: Prisma.InsuranceClaimOrderByWithRelationInput | Prisma.InsuranceClaimOrderByWithRelationInput[]
+  cursor?: Prisma.InsuranceClaimWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.InsuranceClaimScalarFieldEnum | Prisma.InsuranceClaimScalarFieldEnum[]
 }
 
 /**

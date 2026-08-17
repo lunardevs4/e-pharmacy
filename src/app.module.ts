@@ -28,6 +28,7 @@ import { GovernmentDashboardModule } from './government/government-dashboard.mod
 import { AuditLogsModule } from './audit-logs/audit-logs.module';
 import { FileUploadsModule } from './file-uploads/file-uploads.module';
 import { ReportsModule } from './reports/reports.module';
+import { InsuranceDashboardModule } from './insurance/insurance-dashboard.module';
 
 @Module({
   imports: [
@@ -55,6 +56,7 @@ import { ReportsModule } from './reports/reports.module';
     AuditLogsModule,
     FileUploadsModule,
     ReportsModule,
+    InsuranceDashboardModule,
   ],
   controllers: [],
   providers: [

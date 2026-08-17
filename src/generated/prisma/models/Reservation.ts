@@ -251,6 +251,7 @@ export type ReservationWhereInput = {
   patient?: Prisma.XOR<Prisma.PatientScalarRelationFilter, Prisma.PatientWhereInput>
   pharmacy?: Prisma.XOR<Prisma.PharmacyScalarRelationFilter, Prisma.PharmacyWhereInput>
   medicine?: Prisma.XOR<Prisma.MedicineScalarRelationFilter, Prisma.MedicineWhereInput>
+  insuranceClaims?: Prisma.InsuranceClaimListRelationFilter
 }
 
 export type ReservationOrderByWithRelationInput = {
@@ -266,6 +267,7 @@ export type ReservationOrderByWithRelationInput = {
   patient?: Prisma.PatientOrderByWithRelationInput
   pharmacy?: Prisma.PharmacyOrderByWithRelationInput
   medicine?: Prisma.MedicineOrderByWithRelationInput
+  insuranceClaims?: Prisma.InsuranceClaimOrderByRelationAggregateInput
 }
 
 export type ReservationWhereUniqueInput = Prisma.AtLeast<{
@@ -284,6 +286,7 @@ export type ReservationWhereUniqueInput = Prisma.AtLeast<{
   patient?: Prisma.XOR<Prisma.PatientScalarRelationFilter, Prisma.PatientWhereInput>
   pharmacy?: Prisma.XOR<Prisma.PharmacyScalarRelationFilter, Prisma.PharmacyWhereInput>
   medicine?: Prisma.XOR<Prisma.MedicineScalarRelationFilter, Prisma.MedicineWhereInput>
+  insuranceClaims?: Prisma.InsuranceClaimListRelationFilter
 }, "id">
 
 export type ReservationOrderByWithAggregationInput = {
@@ -328,6 +331,7 @@ export type ReservationCreateInput = {
   patient: Prisma.PatientCreateNestedOneWithoutReservationsInput
   pharmacy: Prisma.PharmacyCreateNestedOneWithoutReservationsInput
   medicine: Prisma.MedicineCreateNestedOneWithoutReservationsInput
+  insuranceClaims?: Prisma.InsuranceClaimCreateNestedManyWithoutReservationInput
 }
 
 export type ReservationUncheckedCreateInput = {
@@ -340,6 +344,7 @@ export type ReservationUncheckedCreateInput = {
   expiresAt: Date | string
   createdAt?: Date | string
   updatedAt?: Date | string
+  insuranceClaims?: Prisma.InsuranceClaimUncheckedCreateNestedManyWithoutReservationInput
 }
 
 export type ReservationUpdateInput = {
@@ -352,6 +357,7 @@ export type ReservationUpdateInput = {
   patient?: Prisma.PatientUpdateOneRequiredWithoutReservationsNestedInput
   pharmacy?: Prisma.PharmacyUpdateOneRequiredWithoutReservationsNestedInput
   medicine?: Prisma.MedicineUpdateOneRequiredWithoutReservationsNestedInput
+  insuranceClaims?: Prisma.InsuranceClaimUpdateManyWithoutReservationNestedInput
 }
 
 export type ReservationUncheckedUpdateInput = {
@@ -364,6 +370,7 @@ export type ReservationUncheckedUpdateInput = {
   expiresAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  insuranceClaims?: Prisma.InsuranceClaimUncheckedUpdateManyWithoutReservationNestedInput
 }
 
 export type ReservationCreateManyInput = {
@@ -451,6 +458,11 @@ export type ReservationMinOrderByAggregateInput = {
 
 export type ReservationSumOrderByAggregateInput = {
   quantity?: Prisma.SortOrder
+}
+
+export type ReservationNullableScalarRelationFilter = {
+  is?: Prisma.ReservationWhereInput | null
+  isNot?: Prisma.ReservationWhereInput | null
 }
 
 export type ReservationCreateNestedManyWithoutPatientInput = {
@@ -583,6 +595,22 @@ export type EnumReservationStatusFieldUpdateOperationsInput = {
   set?: $Enums.ReservationStatus
 }
 
+export type ReservationCreateNestedOneWithoutInsuranceClaimsInput = {
+  create?: Prisma.XOR<Prisma.ReservationCreateWithoutInsuranceClaimsInput, Prisma.ReservationUncheckedCreateWithoutInsuranceClaimsInput>
+  connectOrCreate?: Prisma.ReservationCreateOrConnectWithoutInsuranceClaimsInput
+  connect?: Prisma.ReservationWhereUniqueInput
+}
+
+export type ReservationUpdateOneWithoutInsuranceClaimsNestedInput = {
+  create?: Prisma.XOR<Prisma.ReservationCreateWithoutInsuranceClaimsInput, Prisma.ReservationUncheckedCreateWithoutInsuranceClaimsInput>
+  connectOrCreate?: Prisma.ReservationCreateOrConnectWithoutInsuranceClaimsInput
+  upsert?: Prisma.ReservationUpsertWithoutInsuranceClaimsInput
+  disconnect?: Prisma.ReservationWhereInput | boolean
+  delete?: Prisma.ReservationWhereInput | boolean
+  connect?: Prisma.ReservationWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.ReservationUpdateToOneWithWhereWithoutInsuranceClaimsInput, Prisma.ReservationUpdateWithoutInsuranceClaimsInput>, Prisma.ReservationUncheckedUpdateWithoutInsuranceClaimsInput>
+}
+
 export type ReservationCreateWithoutPatientInput = {
   id?: string
   quantity: number
@@ -592,6 +620,7 @@ export type ReservationCreateWithoutPatientInput = {
   updatedAt?: Date | string
   pharmacy: Prisma.PharmacyCreateNestedOneWithoutReservationsInput
   medicine: Prisma.MedicineCreateNestedOneWithoutReservationsInput
+  insuranceClaims?: Prisma.InsuranceClaimCreateNestedManyWithoutReservationInput
 }
 
 export type ReservationUncheckedCreateWithoutPatientInput = {
@@ -603,6 +632,7 @@ export type ReservationUncheckedCreateWithoutPatientInput = {
   expiresAt: Date | string
   createdAt?: Date | string
   updatedAt?: Date | string
+  insuranceClaims?: Prisma.InsuranceClaimUncheckedCreateNestedManyWithoutReservationInput
 }
 
 export type ReservationCreateOrConnectWithoutPatientInput = {
@@ -655,6 +685,7 @@ export type ReservationCreateWithoutPharmacyInput = {
   updatedAt?: Date | string
   patient: Prisma.PatientCreateNestedOneWithoutReservationsInput
   medicine: Prisma.MedicineCreateNestedOneWithoutReservationsInput
+  insuranceClaims?: Prisma.InsuranceClaimCreateNestedManyWithoutReservationInput
 }
 
 export type ReservationUncheckedCreateWithoutPharmacyInput = {
@@ -666,6 +697,7 @@ export type ReservationUncheckedCreateWithoutPharmacyInput = {
   expiresAt: Date | string
   createdAt?: Date | string
   updatedAt?: Date | string
+  insuranceClaims?: Prisma.InsuranceClaimUncheckedCreateNestedManyWithoutReservationInput
 }
 
 export type ReservationCreateOrConnectWithoutPharmacyInput = {
@@ -703,6 +735,7 @@ export type ReservationCreateWithoutMedicineInput = {
   updatedAt?: Date | string
   patient: Prisma.PatientCreateNestedOneWithoutReservationsInput
   pharmacy: Prisma.PharmacyCreateNestedOneWithoutReservationsInput
+  insuranceClaims?: Prisma.InsuranceClaimCreateNestedManyWithoutReservationInput
 }
 
 export type ReservationUncheckedCreateWithoutMedicineInput = {
@@ -714,6 +747,7 @@ export type ReservationUncheckedCreateWithoutMedicineInput = {
   expiresAt: Date | string
   createdAt?: Date | string
   updatedAt?: Date | string
+  insuranceClaims?: Prisma.InsuranceClaimUncheckedCreateNestedManyWithoutReservationInput
 }
 
 export type ReservationCreateOrConnectWithoutMedicineInput = {
@@ -742,6 +776,70 @@ export type ReservationUpdateManyWithWhereWithoutMedicineInput = {
   data: Prisma.XOR<Prisma.ReservationUpdateManyMutationInput, Prisma.ReservationUncheckedUpdateManyWithoutMedicineInput>
 }
 
+export type ReservationCreateWithoutInsuranceClaimsInput = {
+  id?: string
+  quantity: number
+  status?: $Enums.ReservationStatus
+  expiresAt: Date | string
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  patient: Prisma.PatientCreateNestedOneWithoutReservationsInput
+  pharmacy: Prisma.PharmacyCreateNestedOneWithoutReservationsInput
+  medicine: Prisma.MedicineCreateNestedOneWithoutReservationsInput
+}
+
+export type ReservationUncheckedCreateWithoutInsuranceClaimsInput = {
+  id?: string
+  patientId: string
+  pharmacyId: string
+  medicineId: string
+  quantity: number
+  status?: $Enums.ReservationStatus
+  expiresAt: Date | string
+  createdAt?: Date | string
+  updatedAt?: Date | string
+}
+
+export type ReservationCreateOrConnectWithoutInsuranceClaimsInput = {
+  where: Prisma.ReservationWhereUniqueInput
+  create: Prisma.XOR<Prisma.ReservationCreateWithoutInsuranceClaimsInput, Prisma.ReservationUncheckedCreateWithoutInsuranceClaimsInput>
+}
+
+export type ReservationUpsertWithoutInsuranceClaimsInput = {
+  update: Prisma.XOR<Prisma.ReservationUpdateWithoutInsuranceClaimsInput, Prisma.ReservationUncheckedUpdateWithoutInsuranceClaimsInput>
+  create: Prisma.XOR<Prisma.ReservationCreateWithoutInsuranceClaimsInput, Prisma.ReservationUncheckedCreateWithoutInsuranceClaimsInput>
+  where?: Prisma.ReservationWhereInput
+}
+
+export type ReservationUpdateToOneWithWhereWithoutInsuranceClaimsInput = {
+  where?: Prisma.ReservationWhereInput
+  data: Prisma.XOR<Prisma.ReservationUpdateWithoutInsuranceClaimsInput, Prisma.ReservationUncheckedUpdateWithoutInsuranceClaimsInput>
+}
+
+export type ReservationUpdateWithoutInsuranceClaimsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  quantity?: Prisma.IntFieldUpdateOperationsInput | number
+  status?: Prisma.EnumReservationStatusFieldUpdateOperationsInput | $Enums.ReservationStatus
+  expiresAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  patient?: Prisma.PatientUpdateOneRequiredWithoutReservationsNestedInput
+  pharmacy?: Prisma.PharmacyUpdateOneRequiredWithoutReservationsNestedInput
+  medicine?: Prisma.MedicineUpdateOneRequiredWithoutReservationsNestedInput
+}
+
+export type ReservationUncheckedUpdateWithoutInsuranceClaimsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  patientId?: Prisma.StringFieldUpdateOperationsInput | string
+  pharmacyId?: Prisma.StringFieldUpdateOperationsInput | string
+  medicineId?: Prisma.StringFieldUpdateOperationsInput | string
+  quantity?: Prisma.IntFieldUpdateOperationsInput | number
+  status?: Prisma.EnumReservationStatusFieldUpdateOperationsInput | $Enums.ReservationStatus
+  expiresAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+}
+
 export type ReservationCreateManyPatientInput = {
   id?: string
   pharmacyId: string
@@ -762,6 +860,7 @@ export type ReservationUpdateWithoutPatientInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   pharmacy?: Prisma.PharmacyUpdateOneRequiredWithoutReservationsNestedInput
   medicine?: Prisma.MedicineUpdateOneRequiredWithoutReservationsNestedInput
+  insuranceClaims?: Prisma.InsuranceClaimUpdateManyWithoutReservationNestedInput
 }
 
 export type ReservationUncheckedUpdateWithoutPatientInput = {
@@ -773,6 +872,7 @@ export type ReservationUncheckedUpdateWithoutPatientInput = {
   expiresAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  insuranceClaims?: Prisma.InsuranceClaimUncheckedUpdateManyWithoutReservationNestedInput
 }
 
 export type ReservationUncheckedUpdateManyWithoutPatientInput = {
@@ -806,6 +906,7 @@ export type ReservationUpdateWithoutPharmacyInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   patient?: Prisma.PatientUpdateOneRequiredWithoutReservationsNestedInput
   medicine?: Prisma.MedicineUpdateOneRequiredWithoutReservationsNestedInput
+  insuranceClaims?: Prisma.InsuranceClaimUpdateManyWithoutReservationNestedInput
 }
 
 export type ReservationUncheckedUpdateWithoutPharmacyInput = {
@@ -817,6 +918,7 @@ export type ReservationUncheckedUpdateWithoutPharmacyInput = {
   expiresAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  insuranceClaims?: Prisma.InsuranceClaimUncheckedUpdateManyWithoutReservationNestedInput
 }
 
 export type ReservationUncheckedUpdateManyWithoutPharmacyInput = {
@@ -850,6 +952,7 @@ export type ReservationUpdateWithoutMedicineInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   patient?: Prisma.PatientUpdateOneRequiredWithoutReservationsNestedInput
   pharmacy?: Prisma.PharmacyUpdateOneRequiredWithoutReservationsNestedInput
+  insuranceClaims?: Prisma.InsuranceClaimUpdateManyWithoutReservationNestedInput
 }
 
 export type ReservationUncheckedUpdateWithoutMedicineInput = {
@@ -861,6 +964,7 @@ export type ReservationUncheckedUpdateWithoutMedicineInput = {
   expiresAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  insuranceClaims?: Prisma.InsuranceClaimUncheckedUpdateManyWithoutReservationNestedInput
 }
 
 export type ReservationUncheckedUpdateManyWithoutMedicineInput = {
@@ -874,6 +978,35 @@ export type ReservationUncheckedUpdateManyWithoutMedicineInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
+
+/**
+ * Count Type ReservationCountOutputType
+ */
+
+export type ReservationCountOutputType = {
+  insuranceClaims: number
+}
+
+export type ReservationCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  insuranceClaims?: boolean | ReservationCountOutputTypeCountInsuranceClaimsArgs
+}
+
+/**
+ * ReservationCountOutputType without action
+ */
+export type ReservationCountOutputTypeDefaultArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the ReservationCountOutputType
+   */
+  select?: Prisma.ReservationCountOutputTypeSelect<ExtArgs> | null
+}
+
+/**
+ * ReservationCountOutputType without action
+ */
+export type ReservationCountOutputTypeCountInsuranceClaimsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.InsuranceClaimWhereInput
+}
 
 
 export type ReservationSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
@@ -889,6 +1022,8 @@ export type ReservationSelect<ExtArgs extends runtime.Types.Extensions.InternalA
   patient?: boolean | Prisma.PatientDefaultArgs<ExtArgs>
   pharmacy?: boolean | Prisma.PharmacyDefaultArgs<ExtArgs>
   medicine?: boolean | Prisma.MedicineDefaultArgs<ExtArgs>
+  insuranceClaims?: boolean | Prisma.Reservation$insuranceClaimsArgs<ExtArgs>
+  _count?: boolean | Prisma.ReservationCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["reservation"]>
 
 export type ReservationSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
@@ -938,6 +1073,8 @@ export type ReservationInclude<ExtArgs extends runtime.Types.Extensions.Internal
   patient?: boolean | Prisma.PatientDefaultArgs<ExtArgs>
   pharmacy?: boolean | Prisma.PharmacyDefaultArgs<ExtArgs>
   medicine?: boolean | Prisma.MedicineDefaultArgs<ExtArgs>
+  insuranceClaims?: boolean | Prisma.Reservation$insuranceClaimsArgs<ExtArgs>
+  _count?: boolean | Prisma.ReservationCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type ReservationIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   patient?: boolean | Prisma.PatientDefaultArgs<ExtArgs>
@@ -956,6 +1093,7 @@ export type $ReservationPayload<ExtArgs extends runtime.Types.Extensions.Interna
     patient: Prisma.$PatientPayload<ExtArgs>
     pharmacy: Prisma.$PharmacyPayload<ExtArgs>
     medicine: Prisma.$MedicinePayload<ExtArgs>
+    insuranceClaims: Prisma.$InsuranceClaimPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
@@ -1364,6 +1502,7 @@ export interface Prisma__ReservationClient<T, Null = never, ExtArgs extends runt
   patient<T extends Prisma.PatientDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.PatientDefaultArgs<ExtArgs>>): Prisma.Prisma__PatientClient<runtime.Types.Result.GetResult<Prisma.$PatientPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
   pharmacy<T extends Prisma.PharmacyDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.PharmacyDefaultArgs<ExtArgs>>): Prisma.Prisma__PharmacyClient<runtime.Types.Result.GetResult<Prisma.$PharmacyPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
   medicine<T extends Prisma.MedicineDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.MedicineDefaultArgs<ExtArgs>>): Prisma.Prisma__MedicineClient<runtime.Types.Result.GetResult<Prisma.$MedicinePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+  insuranceClaims<T extends Prisma.Reservation$insuranceClaimsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Reservation$insuranceClaimsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$InsuranceClaimPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -1800,6 +1939,30 @@ export type ReservationDeleteManyArgs<ExtArgs extends runtime.Types.Extensions.I
    * Limit how many Reservations to delete.
    */
   limit?: number
+}
+
+/**
+ * Reservation.insuranceClaims
+ */
+export type Reservation$insuranceClaimsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the InsuranceClaim
+   */
+  select?: Prisma.InsuranceClaimSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the InsuranceClaim
+   */
+  omit?: Prisma.InsuranceClaimOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.InsuranceClaimInclude<ExtArgs> | null
+  where?: Prisma.InsuranceClaimWhereInput
+  orderBy?: Prisma.InsuranceClaimOrderByWithRelationInput | Prisma.InsuranceClaimOrderByWithRelationInput[]
+  cursor?: Prisma.InsuranceClaimWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.InsuranceClaimScalarFieldEnum | Prisma.InsuranceClaimScalarFieldEnum[]
 }
 
 /**

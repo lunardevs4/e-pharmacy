@@ -256,6 +256,7 @@ export type UserWhereInput = {
   pharmacyOwner?: Prisma.XOR<Prisma.PharmacyOwnerNullableScalarRelationFilter, Prisma.PharmacyOwnerWhereInput> | null
   pharmacyEmployees?: Prisma.PharmacyEmployeeListRelationFilter
   pharmacistPrescriptions?: Prisma.PrescriptionListRelationFilter
+  insuranceProvider?: Prisma.XOR<Prisma.InsuranceProviderNullableScalarRelationFilter, Prisma.InsuranceProviderWhereInput> | null
   auditLogs?: Prisma.AuditLogListRelationFilter
   notifications?: Prisma.NotificationListRelationFilter
 }
@@ -281,6 +282,7 @@ export type UserOrderByWithRelationInput = {
   pharmacyOwner?: Prisma.PharmacyOwnerOrderByWithRelationInput
   pharmacyEmployees?: Prisma.PharmacyEmployeeOrderByRelationAggregateInput
   pharmacistPrescriptions?: Prisma.PrescriptionOrderByRelationAggregateInput
+  insuranceProvider?: Prisma.InsuranceProviderOrderByWithRelationInput
   auditLogs?: Prisma.AuditLogOrderByRelationAggregateInput
   notifications?: Prisma.NotificationOrderByRelationAggregateInput
 }
@@ -309,6 +311,7 @@ export type UserWhereUniqueInput = Prisma.AtLeast<{
   pharmacyOwner?: Prisma.XOR<Prisma.PharmacyOwnerNullableScalarRelationFilter, Prisma.PharmacyOwnerWhereInput> | null
   pharmacyEmployees?: Prisma.PharmacyEmployeeListRelationFilter
   pharmacistPrescriptions?: Prisma.PrescriptionListRelationFilter
+  insuranceProvider?: Prisma.XOR<Prisma.InsuranceProviderNullableScalarRelationFilter, Prisma.InsuranceProviderWhereInput> | null
   auditLogs?: Prisma.AuditLogListRelationFilter
   notifications?: Prisma.NotificationListRelationFilter
 }, "id" | "email" | "phone">
@@ -374,6 +377,7 @@ export type UserCreateInput = {
   pharmacyOwner?: Prisma.PharmacyOwnerCreateNestedOneWithoutUserInput
   pharmacyEmployees?: Prisma.PharmacyEmployeeCreateNestedManyWithoutUserInput
   pharmacistPrescriptions?: Prisma.PrescriptionCreateNestedManyWithoutPharmacistInput
+  insuranceProvider?: Prisma.InsuranceProviderCreateNestedOneWithoutUserInput
   auditLogs?: Prisma.AuditLogCreateNestedManyWithoutUserInput
   notifications?: Prisma.NotificationCreateNestedManyWithoutUserInput
 }
@@ -399,6 +403,7 @@ export type UserUncheckedCreateInput = {
   pharmacyOwner?: Prisma.PharmacyOwnerUncheckedCreateNestedOneWithoutUserInput
   pharmacyEmployees?: Prisma.PharmacyEmployeeUncheckedCreateNestedManyWithoutUserInput
   pharmacistPrescriptions?: Prisma.PrescriptionUncheckedCreateNestedManyWithoutPharmacistInput
+  insuranceProvider?: Prisma.InsuranceProviderUncheckedCreateNestedOneWithoutUserInput
   auditLogs?: Prisma.AuditLogUncheckedCreateNestedManyWithoutUserInput
   notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutUserInput
 }
@@ -424,6 +429,7 @@ export type UserUpdateInput = {
   pharmacyOwner?: Prisma.PharmacyOwnerUpdateOneWithoutUserNestedInput
   pharmacyEmployees?: Prisma.PharmacyEmployeeUpdateManyWithoutUserNestedInput
   pharmacistPrescriptions?: Prisma.PrescriptionUpdateManyWithoutPharmacistNestedInput
+  insuranceProvider?: Prisma.InsuranceProviderUpdateOneWithoutUserNestedInput
   auditLogs?: Prisma.AuditLogUpdateManyWithoutUserNestedInput
   notifications?: Prisma.NotificationUpdateManyWithoutUserNestedInput
 }
@@ -449,6 +455,7 @@ export type UserUncheckedUpdateInput = {
   pharmacyOwner?: Prisma.PharmacyOwnerUncheckedUpdateOneWithoutUserNestedInput
   pharmacyEmployees?: Prisma.PharmacyEmployeeUncheckedUpdateManyWithoutUserNestedInput
   pharmacistPrescriptions?: Prisma.PrescriptionUncheckedUpdateManyWithoutPharmacistNestedInput
+  insuranceProvider?: Prisma.InsuranceProviderUncheckedUpdateOneWithoutUserNestedInput
   auditLogs?: Prisma.AuditLogUncheckedUpdateManyWithoutUserNestedInput
   notifications?: Prisma.NotificationUncheckedUpdateManyWithoutUserNestedInput
 }
@@ -720,6 +727,22 @@ export type UserUpdateOneWithoutAuditLogsNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutAuditLogsInput, Prisma.UserUpdateWithoutAuditLogsInput>, Prisma.UserUncheckedUpdateWithoutAuditLogsInput>
 }
 
+export type UserCreateNestedOneWithoutInsuranceProviderInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutInsuranceProviderInput, Prisma.UserUncheckedCreateWithoutInsuranceProviderInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutInsuranceProviderInput
+  connect?: Prisma.UserWhereUniqueInput
+}
+
+export type UserUpdateOneWithoutInsuranceProviderNestedInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutInsuranceProviderInput, Prisma.UserUncheckedCreateWithoutInsuranceProviderInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutInsuranceProviderInput
+  upsert?: Prisma.UserUpsertWithoutInsuranceProviderInput
+  disconnect?: Prisma.UserWhereInput | boolean
+  delete?: Prisma.UserWhereInput | boolean
+  connect?: Prisma.UserWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutInsuranceProviderInput, Prisma.UserUpdateWithoutInsuranceProviderInput>, Prisma.UserUncheckedUpdateWithoutInsuranceProviderInput>
+}
+
 export type UserCreateWithoutRefreshTokensInput = {
   id?: string
   email: string
@@ -740,6 +763,7 @@ export type UserCreateWithoutRefreshTokensInput = {
   pharmacyOwner?: Prisma.PharmacyOwnerCreateNestedOneWithoutUserInput
   pharmacyEmployees?: Prisma.PharmacyEmployeeCreateNestedManyWithoutUserInput
   pharmacistPrescriptions?: Prisma.PrescriptionCreateNestedManyWithoutPharmacistInput
+  insuranceProvider?: Prisma.InsuranceProviderCreateNestedOneWithoutUserInput
   auditLogs?: Prisma.AuditLogCreateNestedManyWithoutUserInput
   notifications?: Prisma.NotificationCreateNestedManyWithoutUserInput
 }
@@ -764,6 +788,7 @@ export type UserUncheckedCreateWithoutRefreshTokensInput = {
   pharmacyOwner?: Prisma.PharmacyOwnerUncheckedCreateNestedOneWithoutUserInput
   pharmacyEmployees?: Prisma.PharmacyEmployeeUncheckedCreateNestedManyWithoutUserInput
   pharmacistPrescriptions?: Prisma.PrescriptionUncheckedCreateNestedManyWithoutPharmacistInput
+  insuranceProvider?: Prisma.InsuranceProviderUncheckedCreateNestedOneWithoutUserInput
   auditLogs?: Prisma.AuditLogUncheckedCreateNestedManyWithoutUserInput
   notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutUserInput
 }
@@ -804,6 +829,7 @@ export type UserUpdateWithoutRefreshTokensInput = {
   pharmacyOwner?: Prisma.PharmacyOwnerUpdateOneWithoutUserNestedInput
   pharmacyEmployees?: Prisma.PharmacyEmployeeUpdateManyWithoutUserNestedInput
   pharmacistPrescriptions?: Prisma.PrescriptionUpdateManyWithoutPharmacistNestedInput
+  insuranceProvider?: Prisma.InsuranceProviderUpdateOneWithoutUserNestedInput
   auditLogs?: Prisma.AuditLogUpdateManyWithoutUserNestedInput
   notifications?: Prisma.NotificationUpdateManyWithoutUserNestedInput
 }
@@ -828,6 +854,7 @@ export type UserUncheckedUpdateWithoutRefreshTokensInput = {
   pharmacyOwner?: Prisma.PharmacyOwnerUncheckedUpdateOneWithoutUserNestedInput
   pharmacyEmployees?: Prisma.PharmacyEmployeeUncheckedUpdateManyWithoutUserNestedInput
   pharmacistPrescriptions?: Prisma.PrescriptionUncheckedUpdateManyWithoutPharmacistNestedInput
+  insuranceProvider?: Prisma.InsuranceProviderUncheckedUpdateOneWithoutUserNestedInput
   auditLogs?: Prisma.AuditLogUncheckedUpdateManyWithoutUserNestedInput
   notifications?: Prisma.NotificationUncheckedUpdateManyWithoutUserNestedInput
 }
@@ -852,6 +879,7 @@ export type UserCreateWithoutPatientInput = {
   pharmacyOwner?: Prisma.PharmacyOwnerCreateNestedOneWithoutUserInput
   pharmacyEmployees?: Prisma.PharmacyEmployeeCreateNestedManyWithoutUserInput
   pharmacistPrescriptions?: Prisma.PrescriptionCreateNestedManyWithoutPharmacistInput
+  insuranceProvider?: Prisma.InsuranceProviderCreateNestedOneWithoutUserInput
   auditLogs?: Prisma.AuditLogCreateNestedManyWithoutUserInput
   notifications?: Prisma.NotificationCreateNestedManyWithoutUserInput
 }
@@ -876,6 +904,7 @@ export type UserUncheckedCreateWithoutPatientInput = {
   pharmacyOwner?: Prisma.PharmacyOwnerUncheckedCreateNestedOneWithoutUserInput
   pharmacyEmployees?: Prisma.PharmacyEmployeeUncheckedCreateNestedManyWithoutUserInput
   pharmacistPrescriptions?: Prisma.PrescriptionUncheckedCreateNestedManyWithoutPharmacistInput
+  insuranceProvider?: Prisma.InsuranceProviderUncheckedCreateNestedOneWithoutUserInput
   auditLogs?: Prisma.AuditLogUncheckedCreateNestedManyWithoutUserInput
   notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutUserInput
 }
@@ -916,6 +945,7 @@ export type UserUpdateWithoutPatientInput = {
   pharmacyOwner?: Prisma.PharmacyOwnerUpdateOneWithoutUserNestedInput
   pharmacyEmployees?: Prisma.PharmacyEmployeeUpdateManyWithoutUserNestedInput
   pharmacistPrescriptions?: Prisma.PrescriptionUpdateManyWithoutPharmacistNestedInput
+  insuranceProvider?: Prisma.InsuranceProviderUpdateOneWithoutUserNestedInput
   auditLogs?: Prisma.AuditLogUpdateManyWithoutUserNestedInput
   notifications?: Prisma.NotificationUpdateManyWithoutUserNestedInput
 }
@@ -940,6 +970,7 @@ export type UserUncheckedUpdateWithoutPatientInput = {
   pharmacyOwner?: Prisma.PharmacyOwnerUncheckedUpdateOneWithoutUserNestedInput
   pharmacyEmployees?: Prisma.PharmacyEmployeeUncheckedUpdateManyWithoutUserNestedInput
   pharmacistPrescriptions?: Prisma.PrescriptionUncheckedUpdateManyWithoutPharmacistNestedInput
+  insuranceProvider?: Prisma.InsuranceProviderUncheckedUpdateOneWithoutUserNestedInput
   auditLogs?: Prisma.AuditLogUncheckedUpdateManyWithoutUserNestedInput
   notifications?: Prisma.NotificationUncheckedUpdateManyWithoutUserNestedInput
 }
@@ -964,6 +995,7 @@ export type UserCreateWithoutPharmaciesInput = {
   pharmacyOwner?: Prisma.PharmacyOwnerCreateNestedOneWithoutUserInput
   pharmacyEmployees?: Prisma.PharmacyEmployeeCreateNestedManyWithoutUserInput
   pharmacistPrescriptions?: Prisma.PrescriptionCreateNestedManyWithoutPharmacistInput
+  insuranceProvider?: Prisma.InsuranceProviderCreateNestedOneWithoutUserInput
   auditLogs?: Prisma.AuditLogCreateNestedManyWithoutUserInput
   notifications?: Prisma.NotificationCreateNestedManyWithoutUserInput
 }
@@ -988,6 +1020,7 @@ export type UserUncheckedCreateWithoutPharmaciesInput = {
   pharmacyOwner?: Prisma.PharmacyOwnerUncheckedCreateNestedOneWithoutUserInput
   pharmacyEmployees?: Prisma.PharmacyEmployeeUncheckedCreateNestedManyWithoutUserInput
   pharmacistPrescriptions?: Prisma.PrescriptionUncheckedCreateNestedManyWithoutPharmacistInput
+  insuranceProvider?: Prisma.InsuranceProviderUncheckedCreateNestedOneWithoutUserInput
   auditLogs?: Prisma.AuditLogUncheckedCreateNestedManyWithoutUserInput
   notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutUserInput
 }
@@ -1028,6 +1061,7 @@ export type UserUpdateWithoutPharmaciesInput = {
   pharmacyOwner?: Prisma.PharmacyOwnerUpdateOneWithoutUserNestedInput
   pharmacyEmployees?: Prisma.PharmacyEmployeeUpdateManyWithoutUserNestedInput
   pharmacistPrescriptions?: Prisma.PrescriptionUpdateManyWithoutPharmacistNestedInput
+  insuranceProvider?: Prisma.InsuranceProviderUpdateOneWithoutUserNestedInput
   auditLogs?: Prisma.AuditLogUpdateManyWithoutUserNestedInput
   notifications?: Prisma.NotificationUpdateManyWithoutUserNestedInput
 }
@@ -1052,6 +1086,7 @@ export type UserUncheckedUpdateWithoutPharmaciesInput = {
   pharmacyOwner?: Prisma.PharmacyOwnerUncheckedUpdateOneWithoutUserNestedInput
   pharmacyEmployees?: Prisma.PharmacyEmployeeUncheckedUpdateManyWithoutUserNestedInput
   pharmacistPrescriptions?: Prisma.PrescriptionUncheckedUpdateManyWithoutPharmacistNestedInput
+  insuranceProvider?: Prisma.InsuranceProviderUncheckedUpdateOneWithoutUserNestedInput
   auditLogs?: Prisma.AuditLogUncheckedUpdateManyWithoutUserNestedInput
   notifications?: Prisma.NotificationUncheckedUpdateManyWithoutUserNestedInput
 }
@@ -1076,6 +1111,7 @@ export type UserCreateWithoutPharmacyOwnerInput = {
   pharmacies?: Prisma.PharmacyCreateNestedManyWithoutOwnerInput
   pharmacyEmployees?: Prisma.PharmacyEmployeeCreateNestedManyWithoutUserInput
   pharmacistPrescriptions?: Prisma.PrescriptionCreateNestedManyWithoutPharmacistInput
+  insuranceProvider?: Prisma.InsuranceProviderCreateNestedOneWithoutUserInput
   auditLogs?: Prisma.AuditLogCreateNestedManyWithoutUserInput
   notifications?: Prisma.NotificationCreateNestedManyWithoutUserInput
 }
@@ -1100,6 +1136,7 @@ export type UserUncheckedCreateWithoutPharmacyOwnerInput = {
   pharmacies?: Prisma.PharmacyUncheckedCreateNestedManyWithoutOwnerInput
   pharmacyEmployees?: Prisma.PharmacyEmployeeUncheckedCreateNestedManyWithoutUserInput
   pharmacistPrescriptions?: Prisma.PrescriptionUncheckedCreateNestedManyWithoutPharmacistInput
+  insuranceProvider?: Prisma.InsuranceProviderUncheckedCreateNestedOneWithoutUserInput
   auditLogs?: Prisma.AuditLogUncheckedCreateNestedManyWithoutUserInput
   notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutUserInput
 }
@@ -1140,6 +1177,7 @@ export type UserUpdateWithoutPharmacyOwnerInput = {
   pharmacies?: Prisma.PharmacyUpdateManyWithoutOwnerNestedInput
   pharmacyEmployees?: Prisma.PharmacyEmployeeUpdateManyWithoutUserNestedInput
   pharmacistPrescriptions?: Prisma.PrescriptionUpdateManyWithoutPharmacistNestedInput
+  insuranceProvider?: Prisma.InsuranceProviderUpdateOneWithoutUserNestedInput
   auditLogs?: Prisma.AuditLogUpdateManyWithoutUserNestedInput
   notifications?: Prisma.NotificationUpdateManyWithoutUserNestedInput
 }
@@ -1164,6 +1202,7 @@ export type UserUncheckedUpdateWithoutPharmacyOwnerInput = {
   pharmacies?: Prisma.PharmacyUncheckedUpdateManyWithoutOwnerNestedInput
   pharmacyEmployees?: Prisma.PharmacyEmployeeUncheckedUpdateManyWithoutUserNestedInput
   pharmacistPrescriptions?: Prisma.PrescriptionUncheckedUpdateManyWithoutPharmacistNestedInput
+  insuranceProvider?: Prisma.InsuranceProviderUncheckedUpdateOneWithoutUserNestedInput
   auditLogs?: Prisma.AuditLogUncheckedUpdateManyWithoutUserNestedInput
   notifications?: Prisma.NotificationUncheckedUpdateManyWithoutUserNestedInput
 }
@@ -1188,6 +1227,7 @@ export type UserCreateWithoutPharmacyEmployeesInput = {
   pharmacies?: Prisma.PharmacyCreateNestedManyWithoutOwnerInput
   pharmacyOwner?: Prisma.PharmacyOwnerCreateNestedOneWithoutUserInput
   pharmacistPrescriptions?: Prisma.PrescriptionCreateNestedManyWithoutPharmacistInput
+  insuranceProvider?: Prisma.InsuranceProviderCreateNestedOneWithoutUserInput
   auditLogs?: Prisma.AuditLogCreateNestedManyWithoutUserInput
   notifications?: Prisma.NotificationCreateNestedManyWithoutUserInput
 }
@@ -1212,6 +1252,7 @@ export type UserUncheckedCreateWithoutPharmacyEmployeesInput = {
   pharmacies?: Prisma.PharmacyUncheckedCreateNestedManyWithoutOwnerInput
   pharmacyOwner?: Prisma.PharmacyOwnerUncheckedCreateNestedOneWithoutUserInput
   pharmacistPrescriptions?: Prisma.PrescriptionUncheckedCreateNestedManyWithoutPharmacistInput
+  insuranceProvider?: Prisma.InsuranceProviderUncheckedCreateNestedOneWithoutUserInput
   auditLogs?: Prisma.AuditLogUncheckedCreateNestedManyWithoutUserInput
   notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutUserInput
 }
@@ -1252,6 +1293,7 @@ export type UserUpdateWithoutPharmacyEmployeesInput = {
   pharmacies?: Prisma.PharmacyUpdateManyWithoutOwnerNestedInput
   pharmacyOwner?: Prisma.PharmacyOwnerUpdateOneWithoutUserNestedInput
   pharmacistPrescriptions?: Prisma.PrescriptionUpdateManyWithoutPharmacistNestedInput
+  insuranceProvider?: Prisma.InsuranceProviderUpdateOneWithoutUserNestedInput
   auditLogs?: Prisma.AuditLogUpdateManyWithoutUserNestedInput
   notifications?: Prisma.NotificationUpdateManyWithoutUserNestedInput
 }
@@ -1276,6 +1318,7 @@ export type UserUncheckedUpdateWithoutPharmacyEmployeesInput = {
   pharmacies?: Prisma.PharmacyUncheckedUpdateManyWithoutOwnerNestedInput
   pharmacyOwner?: Prisma.PharmacyOwnerUncheckedUpdateOneWithoutUserNestedInput
   pharmacistPrescriptions?: Prisma.PrescriptionUncheckedUpdateManyWithoutPharmacistNestedInput
+  insuranceProvider?: Prisma.InsuranceProviderUncheckedUpdateOneWithoutUserNestedInput
   auditLogs?: Prisma.AuditLogUncheckedUpdateManyWithoutUserNestedInput
   notifications?: Prisma.NotificationUncheckedUpdateManyWithoutUserNestedInput
 }
@@ -1300,6 +1343,7 @@ export type UserCreateWithoutPharmacistPrescriptionsInput = {
   pharmacies?: Prisma.PharmacyCreateNestedManyWithoutOwnerInput
   pharmacyOwner?: Prisma.PharmacyOwnerCreateNestedOneWithoutUserInput
   pharmacyEmployees?: Prisma.PharmacyEmployeeCreateNestedManyWithoutUserInput
+  insuranceProvider?: Prisma.InsuranceProviderCreateNestedOneWithoutUserInput
   auditLogs?: Prisma.AuditLogCreateNestedManyWithoutUserInput
   notifications?: Prisma.NotificationCreateNestedManyWithoutUserInput
 }
@@ -1324,6 +1368,7 @@ export type UserUncheckedCreateWithoutPharmacistPrescriptionsInput = {
   pharmacies?: Prisma.PharmacyUncheckedCreateNestedManyWithoutOwnerInput
   pharmacyOwner?: Prisma.PharmacyOwnerUncheckedCreateNestedOneWithoutUserInput
   pharmacyEmployees?: Prisma.PharmacyEmployeeUncheckedCreateNestedManyWithoutUserInput
+  insuranceProvider?: Prisma.InsuranceProviderUncheckedCreateNestedOneWithoutUserInput
   auditLogs?: Prisma.AuditLogUncheckedCreateNestedManyWithoutUserInput
   notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutUserInput
 }
@@ -1364,6 +1409,7 @@ export type UserUpdateWithoutPharmacistPrescriptionsInput = {
   pharmacies?: Prisma.PharmacyUpdateManyWithoutOwnerNestedInput
   pharmacyOwner?: Prisma.PharmacyOwnerUpdateOneWithoutUserNestedInput
   pharmacyEmployees?: Prisma.PharmacyEmployeeUpdateManyWithoutUserNestedInput
+  insuranceProvider?: Prisma.InsuranceProviderUpdateOneWithoutUserNestedInput
   auditLogs?: Prisma.AuditLogUpdateManyWithoutUserNestedInput
   notifications?: Prisma.NotificationUpdateManyWithoutUserNestedInput
 }
@@ -1388,6 +1434,7 @@ export type UserUncheckedUpdateWithoutPharmacistPrescriptionsInput = {
   pharmacies?: Prisma.PharmacyUncheckedUpdateManyWithoutOwnerNestedInput
   pharmacyOwner?: Prisma.PharmacyOwnerUncheckedUpdateOneWithoutUserNestedInput
   pharmacyEmployees?: Prisma.PharmacyEmployeeUncheckedUpdateManyWithoutUserNestedInput
+  insuranceProvider?: Prisma.InsuranceProviderUncheckedUpdateOneWithoutUserNestedInput
   auditLogs?: Prisma.AuditLogUncheckedUpdateManyWithoutUserNestedInput
   notifications?: Prisma.NotificationUncheckedUpdateManyWithoutUserNestedInput
 }
@@ -1413,6 +1460,7 @@ export type UserCreateWithoutNotificationsInput = {
   pharmacyOwner?: Prisma.PharmacyOwnerCreateNestedOneWithoutUserInput
   pharmacyEmployees?: Prisma.PharmacyEmployeeCreateNestedManyWithoutUserInput
   pharmacistPrescriptions?: Prisma.PrescriptionCreateNestedManyWithoutPharmacistInput
+  insuranceProvider?: Prisma.InsuranceProviderCreateNestedOneWithoutUserInput
   auditLogs?: Prisma.AuditLogCreateNestedManyWithoutUserInput
 }
 
@@ -1437,6 +1485,7 @@ export type UserUncheckedCreateWithoutNotificationsInput = {
   pharmacyOwner?: Prisma.PharmacyOwnerUncheckedCreateNestedOneWithoutUserInput
   pharmacyEmployees?: Prisma.PharmacyEmployeeUncheckedCreateNestedManyWithoutUserInput
   pharmacistPrescriptions?: Prisma.PrescriptionUncheckedCreateNestedManyWithoutPharmacistInput
+  insuranceProvider?: Prisma.InsuranceProviderUncheckedCreateNestedOneWithoutUserInput
   auditLogs?: Prisma.AuditLogUncheckedCreateNestedManyWithoutUserInput
 }
 
@@ -1477,6 +1526,7 @@ export type UserUpdateWithoutNotificationsInput = {
   pharmacyOwner?: Prisma.PharmacyOwnerUpdateOneWithoutUserNestedInput
   pharmacyEmployees?: Prisma.PharmacyEmployeeUpdateManyWithoutUserNestedInput
   pharmacistPrescriptions?: Prisma.PrescriptionUpdateManyWithoutPharmacistNestedInput
+  insuranceProvider?: Prisma.InsuranceProviderUpdateOneWithoutUserNestedInput
   auditLogs?: Prisma.AuditLogUpdateManyWithoutUserNestedInput
 }
 
@@ -1501,6 +1551,7 @@ export type UserUncheckedUpdateWithoutNotificationsInput = {
   pharmacyOwner?: Prisma.PharmacyOwnerUncheckedUpdateOneWithoutUserNestedInput
   pharmacyEmployees?: Prisma.PharmacyEmployeeUncheckedUpdateManyWithoutUserNestedInput
   pharmacistPrescriptions?: Prisma.PrescriptionUncheckedUpdateManyWithoutPharmacistNestedInput
+  insuranceProvider?: Prisma.InsuranceProviderUncheckedUpdateOneWithoutUserNestedInput
   auditLogs?: Prisma.AuditLogUncheckedUpdateManyWithoutUserNestedInput
 }
 
@@ -1525,6 +1576,7 @@ export type UserCreateWithoutAuditLogsInput = {
   pharmacyOwner?: Prisma.PharmacyOwnerCreateNestedOneWithoutUserInput
   pharmacyEmployees?: Prisma.PharmacyEmployeeCreateNestedManyWithoutUserInput
   pharmacistPrescriptions?: Prisma.PrescriptionCreateNestedManyWithoutPharmacistInput
+  insuranceProvider?: Prisma.InsuranceProviderCreateNestedOneWithoutUserInput
   notifications?: Prisma.NotificationCreateNestedManyWithoutUserInput
 }
 
@@ -1549,6 +1601,7 @@ export type UserUncheckedCreateWithoutAuditLogsInput = {
   pharmacyOwner?: Prisma.PharmacyOwnerUncheckedCreateNestedOneWithoutUserInput
   pharmacyEmployees?: Prisma.PharmacyEmployeeUncheckedCreateNestedManyWithoutUserInput
   pharmacistPrescriptions?: Prisma.PrescriptionUncheckedCreateNestedManyWithoutPharmacistInput
+  insuranceProvider?: Prisma.InsuranceProviderUncheckedCreateNestedOneWithoutUserInput
   notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutUserInput
 }
 
@@ -1589,6 +1642,7 @@ export type UserUpdateWithoutAuditLogsInput = {
   pharmacyOwner?: Prisma.PharmacyOwnerUpdateOneWithoutUserNestedInput
   pharmacyEmployees?: Prisma.PharmacyEmployeeUpdateManyWithoutUserNestedInput
   pharmacistPrescriptions?: Prisma.PrescriptionUpdateManyWithoutPharmacistNestedInput
+  insuranceProvider?: Prisma.InsuranceProviderUpdateOneWithoutUserNestedInput
   notifications?: Prisma.NotificationUpdateManyWithoutUserNestedInput
 }
 
@@ -1613,6 +1667,123 @@ export type UserUncheckedUpdateWithoutAuditLogsInput = {
   pharmacyOwner?: Prisma.PharmacyOwnerUncheckedUpdateOneWithoutUserNestedInput
   pharmacyEmployees?: Prisma.PharmacyEmployeeUncheckedUpdateManyWithoutUserNestedInput
   pharmacistPrescriptions?: Prisma.PrescriptionUncheckedUpdateManyWithoutPharmacistNestedInput
+  insuranceProvider?: Prisma.InsuranceProviderUncheckedUpdateOneWithoutUserNestedInput
+  notifications?: Prisma.NotificationUncheckedUpdateManyWithoutUserNestedInput
+}
+
+export type UserCreateWithoutInsuranceProviderInput = {
+  id?: string
+  email: string
+  phone: string
+  password: string
+  firstName: string
+  lastName: string
+  role: $Enums.UserRole
+  position?: string | null
+  permissions?: Prisma.UserCreatepermissionsInput | string[]
+  firstLogin?: boolean
+  isActive?: boolean
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  deletedAt?: Date | string | null
+  refreshTokens?: Prisma.RefreshTokenCreateNestedManyWithoutUserInput
+  patient?: Prisma.PatientCreateNestedOneWithoutUserInput
+  pharmacies?: Prisma.PharmacyCreateNestedManyWithoutOwnerInput
+  pharmacyOwner?: Prisma.PharmacyOwnerCreateNestedOneWithoutUserInput
+  pharmacyEmployees?: Prisma.PharmacyEmployeeCreateNestedManyWithoutUserInput
+  pharmacistPrescriptions?: Prisma.PrescriptionCreateNestedManyWithoutPharmacistInput
+  auditLogs?: Prisma.AuditLogCreateNestedManyWithoutUserInput
+  notifications?: Prisma.NotificationCreateNestedManyWithoutUserInput
+}
+
+export type UserUncheckedCreateWithoutInsuranceProviderInput = {
+  id?: string
+  email: string
+  phone: string
+  password: string
+  firstName: string
+  lastName: string
+  role: $Enums.UserRole
+  position?: string | null
+  permissions?: Prisma.UserCreatepermissionsInput | string[]
+  firstLogin?: boolean
+  isActive?: boolean
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  deletedAt?: Date | string | null
+  refreshTokens?: Prisma.RefreshTokenUncheckedCreateNestedManyWithoutUserInput
+  patient?: Prisma.PatientUncheckedCreateNestedOneWithoutUserInput
+  pharmacies?: Prisma.PharmacyUncheckedCreateNestedManyWithoutOwnerInput
+  pharmacyOwner?: Prisma.PharmacyOwnerUncheckedCreateNestedOneWithoutUserInput
+  pharmacyEmployees?: Prisma.PharmacyEmployeeUncheckedCreateNestedManyWithoutUserInput
+  pharmacistPrescriptions?: Prisma.PrescriptionUncheckedCreateNestedManyWithoutPharmacistInput
+  auditLogs?: Prisma.AuditLogUncheckedCreateNestedManyWithoutUserInput
+  notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutUserInput
+}
+
+export type UserCreateOrConnectWithoutInsuranceProviderInput = {
+  where: Prisma.UserWhereUniqueInput
+  create: Prisma.XOR<Prisma.UserCreateWithoutInsuranceProviderInput, Prisma.UserUncheckedCreateWithoutInsuranceProviderInput>
+}
+
+export type UserUpsertWithoutInsuranceProviderInput = {
+  update: Prisma.XOR<Prisma.UserUpdateWithoutInsuranceProviderInput, Prisma.UserUncheckedUpdateWithoutInsuranceProviderInput>
+  create: Prisma.XOR<Prisma.UserCreateWithoutInsuranceProviderInput, Prisma.UserUncheckedCreateWithoutInsuranceProviderInput>
+  where?: Prisma.UserWhereInput
+}
+
+export type UserUpdateToOneWithWhereWithoutInsuranceProviderInput = {
+  where?: Prisma.UserWhereInput
+  data: Prisma.XOR<Prisma.UserUpdateWithoutInsuranceProviderInput, Prisma.UserUncheckedUpdateWithoutInsuranceProviderInput>
+}
+
+export type UserUpdateWithoutInsuranceProviderInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  phone?: Prisma.StringFieldUpdateOperationsInput | string
+  password?: Prisma.StringFieldUpdateOperationsInput | string
+  firstName?: Prisma.StringFieldUpdateOperationsInput | string
+  lastName?: Prisma.StringFieldUpdateOperationsInput | string
+  role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
+  position?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  permissions?: Prisma.UserUpdatepermissionsInput | string[]
+  firstLogin?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  refreshTokens?: Prisma.RefreshTokenUpdateManyWithoutUserNestedInput
+  patient?: Prisma.PatientUpdateOneWithoutUserNestedInput
+  pharmacies?: Prisma.PharmacyUpdateManyWithoutOwnerNestedInput
+  pharmacyOwner?: Prisma.PharmacyOwnerUpdateOneWithoutUserNestedInput
+  pharmacyEmployees?: Prisma.PharmacyEmployeeUpdateManyWithoutUserNestedInput
+  pharmacistPrescriptions?: Prisma.PrescriptionUpdateManyWithoutPharmacistNestedInput
+  auditLogs?: Prisma.AuditLogUpdateManyWithoutUserNestedInput
+  notifications?: Prisma.NotificationUpdateManyWithoutUserNestedInput
+}
+
+export type UserUncheckedUpdateWithoutInsuranceProviderInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  phone?: Prisma.StringFieldUpdateOperationsInput | string
+  password?: Prisma.StringFieldUpdateOperationsInput | string
+  firstName?: Prisma.StringFieldUpdateOperationsInput | string
+  lastName?: Prisma.StringFieldUpdateOperationsInput | string
+  role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
+  position?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  permissions?: Prisma.UserUpdatepermissionsInput | string[]
+  firstLogin?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  refreshTokens?: Prisma.RefreshTokenUncheckedUpdateManyWithoutUserNestedInput
+  patient?: Prisma.PatientUncheckedUpdateOneWithoutUserNestedInput
+  pharmacies?: Prisma.PharmacyUncheckedUpdateManyWithoutOwnerNestedInput
+  pharmacyOwner?: Prisma.PharmacyOwnerUncheckedUpdateOneWithoutUserNestedInput
+  pharmacyEmployees?: Prisma.PharmacyEmployeeUncheckedUpdateManyWithoutUserNestedInput
+  pharmacistPrescriptions?: Prisma.PrescriptionUncheckedUpdateManyWithoutPharmacistNestedInput
+  auditLogs?: Prisma.AuditLogUncheckedUpdateManyWithoutUserNestedInput
   notifications?: Prisma.NotificationUncheckedUpdateManyWithoutUserNestedInput
 }
 
@@ -1713,6 +1884,7 @@ export type UserSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = r
   pharmacyOwner?: boolean | Prisma.User$pharmacyOwnerArgs<ExtArgs>
   pharmacyEmployees?: boolean | Prisma.User$pharmacyEmployeesArgs<ExtArgs>
   pharmacistPrescriptions?: boolean | Prisma.User$pharmacistPrescriptionsArgs<ExtArgs>
+  insuranceProvider?: boolean | Prisma.User$insuranceProviderArgs<ExtArgs>
   auditLogs?: boolean | Prisma.User$auditLogsArgs<ExtArgs>
   notifications?: boolean | Prisma.User$notificationsArgs<ExtArgs>
   _count?: boolean | Prisma.UserCountOutputTypeDefaultArgs<ExtArgs>
@@ -1777,6 +1949,7 @@ export type UserInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = 
   pharmacyOwner?: boolean | Prisma.User$pharmacyOwnerArgs<ExtArgs>
   pharmacyEmployees?: boolean | Prisma.User$pharmacyEmployeesArgs<ExtArgs>
   pharmacistPrescriptions?: boolean | Prisma.User$pharmacistPrescriptionsArgs<ExtArgs>
+  insuranceProvider?: boolean | Prisma.User$insuranceProviderArgs<ExtArgs>
   auditLogs?: boolean | Prisma.User$auditLogsArgs<ExtArgs>
   notifications?: boolean | Prisma.User$notificationsArgs<ExtArgs>
   _count?: boolean | Prisma.UserCountOutputTypeDefaultArgs<ExtArgs>
@@ -1793,6 +1966,7 @@ export type $UserPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs =
     pharmacyOwner: Prisma.$PharmacyOwnerPayload<ExtArgs> | null
     pharmacyEmployees: Prisma.$PharmacyEmployeePayload<ExtArgs>[]
     pharmacistPrescriptions: Prisma.$PrescriptionPayload<ExtArgs>[]
+    insuranceProvider: Prisma.$InsuranceProviderPayload<ExtArgs> | null
     auditLogs: Prisma.$AuditLogPayload<ExtArgs>[]
     notifications: Prisma.$NotificationPayload<ExtArgs>[]
   }
@@ -2211,6 +2385,7 @@ export interface Prisma__UserClient<T, Null = never, ExtArgs extends runtime.Typ
   pharmacyOwner<T extends Prisma.User$pharmacyOwnerArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$pharmacyOwnerArgs<ExtArgs>>): Prisma.Prisma__PharmacyOwnerClient<runtime.Types.Result.GetResult<Prisma.$PharmacyOwnerPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   pharmacyEmployees<T extends Prisma.User$pharmacyEmployeesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$pharmacyEmployeesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$PharmacyEmployeePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   pharmacistPrescriptions<T extends Prisma.User$pharmacistPrescriptionsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$pharmacistPrescriptionsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$PrescriptionPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  insuranceProvider<T extends Prisma.User$insuranceProviderArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$insuranceProviderArgs<ExtArgs>>): Prisma.Prisma__InsuranceProviderClient<runtime.Types.Result.GetResult<Prisma.$InsuranceProviderPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   auditLogs<T extends Prisma.User$auditLogsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$auditLogsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$AuditLogPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   notifications<T extends Prisma.User$notificationsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$notificationsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$NotificationPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
@@ -2780,6 +2955,25 @@ export type User$pharmacistPrescriptionsArgs<ExtArgs extends runtime.Types.Exten
   take?: number
   skip?: number
   distinct?: Prisma.PrescriptionScalarFieldEnum | Prisma.PrescriptionScalarFieldEnum[]
+}
+
+/**
+ * User.insuranceProvider
+ */
+export type User$insuranceProviderArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the InsuranceProvider
+   */
+  select?: Prisma.InsuranceProviderSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the InsuranceProvider
+   */
+  omit?: Prisma.InsuranceProviderOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.InsuranceProviderInclude<ExtArgs> | null
+  where?: Prisma.InsuranceProviderWhereInput
 }
 
 /**

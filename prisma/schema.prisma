@@ -72,6 +72,7 @@ model User {
   pharmacyOwner     PharmacyOwner?
   pharmacyEmployees PharmacyEmployee[]
   pharmacistPrescriptions Prescription[]
+  insuranceProvider InsuranceProvider?
   auditLogs         AuditLog[]
   notifications     Notification[]
 
@@ -106,6 +107,8 @@ model Patient {
   user             User           @relation(fields: [userId], references: [id], onDelete: Cascade)
   reservations     Reservation[]
   prescriptions    Prescription[]
+  insuredPolicies  InsuredPatient[]
+  insuranceClaims  InsuranceClaim[]
   reminderSchedules ReminderSchedule[]
   reminderLogs     ReminderLog[]
 
@@ -139,6 +142,8 @@ model Pharmacy {
   inventories    Inventory[]
   reservations   Reservation[]
   prescriptions  Prescription[]
+  insuranceAgreements PharmacyInsuranceAgreement[]
+  insuranceClaims     InsuranceClaim[]
   auditLogs      AuditLog[]
 
   @@index([ownerId])
@@ -213,6 +218,8 @@ model Medicine {
   reservations   Reservation[]
   prescriptionMedicines PrescriptionMedicine[]
   reminderSchedules ReminderSchedule[]
+  insuranceTariffs InsuranceMedicineTariff[]
+  insuranceClaims InsuranceClaim[]
 
   createdAt      DateTime     @default(now())
   updatedAt      DateTime     @updatedAt
@@ -320,6 +327,7 @@ model Reservation {
   patient     Patient           @relation(fields: [patientId], references: [id], onDelete: Cascade)
   pharmacy    Pharmacy          @relation(fields: [pharmacyId], references: [id], onDelete: Cascade)
   medicine    Medicine          @relation(fields: [medicineId], references: [id], onDelete: Cascade)
+  insuranceClaims InsuranceClaim[]
 
   @@index([patientId])
   @@index([pharmacyId])
@@ -344,6 +352,7 @@ model Prescription {
   pharmacist       User?                  @relation(fields: [pharmacistId], references: [id], onDelete: SetNull)
   medicines        PrescriptionMedicine[]
   reminderSchedules ReminderSchedule[]
+  insuranceClaims  InsuranceClaim[]
 
   @@index([patientId])
   @@index([pharmacyId])
@@ -451,3 +460,147 @@ model SystemSetting {
 
   @@index([key])
 }
+
+// ── INSURANCE MODELS ─────────────────────────────────────────────────────────
+
+model InsuranceProvider {
+  id                        String                       @id @default(uuid())
+  userId                    String?                      @unique
+  name                      String                       @unique
+  code                      String                       @unique
+  logoUrl                   String?
+  email                     String?
+  phone                     String?
+  address                   String?
+  defaultCoveragePercentage Decimal                      @default(85.00) @db.Decimal(5, 2)
+  defaultCopayPercentage    Decimal                      @default(15.00) @db.Decimal(5, 2)
+  status                    String                       @default("ACTIVE")
+  isActive                  Boolean                      @default(true)
+  createdAt                 DateTime                     @default(now())
+  updatedAt                 DateTime                     @updatedAt
+
+  user                      User?                        @relation(fields: [userId], references: [id], onDelete: SetNull)
+  insuredPatients           InsuredPatient[]
+  pharmacyAgreements        PharmacyInsuranceAgreement[]
+  tariffs                   InsuranceMedicineTariff[]
+  claims                    InsuranceClaim[]
+
+  @@index([code])
+  @@index([status])
+}
+
+model InsuredPatient {
+  id                    String            @id @default(uuid())
+  insuranceId           String
+  patientId             String?
+  policyNumber          String            @unique
+  nationalId            String?
+  fullName              String
+  dateOfBirth           DateTime?
+  gender                String?
+  phone                 String?
+  coveragePercentage    Decimal?          @db.Decimal(5, 2)
+  status                String            @default("ACTIVE")
+  startDate             DateTime          @default(now())
+  endDate               DateTime?
+  dependentName         String?
+  dependentRelationship String?
+  createdAt             DateTime          @default(now())
+  updatedAt             DateTime          @updatedAt
+
+  insurance             InsuranceProvider @relation(fields: [insuranceId], references: [id], onDelete: Cascade)
+  patient               Patient?          @relation(fields: [patientId], references: [id], onDelete: SetNull)
+  claims                InsuranceClaim[]
+
+  @@index([insuranceId])
+  @@index([patientId])
+  @@index([policyNumber])
+  @@index([nationalId])
+  @@index([status])
+}
+
+model PharmacyInsuranceAgreement {
+  id                 String            @id @default(uuid())
+  insuranceId        String
+  pharmacyId         String
+  contractNumber     String?
+  status             String            @default("ACTIVE")
+  discountRate       Decimal           @default(0.00) @db.Decimal(5, 2)
+  customCoverageRate Decimal?          @db.Decimal(5, 2)
+  startDate          DateTime          @default(now())
+  endDate            DateTime?
+  createdAt          DateTime          @default(now())
+  updatedAt          DateTime          @updatedAt
+
+  insurance          InsuranceProvider @relation(fields: [insuranceId], references: [id], onDelete: Cascade)
+  pharmacy           Pharmacy          @relation(fields: [pharmacyId], references: [id], onDelete: Cascade)
+
+  @@unique([insuranceId, pharmacyId])
+  @@index([insuranceId])
+  @@index([pharmacyId])
+  @@index([status])
+}
+
+model InsuranceMedicineTariff {
+  id                 String            @id @default(uuid())
+  insuranceId        String
+  medicineId         String
+  coveredPrice       Decimal           @db.Decimal(12, 2)
+  coveragePercentage Decimal           @default(85.00) @db.Decimal(5, 2)
+  copayPercentage    Decimal           @default(15.00) @db.Decimal(5, 2)
+  fixedCopayAmount   Decimal?          @db.Decimal(12, 2)
+  isCovered          Boolean           @default(true)
+  requiresPreAuth    Boolean           @default(false)
+  status             String            @default("ACTIVE")
+  effectiveDate      DateTime          @default(now())
+  createdAt          DateTime          @default(now())
+  updatedAt          DateTime          @updatedAt
+
+  insurance          InsuranceProvider @relation(fields: [insuranceId], references: [id], onDelete: Cascade)
+  medicine           Medicine          @relation(fields: [medicineId], references: [id], onDelete: Cascade)
+
+  @@unique([insuranceId, medicineId])
+  @@index([insuranceId])
+  @@index([medicineId])
+  @@index([status])
+}
+
+model InsuranceClaim {
+  id               String            @id @default(uuid())
+  claimNumber      String            @unique
+  insuranceId      String
+  pharmacyId       String
+  insuredPatientId String?
+  patientId        String?
+  medicineId       String?
+  prescriptionId   String?
+  reservationId    String?
+  quantity         Int               @default(1)
+  unitPrice        Decimal           @db.Decimal(12, 2)
+  totalAmount      Decimal           @db.Decimal(12, 2)
+  insuranceAmount  Decimal           @db.Decimal(12, 2)
+  patientAmount    Decimal           @db.Decimal(12, 2)
+  status           String            @default("PENDING")
+  rejectionReason  String?
+  notes            String?
+  claimedAt        DateTime          @default(now())
+  processedAt      DateTime?
+  paidAt           DateTime?
+  createdAt        DateTime          @default(now())
+  updatedAt        DateTime          @updatedAt
+
+  insurance        InsuranceProvider @relation(fields: [insuranceId], references: [id], onDelete: Cascade)
+  pharmacy         Pharmacy          @relation(fields: [pharmacyId], references: [id], onDelete: Cascade)
+  insuredPatient   InsuredPatient?   @relation(fields: [insuredPatientId], references: [id], onDelete: SetNull)
+  patient          Patient?          @relation(fields: [patientId], references: [id], onDelete: SetNull)
+  medicine         Medicine?         @relation(fields: [medicineId], references: [id], onDelete: SetNull)
+  prescription     Prescription?     @relation(fields: [prescriptionId], references: [id], onDelete: SetNull)
+  reservation      Reservation?      @relation(fields: [reservationId], references: [id], onDelete: SetNull)
+
+  @@index([claimNumber])
+  @@index([insuranceId])
+  @@index([pharmacyId])
+  @@index([status])
+  @@index([claimedAt])
+}
+

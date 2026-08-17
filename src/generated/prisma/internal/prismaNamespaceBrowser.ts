@@ -71,7 +71,12 @@ export const ModelName = {
   ReminderLog: 'ReminderLog',
   Notification: 'Notification',
   AuditLog: 'AuditLog',
-  SystemSetting: 'SystemSetting'
+  SystemSetting: 'SystemSetting',
+  InsuranceProvider: 'InsuranceProvider',
+  InsuredPatient: 'InsuredPatient',
+  PharmacyInsuranceAgreement: 'PharmacyInsuranceAgreement',
+  InsuranceMedicineTariff: 'InsuranceMedicineTariff',
+  InsuranceClaim: 'InsuranceClaim'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -390,6 +395,113 @@ export const SystemSettingScalarFieldEnum = {
 } as const
 
 export type SystemSettingScalarFieldEnum = (typeof SystemSettingScalarFieldEnum)[keyof typeof SystemSettingScalarFieldEnum]
+
+
+export const InsuranceProviderScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  name: 'name',
+  code: 'code',
+  logoUrl: 'logoUrl',
+  email: 'email',
+  phone: 'phone',
+  address: 'address',
+  defaultCoveragePercentage: 'defaultCoveragePercentage',
+  defaultCopayPercentage: 'defaultCopayPercentage',
+  status: 'status',
+  isActive: 'isActive',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type InsuranceProviderScalarFieldEnum = (typeof InsuranceProviderScalarFieldEnum)[keyof typeof InsuranceProviderScalarFieldEnum]
+
+
+export const InsuredPatientScalarFieldEnum = {
+  id: 'id',
+  insuranceId: 'insuranceId',
+  patientId: 'patientId',
+  policyNumber: 'policyNumber',
+  nationalId: 'nationalId',
+  fullName: 'fullName',
+  dateOfBirth: 'dateOfBirth',
+  gender: 'gender',
+  phone: 'phone',
+  coveragePercentage: 'coveragePercentage',
+  status: 'status',
+  startDate: 'startDate',
+  endDate: 'endDate',
+  dependentName: 'dependentName',
+  dependentRelationship: 'dependentRelationship',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type InsuredPatientScalarFieldEnum = (typeof InsuredPatientScalarFieldEnum)[keyof typeof InsuredPatientScalarFieldEnum]
+
+
+export const PharmacyInsuranceAgreementScalarFieldEnum = {
+  id: 'id',
+  insuranceId: 'insuranceId',
+  pharmacyId: 'pharmacyId',
+  contractNumber: 'contractNumber',
+  status: 'status',
+  discountRate: 'discountRate',
+  customCoverageRate: 'customCoverageRate',
+  startDate: 'startDate',
+  endDate: 'endDate',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type PharmacyInsuranceAgreementScalarFieldEnum = (typeof PharmacyInsuranceAgreementScalarFieldEnum)[keyof typeof PharmacyInsuranceAgreementScalarFieldEnum]
+
+
+export const InsuranceMedicineTariffScalarFieldEnum = {
+  id: 'id',
+  insuranceId: 'insuranceId',
+  medicineId: 'medicineId',
+  coveredPrice: 'coveredPrice',
+  coveragePercentage: 'coveragePercentage',
+  copayPercentage: 'copayPercentage',
+  fixedCopayAmount: 'fixedCopayAmount',
+  isCovered: 'isCovered',
+  requiresPreAuth: 'requiresPreAuth',
+  status: 'status',
+  effectiveDate: 'effectiveDate',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type InsuranceMedicineTariffScalarFieldEnum = (typeof InsuranceMedicineTariffScalarFieldEnum)[keyof typeof InsuranceMedicineTariffScalarFieldEnum]
+
+
+export const InsuranceClaimScalarFieldEnum = {
+  id: 'id',
+  claimNumber: 'claimNumber',
+  insuranceId: 'insuranceId',
+  pharmacyId: 'pharmacyId',
+  insuredPatientId: 'insuredPatientId',
+  patientId: 'patientId',
+  medicineId: 'medicineId',
+  prescriptionId: 'prescriptionId',
+  reservationId: 'reservationId',
+  quantity: 'quantity',
+  unitPrice: 'unitPrice',
+  totalAmount: 'totalAmount',
+  insuranceAmount: 'insuranceAmount',
+  patientAmount: 'patientAmount',
+  status: 'status',
+  rejectionReason: 'rejectionReason',
+  notes: 'notes',
+  claimedAt: 'claimedAt',
+  processedAt: 'processedAt',
+  paidAt: 'paidAt',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type InsuranceClaimScalarFieldEnum = (typeof InsuranceClaimScalarFieldEnum)[keyof typeof InsuranceClaimScalarFieldEnum]
 
 
 export const SortOrder = {
