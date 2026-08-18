@@ -59,9 +59,63 @@ async function main() {
     });
 
     console.log(`✅ Government user created/found: ${gov.email} (id: ${gov.id})`);
+
+    // ── INSURANCE USERS ─────────────────────────────────────────────────────────
+    const rssbUser = await prisma.user.upsert({
+        where: { email: 'insurance@rssb.rw' },
+        update: {},
+        create: {
+            email: 'insurance@rssb.rw',
+            phone: '+250788001234',
+            password: await bcrypt.hash('RSSB@123456', 10),
+            firstName: 'RSSB',
+            lastName: 'Administrator',
+            role: UserRole.INSURANCE,
+            permissions: ['VIEW_DASHBOARD', 'MANAGE_CLAIMS', 'MANAGE_TARIFFS', 'MANAGE_AGREEMENTS'],
+            firstLogin: true,
+            isActive: true,
+        },
+    });
+
+    const mmiUser = await prisma.user.upsert({
+        where: { email: 'insurance@mmi.rw' },
+        update: {},
+        create: {
+            email: 'insurance@mmi.rw',
+            phone: '+250788005678',
+            password: await bcrypt.hash('MMI@123456', 10),
+            firstName: 'MMI',
+            lastName: 'Administrator',
+            role: UserRole.INSURANCE,
+            permissions: ['VIEW_DASHBOARD', 'MANAGE_CLAIMS', 'MANAGE_TARIFFS', 'MANAGE_AGREEMENTS'],
+            firstLogin: true,
+            isActive: true,
+        },
+    });
+
+    const ramaUser = await prisma.user.upsert({
+        where: { email: 'insurance@rama.rw' },
+        update: {},
+        create: {
+            email: 'insurance@rama.rw',
+            phone: '+250788009012',
+            password: await bcrypt.hash('RAMA@123456', 10),
+            firstName: 'RAMA',
+            lastName: 'Administrator',
+            role: UserRole.INSURANCE,
+            permissions: ['VIEW_DASHBOARD', 'MANAGE_CLAIMS', 'MANAGE_TARIFFS', 'MANAGE_AGREEMENTS'],
+            firstLogin: true,
+            isActive: true,
+        },
+    });
+
+    console.log(`✅ Insurance users created: RSSB, MMI, RAMA`);
     console.log('\n⚠️  Change these passwords immediately after first login!');
     console.log(`   Admin:      ${adminEmail}  /  ${adminRawPassword}`);
     console.log('   Government: gov@ministry.gov  /  Gov@123456');
+    console.log('   RSSB:       insurance@rssb.rw  /  RSSB@123456');
+    console.log('   MMI:        insurance@mmi.rw   /  MMI@123456');
+    console.log('   RAMA:       insurance@rama.rw  /  RAMA@123456');
 
     // ── INSURANCE PROVIDERS ─────────────────────────────────────────────────────
     const rssbInsurance = await prisma.insuranceProvider.upsert({
