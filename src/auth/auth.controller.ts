@@ -1,4 +1,4 @@
-import { Controller, Post, Body, UseGuards, Req, Param, Get, Patch } from '@nestjs/common';
+import { Controller, Post, Body, UseGuards, Req, Param, Get, Patch, Query } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiBearerAuth, ApiBody } from '@nestjs/swagger';
 import { AuthService } from './auth.service';
 import { RegisterDto } from './dto/register.dto';
@@ -53,6 +53,14 @@ export class AuthController {
   async login(@Body() loginDto: LoginDto) {
     return this.authService.login(loginDto);
   }
+
+  @Public()
+  @Get('verify-email')
+  async verifyEmail(@Query('token') token: string) { return this.authService.verifyEmail(token); }
+
+  @Public()
+  @Post('resend-verification')
+  async resendVerification(@Body('email') email: string) { return this.authService.resendVerificationEmail(email); }
 
   @UseGuards(JwtAuthGuard, PermissionsGuard)
   @Permissions('MANAGE_STAFF')

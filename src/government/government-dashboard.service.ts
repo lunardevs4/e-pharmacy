@@ -6,6 +6,41 @@ import { validatePositiveInt } from '../common/security/security.util';
 export class GovernmentDashboardService {
   constructor(private prismaService: PrismaService) { }
 
+  async getPublicStats() {
+    const prisma = this.prismaService.prisma;
+    const [registeredPharmacies, patientsRegistered, pharmacies, medicines, stockedEntries] =
+      await Promise.all([
+        prisma.pharmacy.count({ where: { deletedAt: null } }),
+        prisma.patient.count(),
+        prisma.pharmacy.findMany({
+          where: { status: 'APPROVED', isActive: true, deletedAt: null },
+          select: { province: true },
+        }),
+        prisma.medicine.count(),
+        prisma.inventory.count({
+          where: {
+            quantity: { gt: 0 },
+            deletedAt: null,
+            pharmacy: { status: 'APPROVED', isActive: true, deletedAt: null },
+          },
+        }),
+      ]);
+
+    const coveredProvinces = new Set(
+      pharmacies.map(({ province }) => province?.trim()).filter(Boolean),
+    ).size;
+    const possibleStockEntries = pharmacies.length * medicines;
+
+    return {
+      registeredPharmacies,
+      patientsRegistered,
+      provincesCovered: coveredProvinces,
+      nationalAvailability: possibleStockEntries
+        ? Number(((stockedEntries / possibleStockEntries) * 100).toFixed(1))
+        : 0,
+    };
+  }
+
   async getSummary() {
     const prisma = this.prismaService.prisma;
     

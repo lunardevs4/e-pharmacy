@@ -2417,6 +2417,9 @@ export const UserScalarFieldEnum = {
   permissions: 'permissions',
   firstLogin: 'firstLogin',
   isActive: 'isActive',
+  emailVerified: 'emailVerified',
+  emailVerificationTokenHash: 'emailVerificationTokenHash',
+  emailVerificationExpiresAt: 'emailVerificationExpiresAt',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt',
   deletedAt: 'deletedAt'

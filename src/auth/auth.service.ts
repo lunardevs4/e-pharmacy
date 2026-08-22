@@ -9,7 +9,7 @@ import {
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
 import * as bcrypt from 'bcrypt';
-import { randomBytes } from 'crypto';
+import { createHash, randomBytes } from 'crypto';
 import { PrismaService } from '../common/prisma/prisma.service';
 import { EmailService } from '../common/email/email.service';
 import { RegisterDto } from './dto/register.dto';
@@ -25,6 +25,7 @@ import {
 } from '../common/security/security.util';
 import { AUTH_PERMISSIONS, STAFF_ROLE_PERMISSIONS } from './auth.constants';
 import { UserRole } from '@generated/prisma';
+import { Cron } from '@nestjs/schedule';
 
 @Injectable()
 export class AuthService {
@@ -86,6 +87,7 @@ export class AuthService {
           role: UserRole.PATIENT,
           permissions: AUTH_PERMISSIONS.patient,
           firstLogin: false,
+          emailVerified: false,
         },
         select: {
           id: true,
@@ -109,20 +111,8 @@ export class AuthService {
       return createdUser;
     });
 
-    const tokens = await this.generateTokens(
-      user.id,
-      user.email,
-      user.role,
-      user.permissions,
-      null,
-      user.position,
-      user.firstLogin,
-    );
-
-    return {
-      user,
-      ...tokens,
-    };
+    await this.issueVerificationEmail(user.id, user.email, `${user.firstName} ${user.lastName}`.trim());
+    return { message: 'Account created. Please check your email to verify your account.', user };
   }
 
   async registerPharmacy(registerPharmacyDto: RegisterPharmacyDto) {
@@ -155,8 +145,11 @@ export class AuthService {
         permissions: AUTH_PERMISSIONS.manager,
         firstLogin: false,
         isActive: true,
+        emailVerified: false,
       },
     });
+
+    await this.issueVerificationEmail(owner.id, owner.email, safeDto.fullname);
 
     // Create a placeholder Pharmacy record for immediate linking so that other database features function properly
     const pharmacy = await prisma.pharmacy.create({
@@ -215,6 +208,13 @@ export class AuthService {
     if (!user.isActive) {
       throw new ForbiddenException('This account is not active yet');
     }
+    if (!user.emailVerified) {
+      if (user.emailVerificationExpiresAt && user.emailVerificationExpiresAt <= new Date()) {
+        await this.deleteExpiredUnverifiedUser(user.id);
+        throw new ForbiddenException('Your verification link expired and your account was removed. Please register again.');
+      }
+      throw new ForbiddenException('Please verify your email before signing in');
+    }
 
     const pharmacyContext = this.resolvePharmacyContext(user);
     const tokens = await this.generateTokens(
@@ -243,6 +243,71 @@ export class AuthService {
       },
       ...tokens,
     };
+  }
+
+  async verifyEmail(token: string) {
+    const tokenHash = createHash('sha256').update(token).digest('hex');
+    const prisma = this.prismaService.prisma;
+    const user = await prisma.user.findFirst({ where: { emailVerificationTokenHash: tokenHash } });
+    if (!user) throw new BadRequestException('This verification link is invalid or expired');
+    if (!user.emailVerificationExpiresAt || user.emailVerificationExpiresAt <= new Date()) {
+      await this.deleteExpiredUnverifiedUser(user.id);
+      throw new BadRequestException('This verification link is invalid or expired');
+    }
+    await prisma.user.update({ where: { id: user.id }, data: { emailVerified: true, emailVerificationTokenHash: null, emailVerificationExpiresAt: null } });
+    return { message: 'Email verified successfully. You can now sign in.' };
+  }
+
+  async resendVerificationEmail(email: string) {
+    const safeEmail = validateSafeString(email.trim().toLowerCase(), 'email', 255);
+    const user = await this.prismaService.prisma.user.findUnique({ where: { email: safeEmail } });
+    if (user && !user.emailVerified) {
+      if (user.emailVerificationExpiresAt && user.emailVerificationExpiresAt <= new Date()) {
+        await this.deleteExpiredUnverifiedUser(user.id);
+      } else {
+        await this.issueVerificationEmail(user.id, user.email, `${user.firstName} ${user.lastName}`.trim());
+      }
+    }
+    return { message: 'If an unverified account exists for that email, a verification email has been sent.' };
+  }
+
+  @Cron('* * * * *')
+  async removeExpiredUnverifiedUsers() {
+    const expiredUsers = await this.prismaService.prisma.user.findMany({
+      where: {
+        emailVerified: false,
+        emailVerificationExpiresAt: { lte: new Date() },
+      },
+      select: { id: true },
+    });
+
+    for (const user of expiredUsers) {
+      await this.deleteExpiredUnverifiedUser(user.id);
+    }
+  }
+
+  private async deleteExpiredUnverifiedUser(userId: string) {
+    await this.prismaService.prisma.user.delete({ where: { id: userId } });
+  }
+
+  private async issueVerificationEmail(userId: string, email: string, name: string) {
+    const rawToken = randomBytes(32).toString('hex');
+    const tokenHash = createHash('sha256').update(rawToken).digest('hex');
+    const expiresAt = new Date(Date.now() + 24 * 60 * 60 * 1000);
+    await this.prismaService.prisma.user.update({ where: { id: userId }, data: { emailVerificationTokenHash: tokenHash, emailVerificationExpiresAt: expiresAt } });
+    const frontendUrl = this.configService.get<string>('FRONTEND_URL') || 'http://localhost:5173';
+    const verificationUrl = `${frontendUrl}/verify-email?token=${rawToken}`;
+
+    // Do not make registration wait for Gmail's SMTP response. The account and
+    // verification token are already persisted, so a slow/unavailable mail
+    // provider must not turn a successful registration into a client timeout.
+    void this.emailService
+      .sendVerificationEmail(email, name, verificationUrl)
+      .catch((error: unknown) => {
+        console.warn(
+          `Verification email failed for ${email}: ${(error as Error).message}`,
+        );
+      });
   }
 
   async refreshTokens(refreshTokenDto: RefreshTokenDto) {

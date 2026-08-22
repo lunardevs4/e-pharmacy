@@ -62,6 +62,9 @@ model User {
   permissions       String[]            @default([])
   firstLogin        Boolean             @default(false)
   isActive          Boolean             @default(true)
+  emailVerified     Boolean             @default(true)
+  emailVerificationTokenHash String?
+  emailVerificationExpiresAt DateTime?
   createdAt         DateTime            @default(now())
   updatedAt         DateTime            @updatedAt
   deletedAt         DateTime?
@@ -79,6 +82,7 @@ model User {
   @@index([email])
   @@index([phone])
   @@index([role])
+  @@index([emailVerificationTokenHash])
 }
 
 model RefreshToken {
