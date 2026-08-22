@@ -36,7 +36,7 @@ import { InsuranceDashboardModule } from './insurance/insurance-dashboard.module
     ScheduleModule.forRoot(),
     ThrottlerModule.forRoot([{
       ttl: 60,
-      limit: 10,
+      limit: 1000,
     }]),
     PrismaModule,
     AuthModule,
