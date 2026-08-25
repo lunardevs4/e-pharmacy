@@ -44,6 +44,16 @@ export class ReservationsController {
     return this.reservationsService.create(req.user, createReservationDto);
   }
 
+  @Get('reservations/late')
+  @Roles(UserRole.PATIENT)
+  @ApiOperation({
+    summary: 'View my late pickups (patient only)',
+    description: 'Endpoint: GET /api/v1/reservations/late\n\nReturns reservations whose pickup window expired without collection.',
+  })
+  findLateForPatient(@Req() req: any) {
+    return this.reservationsService.findLateForPatient(req.user);
+  }
+
   @Get('reservations')
   @Roles(UserRole.PATIENT)
   @ApiOperation({

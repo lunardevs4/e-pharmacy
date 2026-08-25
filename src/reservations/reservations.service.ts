@@ -42,14 +42,15 @@ export class ReservationsService {
       create: { userId: safeUserId },
     });
 
-    const expiresAt = validateDate((safeDto as any).expiresAt, 'expiresAt');
+    const expiresAt = validateDate((safeDto as any).expiresAt, 'expiresAt') ||
+      new Date(Date.now() + 24 * 60 * 60 * 1000);
     const { expiresAt: _stripExpiry, ...restDto } = safeDto as any;
 
     return prisma.reservation.create({
       data: {
         patientId: patient.id,
         ...restDto,
-        ...(expiresAt ? { expiresAt } : {}),
+        expiresAt,
       },
     });
   }
@@ -64,16 +65,62 @@ export class ReservationsService {
       );
     }
 
-    const patient = await prisma.patient.findFirst({
+    // Auto-provision the patient profile so accounts created before the
+    // profile link existed (or via other flows) never 404 here.
+    const patient = await prisma.patient.upsert({
       where: { userId: safeUserId },
+      update: {},
+      create: { userId: safeUserId },
     });
-    if (!patient) throw new NotFoundException('Patient profile not found');
 
     return prisma.reservation.findMany({
       where: { patientId: patient.id },
       include: { medicine: true, pharmacy: true },
       orderBy: { createdAt: 'desc' },
     });
+  }
+
+  /** Patient's reservations whose pickup window has passed without collection. */
+  async findLateForPatient(user: AuthenticatedUser) {
+    const prisma = this.prismaService.prisma;
+    const safeUserId = validateUuid(user.id, 'userId');
+
+    if (user.role !== UserRole.PATIENT) {
+      throw new ForbiddenException(
+        'Only patients can view their late pickups via this endpoint',
+      );
+    }
+
+    const patient = await prisma.patient.upsert({
+      where: { userId: safeUserId },
+      update: {},
+      create: { userId: safeUserId },
+    });
+
+    const now = new Date();
+    const stale = await prisma.reservation.findMany({
+      where: {
+        patientId: patient.id,
+        status: { in: [ReservationStatus.PENDING, ReservationStatus.CONFIRMED] },
+        expiresAt: { lt: now },
+      },
+      include: { medicine: true, pharmacy: true },
+      orderBy: { expiresAt: 'asc' },
+    });
+
+    return stale.map((reservation) => ({
+      id: reservation.id,
+      medicineName:
+        reservation.medicine?.tradeName || reservation.medicine?.genericName || 'Medication',
+      pharmacyName: reservation.pharmacy?.name || 'Pharmacy',
+      pickupDeadline: reservation.expiresAt,
+      hoursLate: Math.max(
+        0,
+        Math.floor((now.getTime() - new Date(reservation.expiresAt).getTime()) / (1000 * 60 * 60)),
+      ),
+      quantity: reservation.quantity,
+      status: reservation.status,
+    }));
   }
 
   async cancelPatient(user: AuthenticatedUser, id: string) {

@@ -107,6 +107,15 @@ export class InsuranceDashboardService {
     });
     const paidClaimsAmount = Number(paidClaimsAgg._sum.insuranceAmount || 0);
 
+    // Active partnership & tariff counts for dashboard cards
+    const totalActiveAgreements = await prisma.pharmacyInsuranceAgreement.count({
+      where: { ...whereClause, status: 'ACTIVE' },
+    });
+
+    const totalCoveredTariffs = await prisma.insuranceMedicineTariff.count({
+      where: { ...whereClause, isCovered: true, status: 'ACTIVE' },
+    });
+
     const approvalPercentage =
       totalClaimsCount > 0 ? (approvedClaimsCount / totalClaimsCount) * 100 : 0;
 
@@ -226,6 +235,12 @@ export class InsuranceDashboardService {
     const formattedRecentClaims = recentClaims.map((claim) => ({
       id: claim.id,
       claimNumber: claim.claimNumber,
+      patientName: claim.insuredPatient?.fullName ||
+        [claim.patient?.user?.firstName, claim.patient?.user?.lastName].filter(Boolean).join(' ') ||
+        'Unknown',
+      medicineName: claim.medicine?.tradeName || claim.medicine?.genericName || 'Unknown',
+      pharmacyName: claim.pharmacy?.name || 'Unknown',
+      insuranceName: claim.insurance?.name || 'Unknown',
       pharmacy: {
         name: claim.pharmacy?.name || 'Unknown',
       },
@@ -260,6 +275,8 @@ export class InsuranceDashboardService {
         paidClaimsAmount,
         outstandingPaymentsAmount: Number(outstandingPaymentsAmount),
         pharmaciesAwaitingPayout,
+        totalActiveAgreements,
+        totalCoveredTariffs,
       },
       monthlyTrend,
       claimsByStatus,

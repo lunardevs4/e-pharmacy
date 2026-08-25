@@ -112,7 +112,25 @@ export class AuthService {
       return createdUser;
     });
 
-    await this.issueVerificationEmail(user.id, user.email, `${user.firstName} ${user.lastName}`.trim());
+    const delivered = await this.tryIssueVerificationEmail(
+      user.id,
+      user.email,
+      `${user.firstName} ${user.lastName}`.trim(),
+    );
+
+    if (!delivered) {
+      // Email delivery is unavailable or failing — never strand the user in
+      // an unverified state they cannot escape. Activate immediately.
+      await this.prismaService.prisma.user.update({
+        where: { id: user.id },
+        data: { emailVerified: true, emailVerificationTokenHash: null, emailVerificationExpiresAt: null },
+      });
+      return {
+        message: 'Account created successfully. Your account has been activated.',
+        user,
+      };
+    }
+
     return { message: 'Account created. Please check your email to verify your account.', user };
   }
 
@@ -150,7 +168,13 @@ export class AuthService {
       },
     });
 
-    await this.issueVerificationEmail(owner.id, owner.email, safeDto.fullname);
+    const ownerEmailDelivered = await this.tryIssueVerificationEmail(owner.id, owner.email, safeDto.fullname);
+    if (!ownerEmailDelivered) {
+      await this.prismaService.prisma.user.update({
+        where: { id: owner.id },
+        data: { emailVerified: true, emailVerificationTokenHash: null, emailVerificationExpiresAt: null },
+      });
+    }
 
     // Create a placeholder Pharmacy record for immediate linking so that other database features function properly
     const pharmacy = await prisma.pharmacy.create({
@@ -355,7 +379,13 @@ export class AuthService {
       if (user.emailVerificationExpiresAt && user.emailVerificationExpiresAt <= new Date()) {
         await this.deleteExpiredUnverifiedUser(user.id);
       } else {
-        await this.issueVerificationEmail(user.id, user.email, `${user.firstName} ${user.lastName}`.trim());
+        const delivered = await this.tryIssueVerificationEmail(user.id, user.email, `${user.firstName} ${user.lastName}`.trim());
+        if (!delivered) {
+          await this.prismaService.prisma.user.update({
+            where: { id: user.id },
+            data: { emailVerified: true, emailVerificationTokenHash: null, emailVerificationExpiresAt: null },
+          });
+        }
       }
     }
     return { message: 'If an unverified account exists for that email, a verification email has been sent.' };
@@ -380,7 +410,16 @@ export class AuthService {
     await this.prismaService.prisma.user.delete({ where: { id: userId } });
   }
 
-  private async issueVerificationEmail(userId: string, email: string, name: string) {
+  /**
+   * Sends the verification email and reports whether delivery actually
+   * succeeded. Callers decide what to do when it did not — a user must never
+   * be stranded unverified because SMTP is unavailable or misconfigured.
+   */
+  private async tryIssueVerificationEmail(
+    userId: string,
+    email: string,
+    name: string,
+  ): Promise<boolean> {
     const rawToken = randomBytes(32).toString('hex');
     const tokenHash = createHash('sha256').update(rawToken).digest('hex');
     const expiresAt = new Date(Date.now() + 24 * 60 * 60 * 1000);
@@ -388,16 +427,18 @@ export class AuthService {
     const frontendUrl = this.configService.get<string>('FRONTEND_URL') || 'http://localhost:5173';
     const verificationUrl = `${frontendUrl}/verify-email?token=${rawToken}`;
 
-    // Do not make registration wait for Gmail's SMTP response. The account and
-    // verification token are already persisted, so a slow/unavailable mail
-    // provider must not turn a successful registration into a client timeout.
-    void this.emailService
-      .sendVerificationEmail(email, name, verificationUrl)
-      .catch((error: unknown) => {
-        console.warn(
-          `Verification email failed for ${email}: ${(error as Error).message}`,
-        );
-      });
+    try {
+      const sent = await this.emailService.sendVerificationEmail(email, name, verificationUrl);
+      if (!sent) {
+        console.warn(`Verification email not configured — skipped for ${email}`);
+      }
+      return Boolean(sent);
+    } catch (error) {
+      console.warn(
+        `Verification email failed for ${email}: ${(error as Error).message}`,
+      );
+      return false;
+    }
   }
 
   async refreshTokens(refreshTokenDto: RefreshTokenDto) {

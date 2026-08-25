@@ -30,73 +30,112 @@ export class MedicinesService {
         'manufacturerId or manufacturerName is required',
       );
 
-    try {
-      return await prisma.$transaction(
-        async (tx) => {
-          const category = safeDto.categoryId
-            ? await tx.category.findUnique({
-                where: { id: validateUuid(safeDto.categoryId, 'categoryId') },
-              })
-            : await tx.category.upsert({
-                where: { name: categoryName! },
-                update: {},
-                create: { name: categoryName! },
-              });
-          if (!category) throw new NotFoundException('Category not found');
+    const existingMedicine = await this.medicineExists(
+      safeDto.tradeName,
+      safeDto.categoryId,
+      safeDto.manufacturerId,
+      prisma,
+    );
 
-          const manufacturer = safeDto.manufacturerId
-            ? await tx.manufacturer.findUnique({
-                where: {
-                  id: validateUuid(safeDto.manufacturerId, 'manufacturerId'),
-                },
-              })
-            : await tx.manufacturer.upsert({
-                where: { name: manufacturerName! },
-                update: {},
-                create: { name: manufacturerName! },
-              });
-          if (!manufacturer)
-            throw new NotFoundException('Manufacturer not found');
-
-          const batch = safeDto.initialBatch;
-          const medicine = await tx.medicine.create({
-            data: {
-              tradeName: safeDto.tradeName,
-              genericName: safeDto.genericName,
-              categoryId: category.id,
-              manufacturerId: manufacturer.id,
-              batches: {
-                create: {
-                  lotNumber: batch.lotNumber,
-                  batchNumber: batch.batchNumber,
-                  expiryDate: validateDate(batch.expiryDate, 'expiryDate')!,
-                  unitCost: batch.unitCost,
-                  unitSellingPrice: batch.unitSellingPrice,
-                  initialStock: batch.initialStock,
-                  currentStock: batch.initialStock,
-                  storageConditions: batch.storageConditions,
-                  minTemperature: batch.minTemperature,
-                  maxTemperature: batch.maxTemperature,
-                },
-              },
+    if (existingMedicine) {
+      // Medicine already exists - update its batch/stock instead of creating duplicate
+      const batch = safeDto.initialBatch;
+      const updatedMedicine = await prisma.medicine.update({
+        where: { id: existingMedicine.id },
+        data: {
+          genericName: safeDto.genericName,
+          batches: {
+            create: {
+              lotNumber: batch.lotNumber,
+              batchNumber: batch.batchNumber,
+              expiryDate: validateDate(batch.expiryDate, 'expiryDate')!,
+              unitCost: batch.unitCost,
+              unitSellingPrice: batch.unitSellingPrice,
+              initialStock: batch.initialStock,
+              currentStock: batch.initialStock + existingMedicine.batches?.reduce(
+                (sum, b) => sum + (b.currentStock || 0),
+                0,
+              ) || batch.initialStock,
+              storageConditions: batch.storageConditions,
+              minTemperature: batch.minTemperature,
+              maxTemperature: batch.maxTemperature,
             },
-            include: { category: true, manufacturer: true, batches: true },
-          });
-          return medicine;
+          },
         },
-        {
-          maxWait: 15_000,
-          timeout: 30_000,
-        },
-      );
-    } catch (error) {
-      if ((error as any)?.code === 'P2002') {
-        throw new ConflictException(
-          'A category, manufacturer, or batch with this name already exists',
-        );
-      }
-      throw error;
+        include: { category: true, manufacturer: true, batches: true },
+      });
+      return updatedMedicine;
     }
+
+    // Find or create category
+    const category = safeDto.categoryId
+      ? await prisma.category.findUnique({
+          where: { id: validateUuid(safeDto.categoryId, 'categoryId') },
+        })
+      : await prisma.category.upsert({
+          where: { name: categoryName! },
+          update: {},
+          create: { name: categoryName! },
+        });
+    if (!category) throw new NotFoundException('Category not found');
+
+    // Find or create manufacturer
+    const manufacturer = safeDto.manufacturerId
+      ? await prisma.manufacturer.findUnique({
+          where: {
+            id: validateUuid(safeDto.manufacturerId, 'manufacturerId'),
+          },
+        })
+      : await prisma.manufacturer.upsert({
+          where: { name: manufacturerName! },
+          update: {},
+          create: { name: manufacturerName! },
+        });
+    if (!manufacturer) throw new NotFoundException('Manufacturer not found');
+
+    const batch = safeDto.initialBatch;
+    const medicine = await prisma.medicine.create({
+      data: {
+        tradeName: safeDto.tradeName,
+        genericName: safeDto.genericName,
+        categoryId: category.id,
+        manufacturerId: manufacturer.id,
+        batches: {
+          create: {
+            lotNumber: batch.lotNumber,
+            batchNumber: batch.batchNumber,
+            expiryDate: validateDate(batch.expiryDate, 'expiryDate')!,
+            unitCost: batch.unitCost,
+            unitSellingPrice: batch.unitSellingPrice,
+            initialStock: batch.initialStock,
+            currentStock: batch.initialStock,
+            storageConditions: batch.storageConditions,
+            minTemperature: batch.minTemperature,
+            maxTemperature: batch.maxTemperature,
+          },
+        },
+      },
+      include: { category: true, manufacturer: true, batches: true },
+    });
+    return medicine;
+  }
+
+  private async medicineExists(
+    tradeName: string,
+    categoryId: string | undefined,
+    manufacturerId: string | undefined,
+    prisma: any,
+  ) {
+    if (!categoryId || !manufacturerId) return null;
+    return await prisma.medicine.findFirst({
+      where: {
+        tradeName,
+        categoryId,
+        manufacturerId,
+        deletedAt: null,
+      },
+      include: { category: true, manufacturer: true },
+    });
   }
 
   findAll(

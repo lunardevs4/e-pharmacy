@@ -304,20 +304,25 @@ export class CreateInsuranceClaimDto {
   @Min(0)
   unitPrice: number;
 
-  @ApiProperty({ example: 10000.00 })
+  // Amounts are recomputed server-side from tariffs/agreements; client values
+  // are accepted for backwards compatibility but never trusted.
+  @ApiPropertyOptional({ example: 10000.00 })
+  @IsOptional()
   @IsNumber()
   @Min(0)
-  totalAmount: number;
+  totalAmount?: number;
 
-  @ApiProperty({ example: 8500.00 })
+  @ApiPropertyOptional({ example: 8500.00 })
+  @IsOptional()
   @IsNumber()
   @Min(0)
-  insuranceAmount: number;
+  insuranceAmount?: number;
 
-  @ApiProperty({ example: 1500.00 })
+  @ApiPropertyOptional({ example: 1500.00 })
+  @IsOptional()
   @IsNumber()
   @Min(0)
-  patientAmount: number;
+  patientAmount?: number;
 
   @ApiPropertyOptional({ example: 'Urgent prescription' })
   @IsOptional()

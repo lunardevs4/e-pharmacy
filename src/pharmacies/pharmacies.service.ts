@@ -106,7 +106,17 @@ export class PharmaciesService {
       province,
       district,
       managerName,
+      category,
+      ownershipType,
     } = safeDto;
+
+    // Registration activation: when the placeholder licence is replaced with a
+    // real one, or a rejected owner re-submits details, push the pharmacy back
+    // into the government review queue.
+    const isInitialActivation = pharmacy.licenseNumber === 'PENDING' && !!licenseNumber && licenseNumber !== 'PENDING';
+    const isReapplication = (pharmacy.status as string) === 'REJECTED';
+    const shouldResetToPending =
+      (isInitialActivation || isReapplication) && licenseNumber && licenseNumber !== 'PENDING';
 
     return prisma.pharmacy.update({
       where: { id: safeId },
@@ -121,6 +131,11 @@ export class PharmaciesService {
         province,
         district,
         managerName,
+        category,
+        ownershipType,
+        // PENDING status alone gates public visibility; do not deactivate the
+        // record itself or it stays hidden even after approval.
+        ...(shouldResetToPending ? { status: PharmacyStatus.PENDING } : {}),
       },
     });
   }
@@ -129,7 +144,20 @@ export class PharmaciesService {
     const prisma = this.prismaService.prisma;
     const safeId = validateUuid(id, 'id');
     const safeDto = sanitizeDeep(approvePharmacyDto);
-    return prisma.pharmacy.update({ where: { id: safeId }, data: safeDto });
+    const pharmacy = await prisma.pharmacy.findUnique({ where: { id: safeId } });
+    if (!pharmacy) throw new NotFoundException('Pharmacy not found');
+
+    // Approval must reactivate the record so it appears in patient-facing
+    // availability searches; rejection/pending keeps it out of search.
+    const reactivate = safeDto.status === PharmacyStatus.APPROVED;
+
+    return prisma.pharmacy.update({
+      where: { id: safeId },
+      data: {
+        status: safeDto.status,
+        ...(reactivate ? { isActive: true } : {}),
+      },
+    });
   }
 
   async addEmployee(id: string, ownerId: string, addEmployeeDto: AddEmployeeDto) {

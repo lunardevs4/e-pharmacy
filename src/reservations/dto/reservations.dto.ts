@@ -1,4 +1,4 @@
-import { IsUUID, IsInt, Min, IsEnum, IsDateString } from 'class-validator';
+import { IsUUID, IsInt, Min, IsEnum, IsDateString, IsOptional } from 'class-validator';
 import { ReservationStatus } from '@generated/prisma';
 import { TransformToISODateTime } from '../../common/transformers/date.transformer';
 
@@ -13,9 +13,11 @@ export class CreateReservationDto {
   @Min(1)
   quantity: number;
 
+  // Optional — the service defaults the pickup window to 24h when omitted.
+  @IsOptional()
   @IsDateString()
   @TransformToISODateTime()
-  expiresAt: string;
+  expiresAt?: string;
 }
 
 export class UpdateReservationStatusDto {

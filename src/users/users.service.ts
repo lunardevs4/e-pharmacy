@@ -19,8 +19,19 @@ export class UsersService {
         firstName: true,
         lastName: true,
         role: true,
+        position: true,
+        permissions: true,
+        firstLogin: true,
+        isActive: true,
         createdAt: true,
         patient: true,
+        pharmacyOwner: {
+          include: { pharmacy: true },
+        },
+        pharmacyEmployees: {
+          include: { pharmacy: true },
+        },
+        insuranceProvider: true,
       },
     });
 
@@ -28,7 +39,16 @@ export class UsersService {
       throw new NotFoundException('User not found');
     }
 
-    return user;
+    // Flatten the active pharmacy context (owned first, then employed-at)
+    const ownedPharmacy = user.pharmacyOwner?.pharmacy ?? null;
+    const employedPharmacy = user.pharmacyEmployees?.[0]?.pharmacy ?? null;
+    const { pharmacyOwner, pharmacyEmployees, insuranceProvider, ...rest } = user;
+
+    return {
+      ...rest,
+      pharmacy: ownedPharmacy || employedPharmacy,
+      insuranceProvider: insuranceProvider ?? null,
+    };
   }
 
   async updateProfile(userId: string, updateUserDto: UpdateUserDto) {
