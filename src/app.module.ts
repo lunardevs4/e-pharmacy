@@ -29,6 +29,7 @@ import { AuditLogsModule } from './audit-logs/audit-logs.module';
 import { FileUploadsModule } from './file-uploads/file-uploads.module';
 import { ReportsModule } from './reports/reports.module';
 import { InsuranceDashboardModule } from './insurance/insurance-dashboard.module';
+import { CommunicationModule } from './common/communication/communication.module';
 
 @Module({
   imports: [
@@ -57,6 +58,7 @@ import { InsuranceDashboardModule } from './insurance/insurance-dashboard.module
     FileUploadsModule,
     ReportsModule,
     InsuranceDashboardModule,
+    CommunicationModule,
   ],
   controllers: [],
   providers: [

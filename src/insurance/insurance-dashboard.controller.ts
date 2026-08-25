@@ -1,10 +1,11 @@
-import { Controller, Get, Post, Patch, Param, Query, Body, UseGuards } from '@nestjs/common';
-import { ApiTags, ApiOperation, ApiQuery, ApiParam, ApiBearerAuth } from '@nestjs/swagger';
+import { Controller, Get, Post, Patch, Param, Query, Body, UseGuards, Req } from '@nestjs/common';
+import { ApiTags, ApiOperation, ApiQuery, ApiParam, ApiBearerAuth, ApiBody } from '@nestjs/swagger';
 import { InsuranceDashboardService } from './insurance-dashboard.service';
 import { InsurancePharmaciesService } from './insurance-pharmacies.service';
 import { InsuranceTariffsService } from './insurance-tariffs.service';
 import { InsuranceClaimsService } from './insurance-claims.service';
 import { InsuredPatientsService } from './insured-patients.service';
+import { InsuranceCalculationService } from './insurance-calculation.service';
 import { Roles } from '../common/guards/roles.decorator';
 import { UserRole } from '../generated/prisma';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
@@ -22,6 +23,8 @@ import {
   RegisterInsuredPatientDto,
   VerifyPolicyDto,
   InsuranceDashboardQueryDto,
+  CalculatePaymentsDto,
+  ValidatePatientInsuranceDto,
 } from './dto/insurance.dto';
 
 @ApiTags('Insurance')
@@ -35,6 +38,7 @@ export class InsuranceDashboardController {
     private tariffsService: InsuranceTariffsService,
     private claimsService: InsuranceClaimsService,
     private patientsService: InsuredPatientsService,
+    private calculationService: InsuranceCalculationService,
   ) {}
 
   // Dashboard Summary
@@ -48,7 +52,7 @@ export class InsuranceDashboardController {
 
   // Claims Endpoints
   @Get('claims')
-  @Roles(UserRole.INSURANCE, UserRole.ADMIN)
+  @Roles(UserRole.INSURANCE, UserRole.ADMIN, UserRole.PHARMACY_OWNER, UserRole.PHARMACY, UserRole.PHARMACIST)
   @ApiOperation({ summary: 'Get insurance claims with filtering' })
   @ApiQuery({ name: 'insuranceId', required: false })
   @ApiQuery({ name: 'pharmacyId', required: false })
@@ -78,7 +82,7 @@ export class InsuranceDashboardController {
   }
 
   @Get('claims/:id')
-  @Roles(UserRole.INSURANCE, UserRole.ADMIN)
+  @Roles(UserRole.INSURANCE, UserRole.ADMIN, UserRole.PHARMACY_OWNER, UserRole.PHARMACY, UserRole.PHARMACIST)
   @ApiOperation({ summary: 'Get claim by ID' })
   @ApiParam({ name: 'id', description: 'Claim ID' })
   async getClaimById(@Param('id') id: string) {
@@ -86,7 +90,7 @@ export class InsuranceDashboardController {
   }
 
   @Post('claims')
-  @Roles(UserRole.INSURANCE, UserRole.ADMIN)
+  @Roles(UserRole.INSURANCE, UserRole.ADMIN, UserRole.PHARMACY_OWNER, UserRole.PHARMACY, UserRole.PHARMACIST)
   @ApiOperation({ summary: 'Create new insurance claim' })
   async createClaim(@Body() dto: CreateInsuranceClaimDto) {
     return this.claimsService.createClaim(dto);
@@ -108,7 +112,7 @@ export class InsuranceDashboardController {
   }
 
   @Get('claims/outstanding')
-  @Roles(UserRole.INSURANCE, UserRole.ADMIN)
+  @Roles(UserRole.INSURANCE, UserRole.ADMIN, UserRole.PHARMACY_OWNER, UserRole.PHARMACY, UserRole.PHARMACIST)
   @ApiOperation({ summary: 'Get outstanding payments' })
   @ApiQuery({ name: 'pharmacyId', required: false })
   async getOutstandingPayments(@Query('pharmacyId') pharmacyId?: string) {
@@ -301,10 +305,62 @@ export class InsuranceDashboardController {
 
   // Insurance Providers Endpoints
   @Get('providers')
-  @Roles(UserRole.INSURANCE, UserRole.ADMIN)
   @ApiOperation({ summary: 'Get insurance providers' })
   async getProviders() {
-    // This would be implemented in a separate InsuranceProvidersService
-    return { message: 'Insurance providers endpoint - to be implemented' };
+    return this.dashboardService.getProviders();
+  }
+
+  @Get('providers/:id')
+  @Roles(UserRole.INSURANCE, UserRole.ADMIN)
+  @ApiOperation({ summary: 'Get insurance provider by ID' })
+  @ApiParam({ name: 'id', description: 'Provider ID' })
+  async getProviderById(@Param('id') id: string) {
+    return this.dashboardService.getProviderById(id);
+  }
+
+  @Patch('providers/:id')
+  @Roles(UserRole.INSURANCE, UserRole.ADMIN)
+  @ApiOperation({ summary: 'Update insurance provider' })
+  @ApiParam({ name: 'id', description: 'Provider ID' })
+  @ApiBody({
+    schema: {
+      type: 'object',
+      properties: {
+        name: { type: 'string' },
+        logoUrl: { type: 'string' },
+        email: { type: 'string' },
+        phone: { type: 'string' },
+        address: { type: 'string' },
+        defaultCoveragePercentage: { type: 'number', minimum: 0, maximum: 100 },
+        defaultCopayPercentage: { type: 'number', minimum: 0, maximum: 100 },
+        status: { type: 'string', enum: ['ACTIVE', 'INACTIVE', 'SUSPENDED'] },
+        isActive: { type: 'boolean' },
+      },
+    },
+  })
+  async updateProvider(@Param('id') id: string, @Req() req: any, @Body() data: any) {
+    return this.dashboardService.updateProvider(id, data, req.user);
+  }
+
+  // Insurance Calculation Endpoints
+
+  @Post('calculate')
+  @ApiOperation({
+    summary: 'Calculate insurance payments for medicines',
+    description: 'Calculates insurance and patient payment amounts for one or more medicines based on coverage rules.',
+  })
+  @ApiBody({ type: CalculatePaymentsDto })
+  async calculatePayments(@Body() dto: CalculatePaymentsDto) {
+    return this.calculationService.calculatePayments(dto);
+  }
+
+  @Post('validate-patient')
+  @ApiOperation({
+    summary: 'Validate patient insurance coverage',
+    description: 'Verifies that a patient has valid insurance with a specific provider.',
+  })
+  @ApiBody({ type: ValidatePatientInsuranceDto })
+  async validatePatientInsurance(@Body() dto: ValidatePatientInsuranceDto) {
+    return this.calculationService.validatePatientInsurance(dto.patientId, dto.insuranceId);
   }
 }

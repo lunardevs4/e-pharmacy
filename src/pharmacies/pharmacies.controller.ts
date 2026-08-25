@@ -177,4 +177,106 @@ export class PharmaciesController {
   removeEmployee(@Param('id') id: string, @Param('employeeId') employeeId: string, @Req() req: any) {
     return this.pharmaciesService.removeEmployee(id, req.user.id, employeeId);
   }
+
+  // Pharmacy Insurance Management Endpoints
+
+  @Get(':id/insurance')
+  @Public()
+  @ApiOperation({
+    summary: 'Get insurance providers accepted by pharmacy',
+    description: 'Returns all active insurance providers that the pharmacy has agreements with, including coverage information.',
+  })
+  @ApiParam({ name: 'id', type: 'string', description: 'Pharmacy UUID', example: '550e8400-e29b-41d4-a716-446655440000' })
+  getInsuranceProviders(@Param('id') id: string) {
+    return this.pharmaciesService.getInsuranceProviders(id);
+  }
+
+  @Post(':id/insurance')
+  @UseGuards(JwtAuthGuard)
+  @Roles(UserRole.PHARMACY_OWNER)
+  @ApiBearerAuth()
+  @ApiOperation({
+    summary: 'Add insurance provider to pharmacy (owner only)',
+    description: 'Creates a new pharmacy-insurance agreement.',
+  })
+  @ApiParam({ name: 'id', type: 'string', description: 'Pharmacy UUID', example: '550e8400-e29b-41d4-a716-446655440000' })
+  @ApiBody({
+    schema: {
+      type: 'object',
+      properties: {
+        insuranceId: { type: 'string', description: 'Insurance provider UUID' },
+        contractNumber: { type: 'string', description: 'Contract number' },
+        discountRate: { type: 'number', description: 'Discount rate (0-100)', minimum: 0, maximum: 100 },
+        customCoverageRate: { type: 'number', description: 'Custom coverage rate (0-100)', minimum: 0, maximum: 100 },
+        startDate: { type: 'string', description: 'Agreement start date (ISO format)' },
+        endDate: { type: 'string', description: 'Agreement end date (ISO format)' },
+      },
+      required: ['insuranceId'],
+    },
+  })
+  addInsuranceProvider(
+    @Param('id') id: string,
+    @Req() req: any,
+    @Body() data: {
+      insuranceId: string;
+      contractNumber?: string;
+      discountRate?: number;
+      customCoverageRate?: number;
+      startDate?: string;
+      endDate?: string;
+    },
+  ) {
+    return this.pharmaciesService.addInsuranceProvider(id, req.user.id, data);
+  }
+
+  @Patch(':id/insurance/:agreementId')
+  @UseGuards(JwtAuthGuard)
+  @Roles(UserRole.PHARMACY_OWNER)
+  @ApiBearerAuth()
+  @ApiOperation({
+    summary: 'Update insurance agreement (owner only)',
+    description: 'Updates an existing pharmacy-insurance agreement.',
+  })
+  @ApiParam({ name: 'id', type: 'string', description: 'Pharmacy UUID', example: '550e8400-e29b-41d4-a716-446655440000' })
+  @ApiParam({ name: 'agreementId', type: 'string', description: 'Agreement UUID', example: '550e8400-e29b-41d4-a716-446655440001' })
+  @ApiBody({
+    schema: {
+      type: 'object',
+      properties: {
+        contractNumber: { type: 'string' },
+        discountRate: { type: 'number', minimum: 0, maximum: 100 },
+        customCoverageRate: { type: 'number', minimum: 0, maximum: 100 },
+        endDate: { type: 'string' },
+        status: { type: 'string', enum: ['ACTIVE', 'SUSPENDED', 'TERMINATED'] },
+      },
+    },
+  })
+  updateInsuranceAgreement(
+    @Param('id') id: string,
+    @Param('agreementId') agreementId: string,
+    @Req() req: any,
+    @Body() data: {
+      contractNumber?: string;
+      discountRate?: number;
+      customCoverageRate?: number;
+      endDate?: string;
+      status?: string;
+    },
+  ) {
+    return this.pharmaciesService.updateInsuranceAgreement(id, req.user.id, agreementId, data);
+  }
+
+  @Delete(':id/insurance/:agreementId')
+  @UseGuards(JwtAuthGuard)
+  @Roles(UserRole.PHARMACY_OWNER)
+  @ApiBearerAuth()
+  @ApiOperation({
+    summary: 'Remove insurance provider from pharmacy (owner only)',
+    description: 'Terminates the pharmacy-insurance agreement.',
+  })
+  @ApiParam({ name: 'id', type: 'string', description: 'Pharmacy UUID', example: '550e8400-e29b-41d4-a716-446655440000' })
+  @ApiParam({ name: 'agreementId', type: 'string', description: 'Agreement UUID', example: '550e8400-e29b-41d4-a716-446655440001' })
+  removeInsuranceProvider(@Param('id') id: string, @Param('agreementId') agreementId: string, @Req() req: any) {
+    return this.pharmaciesService.removeInsuranceProvider(id, req.user.id, agreementId);
+  }
 }

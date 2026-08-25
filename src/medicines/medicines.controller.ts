@@ -21,6 +21,7 @@ import { MedicinesService } from './medicines.service';
 import { CreateMedicineDto, UpdateMedicineDto } from './dto/medicines.dto';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { Roles } from '../common/guards/roles.decorator';
+import { Public } from '../common/guards/public.decorator';
 import { UserRole } from '@generated/prisma';
 
 @ApiTags('Medicines')
@@ -31,9 +32,9 @@ export class MedicinesController {
   constructor(private medicinesService: MedicinesService) {}
 
   @Post()
-  @Roles(UserRole.PHARMACIST, UserRole.PHARMACY_OWNER)
+  @Roles(UserRole.PATIENT, UserRole.PHARMACY_OWNER, UserRole.PHARMACY, UserRole.PHARMACIST, UserRole.INSURANCE, UserRole.GOVERNMENT, UserRole.ADMIN)
   @ApiOperation({
-    summary: 'Create medicine (Government, Pharmacist, Pharmacy Owner only)',
+    summary: 'Create medicine',
     description:
       'Endpoint: POST /api/v1/medicines\n\nCreates a new medicine record in the system. Requires authentication and appropriate user role.',
   })
@@ -78,12 +79,7 @@ export class MedicinesController {
   }
 
   @Get()
-  @Roles(
-    UserRole.PATIENT,
-    UserRole.PHARMACY_OWNER,
-    UserRole.PHARMACIST,
-    UserRole.GOVERNMENT,
-  )
+  @Roles(UserRole.PATIENT, UserRole.PHARMACY_OWNER, UserRole.PHARMACY, UserRole.PHARMACIST, UserRole.INSURANCE, UserRole.GOVERNMENT, UserRole.ADMIN)
   @ApiOperation({
     summary: 'List all medicines',
     description:
@@ -116,12 +112,7 @@ export class MedicinesController {
   }
 
   @Get(':id')
-  @Roles(
-    UserRole.PATIENT,
-    UserRole.PHARMACY_OWNER,
-    UserRole.PHARMACIST,
-    UserRole.GOVERNMENT,
-  )
+  @Roles(UserRole.PATIENT, UserRole.PHARMACY_OWNER, UserRole.PHARMACY, UserRole.PHARMACIST, UserRole.INSURANCE, UserRole.GOVERNMENT, UserRole.ADMIN)
   @ApiOperation({
     summary: 'Get medicine details',
     description:
@@ -137,10 +128,36 @@ export class MedicinesController {
     return this.medicinesService.findOne(id);
   }
 
-  @Patch(':id')
-  @Roles(UserRole.PHARMACIST, UserRole.PHARMACY_OWNER)
+  @Public()
+  @Get(':id/availability')
   @ApiOperation({
-    summary: 'Update medicine (pharmacist and pharmacy_owner)',
+    summary: 'Get medicine availability across pharmacies',
+    description: 'Endpoint: GET /api/v1/medicines/:id/availability\n\nReturns all pharmacies stocking the medicine with prices, quantities, distances, and insurance co-pay splits.\n\nURL Parameters:\n- id (UUID): The unique identifier of the medicine\n\nQuery Parameters:\n- latitude (optional): User latitude for distance calculation\n- longitude (optional): User longitude for distance calculation\n- radius (optional): Search radius in km (default: 5)\n- insuranceId (optional): Insurance provider ID for co-pay calculation',
+  })
+  @ApiParam({
+    name: 'id',
+    type: 'string',
+    description: 'Medicine UUID',
+    example: '550e8400-e29b-41d4-a716-446655440000',
+  })
+  @ApiQuery({ name: 'latitude', required: false, type: Number, example: -1.944 })
+  @ApiQuery({ name: 'longitude', required: false, type: Number, example: 30.061 })
+  @ApiQuery({ name: 'radius', required: false, type: Number, example: 5 })
+  @ApiQuery({ name: 'insuranceId', required: false, type: 'string' })
+  getAvailability(
+    @Param('id') id: string,
+    @Query('latitude') latitude?: number,
+    @Query('longitude') longitude?: number,
+    @Query('radius') radius?: number,
+    @Query('insuranceId') insuranceId?: string,
+  ) {
+    return this.medicinesService.getAvailability(id, latitude, longitude, radius, insuranceId);
+  }
+
+  @Patch(':id')
+  @Roles(UserRole.PATIENT, UserRole.PHARMACY_OWNER, UserRole.PHARMACY, UserRole.PHARMACIST, UserRole.INSURANCE, UserRole.GOVERNMENT, UserRole.ADMIN)
+  @ApiOperation({
+    summary: 'Update medicine',
     description:
       'Endpoint: PATCH /api/v1/medicines/:id\n\nURL Parameters:\n- id (UUID): The unique identifier of the medicine',
   })
@@ -180,9 +197,9 @@ export class MedicinesController {
   }
 
   @Delete(':id')
-  @Roles(UserRole.PHARMACIST, UserRole.PHARMACY_OWNER)
+  @Roles(UserRole.PATIENT, UserRole.PHARMACY_OWNER, UserRole.PHARMACY, UserRole.PHARMACIST, UserRole.INSURANCE, UserRole.GOVERNMENT, UserRole.ADMIN)
   @ApiOperation({
-    summary: 'Delete medicine (pharmacist and pharmacy_owner)',
+    summary: 'Delete medicine',
     description:
       'Endpoint: DELETE /api/v1/medicines/:id\n\nURL Parameters:\n- id (UUID): The unique identifier of the medicine to delete',
   })

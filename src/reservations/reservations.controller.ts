@@ -77,10 +77,10 @@ export class ReservationsController {
   }
 
   @Patch('pharmacies/:pharmacyId/reservations/:id')
-  @Roles(UserRole.PHARMACIST)
+  @Roles(UserRole.PHARMACY_OWNER, UserRole.PHARMACIST)
   @ApiOperation({
-    summary: 'Confirm/manage reservation status (pharmacist only)',
-    description: 'Endpoint: PATCH /api/v1/pharmacies/:pharmacyId/reservations/:id\n\nURL Parameters:\n- pharmacyId (UUID): The unique identifier of the pharmacy\n- id (UUID): The unique identifier of the reservation',
+    summary: 'Confirm/manage reservation status (pharmacist or owner)',
+    description: 'Endpoint: PATCH /api/v1/pharmacies/:pharmacyId/reservations/:id',
   })
   @ApiParam({ name: 'pharmacyId', type: 'string', description: 'Pharmacy UUID', example: '550e8400-e29b-41d4-a716-446655440000' })
   @ApiParam({ name: 'id', type: 'string', description: 'Reservation UUID', example: '550e8400-e29b-41d4-a716-446655440001' })

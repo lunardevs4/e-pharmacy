@@ -5,6 +5,7 @@ import { InsurancePharmaciesService } from './insurance-pharmacies.service';
 import { InsuranceTariffsService } from './insurance-tariffs.service';
 import { InsuranceClaimsService } from './insurance-claims.service';
 import { InsuredPatientsService } from './insured-patients.service';
+import { InsuranceCalculationService } from './insurance-calculation.service';
 import { PrismaModule } from '../common/prisma/prisma.module';
 
 @Module({
@@ -16,6 +17,7 @@ import { PrismaModule } from '../common/prisma/prisma.module';
     InsuranceTariffsService,
     InsuranceClaimsService,
     InsuredPatientsService,
+    InsuranceCalculationService,
   ],
   exports: [
     InsuranceDashboardService,
@@ -23,6 +25,7 @@ import { PrismaModule } from '../common/prisma/prisma.module';
     InsuranceTariffsService,
     InsuranceClaimsService,
     InsuredPatientsService,
+    InsuranceCalculationService,
   ],
 })
 export class InsuranceDashboardModule {}

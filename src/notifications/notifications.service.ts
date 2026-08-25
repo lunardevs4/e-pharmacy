@@ -70,7 +70,7 @@ export class NotificationsService {
       });
     }
 
-    if (user.role === UserRole.PATIENT || user.role === UserRole.GOVERNMENT) {
+    if (user.role === UserRole.PATIENT || user.role === UserRole.GOVERNMENT || user.role === UserRole.INSURANCE) {
       return prisma.notification.findMany({
         where: { userId: safeUserId },
         orderBy: { createdAt: 'desc' },
@@ -92,7 +92,7 @@ export class NotificationsService {
       return prisma.notification.update({ where: { id: safeId }, data: { isRead: true } });
     }
 
-    if (user.role === UserRole.ADMIN) {
+    if (user.role === UserRole.ADMIN || user.role === UserRole.INSURANCE) {
       return prisma.notification.update({ where: { id: safeId }, data: { isRead: true } });
     }
 
@@ -202,7 +202,7 @@ export class NotificationsService {
       });
     }
 
-    if (user.role === UserRole.PATIENT || user.role === UserRole.GOVERNMENT) {
+    if (user.role === UserRole.PATIENT || user.role === UserRole.GOVERNMENT || user.role === UserRole.INSURANCE) {
       return prisma.notification.updateMany({
         where: { userId: safeUserId, isRead: false },
         data: { isRead: true },

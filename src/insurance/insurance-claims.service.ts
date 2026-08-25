@@ -1,10 +1,14 @@
 import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
 import { PrismaService } from '../common/prisma/prisma.service';
 import { CreateInsuranceClaimDto, UpdateClaimStatusDto, BatchPayClaimsDto, ClaimStatus } from './dto/insurance.dto';
+import { InsuranceCalculationService } from './insurance-calculation.service';
 
 @Injectable()
 export class InsuranceClaimsService {
-  constructor(private prismaService: PrismaService) {}
+  constructor(
+    private prismaService: PrismaService,
+    private calculationService: InsuranceCalculationService,
+  ) {}
 
   async createClaim(dto: CreateInsuranceClaimDto) {
     const prisma = this.prismaService.prisma;
@@ -36,6 +40,21 @@ export class InsuranceClaimsService {
       throw new NotFoundException('Medicine not found');
     }
 
+    // Calculate insurance payment using the calculation service
+    const calculation = await this.calculationService.calculatePayments({
+      pharmacyId: dto.pharmacyId,
+      insuranceId: dto.insuranceId,
+      medicines: [{
+        medicineId: dto.medicineId,
+        quantity: dto.quantity,
+        unitPrice: dto.unitPrice,
+      }],
+      patientId: dto.patientId,
+      insuredPatientId: dto.insuredPatientId,
+    });
+
+    const medicineCalculation = calculation.medicines[0];
+
     // Generate claim number
     const claimNumber = await this.generateClaimNumber(dto.insuranceId);
 
@@ -51,9 +70,9 @@ export class InsuranceClaimsService {
         reservationId: dto.reservationId,
         quantity: dto.quantity,
         unitPrice: dto.unitPrice,
-        totalAmount: dto.totalAmount,
-        insuranceAmount: dto.insuranceAmount,
-        patientAmount: dto.patientAmount,
+        totalAmount: medicineCalculation.totalAmount,
+        insuranceAmount: medicineCalculation.insurancePays,
+        patientAmount: medicineCalculation.patientPays,
         notes: dto.notes,
         status: 'PENDING',
       },

@@ -5,6 +5,7 @@ import { RegisterDto } from './dto/register.dto';
 import { LoginDto } from './dto/login.dto';
 import { RefreshTokenDto } from './dto/refresh-token.dto';
 import { RegisterPharmacyDto } from './dto/register-pharmacy.dto';
+import { RegisterInsuranceDto } from './dto/register-insurance.dto';
 import { CreateStaffDto } from './dto/create-staff.dto';
 import { ChangePasswordDto } from './dto/change-password.dto';
 import { CreateManagedUserDto } from './dto/create-managed-user.dto';
@@ -34,6 +35,14 @@ export class AuthController {
   @ApiBody({ type: RegisterPharmacyDto })
   async registerPharmacy(@Body() registerPharmacyDto: RegisterPharmacyDto) {
     return this.authService.registerPharmacy(registerPharmacyDto);
+  }
+
+  @Public()
+  @Post('register-insurance')
+  @ApiOperation({ summary: 'Register a new insurance provider account' })
+  @ApiBody({ type: RegisterInsuranceDto })
+  async registerInsurance(@Body() registerInsuranceDto: RegisterInsuranceDto) {
+    return this.authService.registerInsurance(registerInsuranceDto);
   }
 
   @Public()

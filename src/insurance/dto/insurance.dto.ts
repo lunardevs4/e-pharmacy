@@ -448,3 +448,55 @@ export class InsuranceDashboardQueryDto {
   @IsUUID()
   pharmacyId?: string;
 }
+
+// Insurance Calculation DTOs
+export class MedicineCalculationDto {
+  @ApiProperty({ example: 'uuid-of-medicine' })
+  @IsUUID()
+  medicineId: string;
+
+  @ApiProperty({ example: 2 })
+  @IsInt()
+  @Min(1)
+  quantity: number;
+
+  @ApiProperty({ example: 5000.00 })
+  @IsNumber()
+  @Min(0)
+  unitPrice: number;
+}
+
+export class CalculatePaymentsDto {
+  @ApiProperty({ example: 'uuid-of-pharmacy' })
+  @IsUUID()
+  pharmacyId: string;
+
+  @ApiProperty({ example: 'uuid-of-insurance' })
+  @IsUUID()
+  insuranceId: string;
+
+  @ApiProperty({ type: [MedicineCalculationDto] })
+  @IsArray()
+  @Type(() => MedicineCalculationDto)
+  medicines: MedicineCalculationDto[];
+
+  @ApiPropertyOptional({ example: 'uuid-of-patient' })
+  @IsOptional()
+  @IsUUID()
+  patientId?: string;
+
+  @ApiPropertyOptional({ example: 'uuid-of-insured-patient' })
+  @IsOptional()
+  @IsUUID()
+  insuredPatientId?: string;
+}
+
+export class ValidatePatientInsuranceDto {
+  @ApiProperty({ example: 'uuid-of-patient' })
+  @IsUUID()
+  patientId: string;
+
+  @ApiProperty({ example: 'uuid-of-insurance' })
+  @IsUUID()
+  insuranceId: string;
+}

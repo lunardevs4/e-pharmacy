@@ -16,6 +16,7 @@ import { RegisterDto } from './dto/register.dto';
 import { LoginDto } from './dto/login.dto';
 import { RefreshTokenDto } from './dto/refresh-token.dto';
 import { RegisterPharmacyDto } from './dto/register-pharmacy.dto';
+import { RegisterInsuranceDto } from './dto/register-insurance.dto';
 import { CreateStaffDto } from './dto/create-staff.dto';
 import { ChangePasswordDto } from './dto/change-password.dto';
 import { CreateManagedUserDto } from './dto/create-managed-user.dto';
@@ -183,6 +184,95 @@ export class AuthService {
         role: owner.role,
         pharmacyId: pharmacy.id,
         firstLogin: true,
+      },
+    };
+  }
+
+  async registerInsurance(registerInsuranceDto: RegisterInsuranceDto) {
+    const safeDto = sanitizeDeep(registerInsuranceDto);
+    const prisma = this.prismaService.prisma;
+    const safeEmail = validateSafeString(safeDto.email, 'email', 255);
+    const safePhone = validateSafeString(safeDto.phone, 'phone', 30);
+
+    const existingUser = await prisma.user.findFirst({
+      where: { OR: [{ email: safeEmail }, { phone: safePhone }] },
+    });
+
+    if (existingUser) {
+      throw new ConflictException(
+        'A user with this email or phone already exists',
+      );
+    }
+
+    const hashedPassword = await bcrypt.hash(safeDto.password, 10);
+    const nameParts = (safeDto.fullname || '').split(' ');
+    const firstName = nameParts[0] || 'Insurance';
+    const lastName = nameParts.slice(1).join(' ') || 'Provider';
+
+    // Build a unique code from the company name if not explicitly provided
+    const code = safeDto.code
+      ? validateSafeString(safeDto.code, 'code', 20).toUpperCase()
+      : safeDto.fullname
+          .replace(/[^A-Za-z ]/g, '')
+          .split(' ')
+          .map((w: string) => w[0])
+          .join('')
+          .toUpperCase()
+          .slice(0, 10) || 'INS';
+
+    const result = await prisma.$transaction(async (tx) => {
+      const user = await tx.user.create({
+        data: {
+          email: safeEmail,
+          phone: safePhone,
+          password: hashedPassword,
+          firstName,
+          lastName,
+          role: UserRole.INSURANCE,
+          position: 'Insurance Administrator',
+          permissions: AUTH_PERMISSIONS.insurance || ['VIEW_CLAIMS', 'MANAGE_CLAIMS'],
+          firstLogin: false,
+          isActive: true,
+          emailVerified: true,
+        },
+      });
+
+      // Ensure the code is unique by appending a short suffix if needed
+      let uniqueCode = code;
+      const existing = await tx.insuranceProvider.findFirst({ where: { code } });
+      if (existing) {
+        uniqueCode = `${code}${Math.floor(Math.random() * 100)}`;
+      }
+
+      const provider = await tx.insuranceProvider.create({
+        data: {
+          userId: user.id,
+          name: safeDto.fullname,
+          code: uniqueCode,
+          email: safeEmail,
+          phone: safePhone,
+          defaultCoveragePercentage: 85.0,
+          defaultCopayPercentage: 15.0,
+          status: 'ACTIVE',
+          isActive: true,
+        },
+      });
+
+      return { user, provider };
+    });
+
+    return {
+      message: 'Insurance provider account created successfully',
+      user: {
+        id: result.user.id,
+        email: result.user.email,
+        role: result.user.role,
+        insuranceProviderId: result.provider.id,
+      },
+      provider: {
+        id: result.provider.id,
+        name: result.provider.name,
+        code: result.provider.code,
       },
     };
   }

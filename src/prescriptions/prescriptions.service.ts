@@ -93,22 +93,32 @@ export class PrescriptionsService {
     const pharmacy = await prisma.pharmacy.findUnique({ where: { id: safePharmacyId } });
     if (!pharmacy) throw new NotFoundException('Pharmacy not found');
 
-    if (user.role !== UserRole.PHARMACIST) {
-      throw new ForbiddenException('Only pharmacists can review and manage prescriptions');
+    if (user.role === UserRole.ADMIN) {
+      return { pharmacy, safePharmacyId };
     }
 
-    const employee = await prisma.pharmacyEmployee.findFirst({
-      where: {
-        pharmacyId: safePharmacyId,
-        userId: user.id,
-        role: UserRole.PHARMACIST,
-      },
-    });
-    if (!employee) {
-      throw new ForbiddenException('You are not employed as a pharmacist at this pharmacy');
+    if (user.role === UserRole.PHARMACY_OWNER || (user.role as string) === 'PHARMACY') {
+      if (pharmacy.ownerId !== user.id) {
+        throw new ForbiddenException('You do not own this pharmacy');
+      }
+      return { pharmacy, safePharmacyId };
     }
 
-    return { pharmacy, safePharmacyId };
+    if (user.role === UserRole.PHARMACIST) {
+      const employee = await prisma.pharmacyEmployee.findFirst({
+        where: {
+          pharmacyId: safePharmacyId,
+          userId: user.id,
+          role: UserRole.PHARMACIST,
+        },
+      });
+      if (!employee) {
+        throw new ForbiddenException('You are not employed as a pharmacist at this pharmacy');
+      }
+      return { pharmacy, safePharmacyId };
+    }
+
+    throw new ForbiddenException('Insufficient permissions to manage prescriptions for this pharmacy');
   }
 
   async findByPharmacy(pharmacyId: string, user: AuthenticatedUser) {

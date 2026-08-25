@@ -196,6 +196,16 @@ export class SearchService {
           pharmacyId,
         },
       },
+      include: {
+        insurance: {
+          select: {
+            id: true,
+            name: true,
+            code: true,
+            defaultCoveragePercentage: true,
+          },
+        },
+      },
     });
 
     if (!agreement || agreement.status !== 'ACTIVE') {
@@ -225,6 +235,8 @@ export class SearchService {
         insurancePays: 0,
         patientPays: retailPrice,
         message: 'Medicine not covered by insurance tariff',
+        insuranceName: agreement.insurance.name,
+        insuranceCode: agreement.insurance.code,
       };
     }
 
@@ -255,7 +267,9 @@ export class SearchService {
       copayPercentage: 100 - coveragePercentage,
       requiresPreAuth: tariff.requiresPreAuth,
       coveredPrice: Number(tariff.coveredPrice),
-      insuranceName: agreement.insuranceId, // Would need to join to get name
+      insuranceName: agreement.insurance.name,
+      insuranceCode: agreement.insurance.code,
+      insuranceId: agreement.insurance.id,
     };
   }
 }

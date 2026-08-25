@@ -1,5 +1,6 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, Req } from '@nestjs/common';
-import { ApiTags, ApiBearerAuth, ApiOperation, ApiBody, ApiParam } from '@nestjs/swagger';
+import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, Req, UseInterceptors, UploadedFile } from '@nestjs/common';
+import { ApiTags, ApiBearerAuth, ApiOperation, ApiBody, ApiParam, ApiConsumes } from '@nestjs/swagger';
+import { FileInterceptor } from '@nestjs/platform-express';
 import { InventoryService } from './inventory.service';
 import { CreateInventoryDto, UpdateInventoryDto } from './dto/inventory.dto';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
@@ -14,9 +15,9 @@ export class InventoryController {
   constructor(private inventoryService: InventoryService) { }
 
   @Post()
-  @Roles(UserRole.PHARMACIST)
+  @Roles(UserRole.PHARMACY_OWNER, UserRole.PHARMACY, UserRole.PHARMACIST, UserRole.ADMIN)
   @ApiOperation({
-    summary: 'Add medicine to inventory (pharmacist only)',
+    summary: 'Add medicine to inventory',
     description: 'Endpoint: POST /api/v1/pharmacies/:pharmacyId/inventory\n\nURL Parameters:\n- pharmacyId (UUID): The unique identifier of the pharmacy',
   })
   @ApiParam({ name: 'pharmacyId', type: 'string', description: 'Pharmacy UUID', example: '550e8400-e29b-41d4-a716-446655440000' })
@@ -69,9 +70,9 @@ export class InventoryController {
   }
 
   @Patch(':id')
-  @Roles(UserRole.PHARMACIST)
+  @Roles(UserRole.PHARMACY_OWNER, UserRole.PHARMACY, UserRole.PHARMACIST, UserRole.ADMIN)
   @ApiOperation({
-    summary: 'Update inventory item (pharmacist only)',
+    summary: 'Update inventory item',
     description: 'Endpoint: PATCH /api/v1/pharmacies/:pharmacyId/inventory/:id\n\nURL Parameters:\n- pharmacyId (UUID): The unique identifier of the pharmacy\n- id (UUID): The unique identifier of the inventory item',
   })
   @ApiParam({ name: 'pharmacyId', type: 'string', description: 'Pharmacy UUID', example: '550e8400-e29b-41d4-a716-446655440000' })
@@ -105,14 +106,42 @@ export class InventoryController {
   }
 
   @Delete(':id')
-  @Roles(UserRole.PHARMACIST)
+  @Roles(UserRole.PHARMACY_OWNER, UserRole.PHARMACY, UserRole.PHARMACIST, UserRole.ADMIN)
   @ApiOperation({
-    summary: 'Remove inventory item (pharmacist only)',
+    summary: 'Remove inventory item',
     description: 'Endpoint: DELETE /api/v1/pharmacies/:pharmacyId/inventory/:id\n\nURL Parameters:\n- pharmacyId (UUID): The unique identifier of the pharmacy\n- id (UUID): The unique identifier of the inventory item to remove',
   })
   @ApiParam({ name: 'pharmacyId', type: 'string', description: 'Pharmacy UUID', example: '550e8400-e29b-41d4-a716-446655440000' })
   @ApiParam({ name: 'id', type: 'string', description: 'Inventory item UUID', example: '550e8400-e29b-41d4-a716-446655440001' })
   remove(@Param('id') id: string, @Param('pharmacyId') pharmacyId: string, @Req() req: any) {
     return this.inventoryService.remove(id, pharmacyId, req.user);
+  }
+
+  @Post('import')
+  @Roles(UserRole.PHARMACY_OWNER, UserRole.PHARMACY, UserRole.PHARMACIST, UserRole.ADMIN)
+  @UseInterceptors(FileInterceptor('file'))
+  @ApiConsumes('multipart/form-data')
+  @ApiOperation({
+    summary: 'Import inventory from CSV or Excel file',
+    description: 'Endpoint: POST /api/v1/pharmacies/:pharmacyId/inventory/import\n\nSupported formats: CSV, Excel (.xlsx)\n\nRequired columns: tradeName, quantity, price\n\nOptional columns: genericName, category, manufacturer, batchNumber, lotNumber, expiryDate, unitCost',
+  })
+  @ApiParam({ name: 'pharmacyId', type: 'string', description: 'Pharmacy UUID', example: '550e8400-e29b-41d4-a716-446655440000' })
+  @ApiBody({
+    schema: {
+      type: 'object',
+      properties: {
+        file: {
+          type: 'string',
+          format: 'binary',
+        },
+      },
+    },
+  })
+  async importInventory(
+    @Param('pharmacyId') pharmacyId: string,
+    @Req() req: any,
+    @UploadedFile() file: Express.Multer.File,
+  ) {
+    return this.inventoryService.importInventory(pharmacyId, req.user, file.buffer, file.mimetype);
   }
 }
