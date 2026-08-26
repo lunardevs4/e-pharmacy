@@ -57,7 +57,11 @@ export class ReportsService {
           pharmacyId: safePharmacyId,
           ...(Object.keys(dateFilter).length > 0 ? { createdAt: dateFilter } : {}),
         },
-        include: { medicine: true },
+        include: {
+          medicine: true,
+          patient: { include: { user: true } },
+        },
+        orderBy: { createdAt: 'desc' },
       }),
       prisma.inventory.aggregate({
         where: { pharmacyId: safePharmacyId },
