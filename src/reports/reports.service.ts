@@ -157,8 +157,12 @@ export class ReportsService {
     const safeStartDate = startDate ? validateDate(startDate, 'startDate') : undefined;
     const safeEndDate = endDate ? validateDate(endDate, 'endDate') : undefined;
 
-    const patient = await prisma.patient.findFirst({ where: { userId: safeUserId } });
-    if (!patient) throw new NotFoundException('Patient profile not found');
+    // Auto-provision patient profile like reservations service does
+    const patient = await prisma.patient.upsert({
+      where: { userId: safeUserId },
+      update: {},
+      create: { userId: safeUserId },
+    });
 
     const dateFilter: any = {};
     if (safeStartDate) dateFilter.gte = safeStartDate;

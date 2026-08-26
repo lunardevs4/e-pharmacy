@@ -312,6 +312,7 @@ export class AuthService {
       include: {
         pharmacyOwner: { include: { pharmacy: true } },
         pharmacyEmployees: { include: { pharmacy: true } },
+        insuranceProvider: true,
       },
     });
 
@@ -354,6 +355,7 @@ export class AuthService {
         pharmacyId: pharmacyContext.pharmacyId,
         firstLogin: user.firstLogin,
         pharmacy: pharmacyContext.pharmacy,
+        insuranceProvider: user.insuranceProvider ? user.insuranceProvider.name : null,
       },
       ...tokens,
     };
