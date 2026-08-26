@@ -25,6 +25,7 @@ export type AggregatePatient = {
 }
 
 export type PatientMinAggregateOutputType = {
+  insuranceProvider: string | null
   id: string | null
   userId: string | null
   medicalProfile: string | null
@@ -36,6 +37,7 @@ export type PatientMinAggregateOutputType = {
 }
 
 export type PatientMaxAggregateOutputType = {
+  insuranceProvider: string | null
   id: string | null
   userId: string | null
   medicalProfile: string | null
@@ -47,6 +49,7 @@ export type PatientMaxAggregateOutputType = {
 }
 
 export type PatientCountAggregateOutputType = {
+  insuranceProvider: number
   id: number
   userId: number
   medicalProfile: number
@@ -60,6 +63,7 @@ export type PatientCountAggregateOutputType = {
 
 
 export type PatientMinAggregateInputType = {
+  insuranceProvider?: true
   id?: true
   userId?: true
   medicalProfile?: true
@@ -71,6 +75,7 @@ export type PatientMinAggregateInputType = {
 }
 
 export type PatientMaxAggregateInputType = {
+  insuranceProvider?: true
   id?: true
   userId?: true
   medicalProfile?: true
@@ -82,6 +87,7 @@ export type PatientMaxAggregateInputType = {
 }
 
 export type PatientCountAggregateInputType = {
+  insuranceProvider?: true
   id?: true
   userId?: true
   medicalProfile?: true
@@ -166,6 +172,7 @@ export type PatientGroupByArgs<ExtArgs extends runtime.Types.Extensions.Internal
 }
 
 export type PatientGroupByOutputType = {
+  insuranceProvider: string | null
   id: string
   userId: string
   medicalProfile: string | null
@@ -198,6 +205,7 @@ export type PatientWhereInput = {
   AND?: Prisma.PatientWhereInput | Prisma.PatientWhereInput[]
   OR?: Prisma.PatientWhereInput[]
   NOT?: Prisma.PatientWhereInput | Prisma.PatientWhereInput[]
+  insuranceProvider?: Prisma.StringNullableFilter<"Patient"> | string | null
   id?: Prisma.StringFilter<"Patient"> | string
   userId?: Prisma.StringFilter<"Patient"> | string
   medicalProfile?: Prisma.StringNullableFilter<"Patient"> | string | null
@@ -216,6 +224,7 @@ export type PatientWhereInput = {
 }
 
 export type PatientOrderByWithRelationInput = {
+  insuranceProvider?: Prisma.SortOrderInput | Prisma.SortOrder
   id?: Prisma.SortOrder
   userId?: Prisma.SortOrder
   medicalProfile?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -239,6 +248,7 @@ export type PatientWhereUniqueInput = Prisma.AtLeast<{
   AND?: Prisma.PatientWhereInput | Prisma.PatientWhereInput[]
   OR?: Prisma.PatientWhereInput[]
   NOT?: Prisma.PatientWhereInput | Prisma.PatientWhereInput[]
+  insuranceProvider?: Prisma.StringNullableFilter<"Patient"> | string | null
   medicalProfile?: Prisma.StringNullableFilter<"Patient"> | string | null
   address?: Prisma.StringNullableFilter<"Patient"> | string | null
   dateOfBirth?: Prisma.DateTimeNullableFilter<"Patient"> | Date | string | null
@@ -255,6 +265,7 @@ export type PatientWhereUniqueInput = Prisma.AtLeast<{
 }, "id" | "userId">
 
 export type PatientOrderByWithAggregationInput = {
+  insuranceProvider?: Prisma.SortOrderInput | Prisma.SortOrder
   id?: Prisma.SortOrder
   userId?: Prisma.SortOrder
   medicalProfile?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -272,6 +283,7 @@ export type PatientScalarWhereWithAggregatesInput = {
   AND?: Prisma.PatientScalarWhereWithAggregatesInput | Prisma.PatientScalarWhereWithAggregatesInput[]
   OR?: Prisma.PatientScalarWhereWithAggregatesInput[]
   NOT?: Prisma.PatientScalarWhereWithAggregatesInput | Prisma.PatientScalarWhereWithAggregatesInput[]
+  insuranceProvider?: Prisma.StringNullableWithAggregatesFilter<"Patient"> | string | null
   id?: Prisma.StringWithAggregatesFilter<"Patient"> | string
   userId?: Prisma.StringWithAggregatesFilter<"Patient"> | string
   medicalProfile?: Prisma.StringNullableWithAggregatesFilter<"Patient"> | string | null
@@ -283,6 +295,7 @@ export type PatientScalarWhereWithAggregatesInput = {
 }
 
 export type PatientCreateInput = {
+  insuranceProvider?: string | null
   id?: string
   medicalProfile?: string | null
   address?: string | null
@@ -300,6 +313,7 @@ export type PatientCreateInput = {
 }
 
 export type PatientUncheckedCreateInput = {
+  insuranceProvider?: string | null
   id?: string
   userId: string
   medicalProfile?: string | null
@@ -317,6 +331,7 @@ export type PatientUncheckedCreateInput = {
 }
 
 export type PatientUpdateInput = {
+  insuranceProvider?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   id?: Prisma.StringFieldUpdateOperationsInput | string
   medicalProfile?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -334,6 +349,7 @@ export type PatientUpdateInput = {
 }
 
 export type PatientUncheckedUpdateInput = {
+  insuranceProvider?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   id?: Prisma.StringFieldUpdateOperationsInput | string
   userId?: Prisma.StringFieldUpdateOperationsInput | string
   medicalProfile?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -351,6 +367,7 @@ export type PatientUncheckedUpdateInput = {
 }
 
 export type PatientCreateManyInput = {
+  insuranceProvider?: string | null
   id?: string
   userId: string
   medicalProfile?: string | null
@@ -362,6 +379,7 @@ export type PatientCreateManyInput = {
 }
 
 export type PatientUpdateManyMutationInput = {
+  insuranceProvider?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   id?: Prisma.StringFieldUpdateOperationsInput | string
   medicalProfile?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -372,6 +390,7 @@ export type PatientUpdateManyMutationInput = {
 }
 
 export type PatientUncheckedUpdateManyInput = {
+  insuranceProvider?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   id?: Prisma.StringFieldUpdateOperationsInput | string
   userId?: Prisma.StringFieldUpdateOperationsInput | string
   medicalProfile?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -388,6 +407,7 @@ export type PatientNullableScalarRelationFilter = {
 }
 
 export type PatientCountOrderByAggregateInput = {
+  insuranceProvider?: Prisma.SortOrder
   id?: Prisma.SortOrder
   userId?: Prisma.SortOrder
   medicalProfile?: Prisma.SortOrder
@@ -399,6 +419,7 @@ export type PatientCountOrderByAggregateInput = {
 }
 
 export type PatientMaxOrderByAggregateInput = {
+  insuranceProvider?: Prisma.SortOrder
   id?: Prisma.SortOrder
   userId?: Prisma.SortOrder
   medicalProfile?: Prisma.SortOrder
@@ -410,6 +431,7 @@ export type PatientMaxOrderByAggregateInput = {
 }
 
 export type PatientMinOrderByAggregateInput = {
+  insuranceProvider?: Prisma.SortOrder
   id?: Prisma.SortOrder
   userId?: Prisma.SortOrder
   medicalProfile?: Prisma.SortOrder
@@ -546,6 +568,7 @@ export type PatientUpdateOneWithoutInsuranceClaimsNestedInput = {
 }
 
 export type PatientCreateWithoutUserInput = {
+  insuranceProvider?: string | null
   id?: string
   medicalProfile?: string | null
   address?: string | null
@@ -562,6 +585,7 @@ export type PatientCreateWithoutUserInput = {
 }
 
 export type PatientUncheckedCreateWithoutUserInput = {
+  insuranceProvider?: string | null
   id?: string
   medicalProfile?: string | null
   address?: string | null
@@ -594,6 +618,7 @@ export type PatientUpdateToOneWithWhereWithoutUserInput = {
 }
 
 export type PatientUpdateWithoutUserInput = {
+  insuranceProvider?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   id?: Prisma.StringFieldUpdateOperationsInput | string
   medicalProfile?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -610,6 +635,7 @@ export type PatientUpdateWithoutUserInput = {
 }
 
 export type PatientUncheckedUpdateWithoutUserInput = {
+  insuranceProvider?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   id?: Prisma.StringFieldUpdateOperationsInput | string
   medicalProfile?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -626,6 +652,7 @@ export type PatientUncheckedUpdateWithoutUserInput = {
 }
 
 export type PatientCreateWithoutReservationsInput = {
+  insuranceProvider?: string | null
   id?: string
   medicalProfile?: string | null
   address?: string | null
@@ -642,6 +669,7 @@ export type PatientCreateWithoutReservationsInput = {
 }
 
 export type PatientUncheckedCreateWithoutReservationsInput = {
+  insuranceProvider?: string | null
   id?: string
   userId: string
   medicalProfile?: string | null
@@ -674,6 +702,7 @@ export type PatientUpdateToOneWithWhereWithoutReservationsInput = {
 }
 
 export type PatientUpdateWithoutReservationsInput = {
+  insuranceProvider?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   id?: Prisma.StringFieldUpdateOperationsInput | string
   medicalProfile?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -690,6 +719,7 @@ export type PatientUpdateWithoutReservationsInput = {
 }
 
 export type PatientUncheckedUpdateWithoutReservationsInput = {
+  insuranceProvider?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   id?: Prisma.StringFieldUpdateOperationsInput | string
   userId?: Prisma.StringFieldUpdateOperationsInput | string
   medicalProfile?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -706,6 +736,7 @@ export type PatientUncheckedUpdateWithoutReservationsInput = {
 }
 
 export type PatientCreateWithoutPrescriptionsInput = {
+  insuranceProvider?: string | null
   id?: string
   medicalProfile?: string | null
   address?: string | null
@@ -722,6 +753,7 @@ export type PatientCreateWithoutPrescriptionsInput = {
 }
 
 export type PatientUncheckedCreateWithoutPrescriptionsInput = {
+  insuranceProvider?: string | null
   id?: string
   userId: string
   medicalProfile?: string | null
@@ -754,6 +786,7 @@ export type PatientUpdateToOneWithWhereWithoutPrescriptionsInput = {
 }
 
 export type PatientUpdateWithoutPrescriptionsInput = {
+  insuranceProvider?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   id?: Prisma.StringFieldUpdateOperationsInput | string
   medicalProfile?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -770,6 +803,7 @@ export type PatientUpdateWithoutPrescriptionsInput = {
 }
 
 export type PatientUncheckedUpdateWithoutPrescriptionsInput = {
+  insuranceProvider?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   id?: Prisma.StringFieldUpdateOperationsInput | string
   userId?: Prisma.StringFieldUpdateOperationsInput | string
   medicalProfile?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -786,6 +820,7 @@ export type PatientUncheckedUpdateWithoutPrescriptionsInput = {
 }
 
 export type PatientCreateWithoutReminderSchedulesInput = {
+  insuranceProvider?: string | null
   id?: string
   medicalProfile?: string | null
   address?: string | null
@@ -802,6 +837,7 @@ export type PatientCreateWithoutReminderSchedulesInput = {
 }
 
 export type PatientUncheckedCreateWithoutReminderSchedulesInput = {
+  insuranceProvider?: string | null
   id?: string
   userId: string
   medicalProfile?: string | null
@@ -834,6 +870,7 @@ export type PatientUpdateToOneWithWhereWithoutReminderSchedulesInput = {
 }
 
 export type PatientUpdateWithoutReminderSchedulesInput = {
+  insuranceProvider?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   id?: Prisma.StringFieldUpdateOperationsInput | string
   medicalProfile?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -850,6 +887,7 @@ export type PatientUpdateWithoutReminderSchedulesInput = {
 }
 
 export type PatientUncheckedUpdateWithoutReminderSchedulesInput = {
+  insuranceProvider?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   id?: Prisma.StringFieldUpdateOperationsInput | string
   userId?: Prisma.StringFieldUpdateOperationsInput | string
   medicalProfile?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -866,6 +904,7 @@ export type PatientUncheckedUpdateWithoutReminderSchedulesInput = {
 }
 
 export type PatientCreateWithoutReminderLogsInput = {
+  insuranceProvider?: string | null
   id?: string
   medicalProfile?: string | null
   address?: string | null
@@ -882,6 +921,7 @@ export type PatientCreateWithoutReminderLogsInput = {
 }
 
 export type PatientUncheckedCreateWithoutReminderLogsInput = {
+  insuranceProvider?: string | null
   id?: string
   userId: string
   medicalProfile?: string | null
@@ -914,6 +954,7 @@ export type PatientUpdateToOneWithWhereWithoutReminderLogsInput = {
 }
 
 export type PatientUpdateWithoutReminderLogsInput = {
+  insuranceProvider?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   id?: Prisma.StringFieldUpdateOperationsInput | string
   medicalProfile?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -930,6 +971,7 @@ export type PatientUpdateWithoutReminderLogsInput = {
 }
 
 export type PatientUncheckedUpdateWithoutReminderLogsInput = {
+  insuranceProvider?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   id?: Prisma.StringFieldUpdateOperationsInput | string
   userId?: Prisma.StringFieldUpdateOperationsInput | string
   medicalProfile?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -946,6 +988,7 @@ export type PatientUncheckedUpdateWithoutReminderLogsInput = {
 }
 
 export type PatientCreateWithoutInsuredPoliciesInput = {
+  insuranceProvider?: string | null
   id?: string
   medicalProfile?: string | null
   address?: string | null
@@ -962,6 +1005,7 @@ export type PatientCreateWithoutInsuredPoliciesInput = {
 }
 
 export type PatientUncheckedCreateWithoutInsuredPoliciesInput = {
+  insuranceProvider?: string | null
   id?: string
   userId: string
   medicalProfile?: string | null
@@ -994,6 +1038,7 @@ export type PatientUpdateToOneWithWhereWithoutInsuredPoliciesInput = {
 }
 
 export type PatientUpdateWithoutInsuredPoliciesInput = {
+  insuranceProvider?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   id?: Prisma.StringFieldUpdateOperationsInput | string
   medicalProfile?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1010,6 +1055,7 @@ export type PatientUpdateWithoutInsuredPoliciesInput = {
 }
 
 export type PatientUncheckedUpdateWithoutInsuredPoliciesInput = {
+  insuranceProvider?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   id?: Prisma.StringFieldUpdateOperationsInput | string
   userId?: Prisma.StringFieldUpdateOperationsInput | string
   medicalProfile?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1026,6 +1072,7 @@ export type PatientUncheckedUpdateWithoutInsuredPoliciesInput = {
 }
 
 export type PatientCreateWithoutInsuranceClaimsInput = {
+  insuranceProvider?: string | null
   id?: string
   medicalProfile?: string | null
   address?: string | null
@@ -1042,6 +1089,7 @@ export type PatientCreateWithoutInsuranceClaimsInput = {
 }
 
 export type PatientUncheckedCreateWithoutInsuranceClaimsInput = {
+  insuranceProvider?: string | null
   id?: string
   userId: string
   medicalProfile?: string | null
@@ -1074,6 +1122,7 @@ export type PatientUpdateToOneWithWhereWithoutInsuranceClaimsInput = {
 }
 
 export type PatientUpdateWithoutInsuranceClaimsInput = {
+  insuranceProvider?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   id?: Prisma.StringFieldUpdateOperationsInput | string
   medicalProfile?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1090,6 +1139,7 @@ export type PatientUpdateWithoutInsuranceClaimsInput = {
 }
 
 export type PatientUncheckedUpdateWithoutInsuranceClaimsInput = {
+  insuranceProvider?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   id?: Prisma.StringFieldUpdateOperationsInput | string
   userId?: Prisma.StringFieldUpdateOperationsInput | string
   medicalProfile?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1182,6 +1232,7 @@ export type PatientCountOutputTypeCountReminderLogsArgs<ExtArgs extends runtime.
 
 
 export type PatientSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
+  insuranceProvider?: boolean
   id?: boolean
   userId?: boolean
   medicalProfile?: boolean
@@ -1201,6 +1252,7 @@ export type PatientSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs 
 }, ExtArgs["result"]["patient"]>
 
 export type PatientSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
+  insuranceProvider?: boolean
   id?: boolean
   userId?: boolean
   medicalProfile?: boolean
@@ -1213,6 +1265,7 @@ export type PatientSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Exten
 }, ExtArgs["result"]["patient"]>
 
 export type PatientSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
+  insuranceProvider?: boolean
   id?: boolean
   userId?: boolean
   medicalProfile?: boolean
@@ -1225,6 +1278,7 @@ export type PatientSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Exten
 }, ExtArgs["result"]["patient"]>
 
 export type PatientSelectScalar = {
+  insuranceProvider?: boolean
   id?: boolean
   userId?: boolean
   medicalProfile?: boolean
@@ -1235,7 +1289,7 @@ export type PatientSelectScalar = {
   updatedAt?: boolean
 }
 
-export type PatientOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "userId" | "medicalProfile" | "address" | "dateOfBirth" | "gender" | "createdAt" | "updatedAt", ExtArgs["result"]["patient"]>
+export type PatientOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"insuranceProvider" | "id" | "userId" | "medicalProfile" | "address" | "dateOfBirth" | "gender" | "createdAt" | "updatedAt", ExtArgs["result"]["patient"]>
 export type PatientInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
   reservations?: boolean | Prisma.Patient$reservationsArgs<ExtArgs>
@@ -1265,6 +1319,7 @@ export type $PatientPayload<ExtArgs extends runtime.Types.Extensions.InternalArg
     reminderLogs: Prisma.$ReminderLogPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
+    insuranceProvider: string | null
     id: string
     userId: string
     medicalProfile: string | null
@@ -1356,8 +1411,8 @@ export interface PatientDelegate<ExtArgs extends runtime.Types.Extensions.Intern
    * // Get first 10 Patients
    * const patients = await prisma.patient.findMany({ take: 10 })
    * 
-   * // Only select the `id`
-   * const patientWithIdOnly = await prisma.patient.findMany({ select: { id: true } })
+   * // Only select the `insuranceProvider`
+   * const patientWithInsuranceProviderOnly = await prisma.patient.findMany({ select: { insuranceProvider: true } })
    * 
    */
   findMany<T extends PatientFindManyArgs>(args?: Prisma.SelectSubset<T, PatientFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$PatientPayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
@@ -1401,9 +1456,9 @@ export interface PatientDelegate<ExtArgs extends runtime.Types.Extensions.Intern
    *   ]
    * })
    * 
-   * // Create many Patients and only return the `id`
-   * const patientWithIdOnly = await prisma.patient.createManyAndReturn({
-   *   select: { id: true },
+   * // Create many Patients and only return the `insuranceProvider`
+   * const patientWithInsuranceProviderOnly = await prisma.patient.createManyAndReturn({
+   *   select: { insuranceProvider: true },
    *   data: [
    *     // ... provide data here
    *   ]
@@ -1492,9 +1547,9 @@ export interface PatientDelegate<ExtArgs extends runtime.Types.Extensions.Intern
    *   ]
    * })
    * 
-   * // Update zero or more Patients and only return the `id`
-   * const patientWithIdOnly = await prisma.patient.updateManyAndReturn({
-   *   select: { id: true },
+   * // Update zero or more Patients and only return the `insuranceProvider`
+   * const patientWithInsuranceProviderOnly = await prisma.patient.updateManyAndReturn({
+   *   select: { insuranceProvider: true },
    *   where: {
    *     // ... provide filter here
    *   },
@@ -1703,6 +1758,7 @@ export interface Prisma__PatientClient<T, Null = never, ExtArgs extends runtime.
  * Fields of the Patient model
  */
 export interface PatientFieldRefs {
+  readonly insuranceProvider: Prisma.FieldRef<"Patient", 'String'>
   readonly id: Prisma.FieldRef<"Patient", 'String'>
   readonly userId: Prisma.FieldRef<"Patient", 'String'>
   readonly medicalProfile: Prisma.FieldRef<"Patient", 'String'>

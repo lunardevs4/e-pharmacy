@@ -55,18 +55,20 @@ export class UsersService {
     const prisma = this.prismaService.prisma;
     const safeUserId = validateUuid(userId, 'userId');
     const safeDto = sanitizeDeep(updateUserDto);
-    return prisma.user.update({
-      where: { id: safeUserId },
-      data: safeDto,
-      select: {
-        id: true,
-        email: true,
-        phone: true,
-        firstName: true,
-        lastName: true,
-        role: true,
-      },
+    const { insuranceProvider, ...userFields } = safeDto;
+
+    await prisma.$transaction(async (tx) => {
+      await tx.user.update({ where: { id: safeUserId }, data: userFields });
+
+      if (insuranceProvider !== undefined) {
+        await tx.patient.update({
+          where: { userId: safeUserId },
+          data: { insuranceProvider: insuranceProvider || null },
+        });
+      }
     });
+
+    return this.getProfile(safeUserId);
   }
 
   async softDelete(userId: string) {

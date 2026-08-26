@@ -170,6 +170,8 @@ export class MedicinesService {
             }
           : {}),
       },
+      // Keep the catalogue deterministic and put newly registered medicines first.
+      orderBy: { createdAt: 'desc' },
       include: { category: true, manufacturer: true },
     });
   }

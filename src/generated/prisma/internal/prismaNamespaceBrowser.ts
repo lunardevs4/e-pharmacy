@@ -130,6 +130,7 @@ export type RefreshTokenScalarFieldEnum = (typeof RefreshTokenScalarFieldEnum)[k
 
 
 export const PatientScalarFieldEnum = {
+  insuranceProvider: 'insuranceProvider',
   id: 'id',
   userId: 'userId',
   medicalProfile: 'medicalProfile',

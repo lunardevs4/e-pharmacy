@@ -6,6 +6,52 @@ import { CreatePharmacyAgreementDto, UpdatePharmacyAgreementDto } from './dto/in
 export class InsurancePharmaciesService {
   constructor(private prismaService: PrismaService) {}
 
+  async getPharmacyInsuranceOptions(pharmacyId: string) {
+    const prisma = this.prismaService.prisma;
+    const [providers, agreements] = await Promise.all([
+      prisma.insuranceProvider.findMany({
+        where: { isActive: true, status: 'ACTIVE' },
+        select: { id: true, name: true, code: true, logoUrl: true },
+        orderBy: { name: 'asc' },
+      }),
+      prisma.pharmacyInsuranceAgreement.findMany({
+        where: { pharmacyId },
+        select: { id: true, insuranceId: true, status: true, contractNumber: true, discountRate: true, customCoverageRate: true, startDate: true, endDate: true },
+      }),
+    ]);
+
+    const agreementByProvider = new Map(agreements.map((agreement) => [agreement.insuranceId, agreement]));
+    return providers.map((provider) => ({
+      provider,
+      agreement: agreementByProvider.get(provider.id) || null,
+      enabled: agreementByProvider.get(provider.id)?.status === 'ACTIVE',
+    }));
+  }
+
+  async setPharmacyInsurance(pharmacyId: string, insuranceId: string, enabled: boolean, userId: string) {
+    const prisma = this.prismaService.prisma;
+    const pharmacy = await prisma.pharmacy.findUnique({ where: { id: pharmacyId }, select: { id: true, ownerId: true } });
+    if (!pharmacy) throw new NotFoundException('Pharmacy not found');
+    if (pharmacy.ownerId !== userId) throw new BadRequestException('Only the pharmacy owner can manage insurance agreements');
+
+    const provider = await prisma.insuranceProvider.findUnique({ where: { id: insuranceId }, select: { id: true } });
+    if (!provider) throw new NotFoundException('Insurance provider not found');
+
+    return prisma.pharmacyInsuranceAgreement.upsert({
+      where: { insuranceId_pharmacyId: { insuranceId, pharmacyId } },
+      create: {
+        insuranceId,
+        pharmacyId,
+        contractNumber: `PHARMACY-${pharmacyId.slice(0, 8)}-${insuranceId.slice(0, 8)}`,
+        discountRate: 0,
+        status: enabled ? 'ACTIVE' : 'INACTIVE',
+        startDate: new Date(),
+      },
+      update: { status: enabled ? 'ACTIVE' : 'INACTIVE' },
+      include: { insurance: { select: { id: true, name: true, code: true } } },
+    });
+  }
+
   async createAgreement(dto: CreatePharmacyAgreementDto) {
     const prisma = this.prismaService.prisma;
 

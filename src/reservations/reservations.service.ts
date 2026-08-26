@@ -236,7 +236,7 @@ export class ReservationsService {
       user,
     );
 
-    return prisma.reservation.findMany({
+    const reservations = await prisma.reservation.findMany({
       where: { pharmacyId: safePharmacyId },
       include: {
         patient: { include: { user: true } },
@@ -244,6 +244,80 @@ export class ReservationsService {
       },
       orderBy: { createdAt: 'desc' },
     });
+
+    // Reservations intentionally keep stock prices in Inventory rather than
+    // duplicating them. Enrich the pharmacy response with the current total
+    // and the patient's actual co-pay so the portal does not display zero.
+    const inventory = await prisma.inventory.findMany({
+      where: {
+        pharmacyId: safePharmacyId,
+        medicineId: { in: reservations.map((reservation) => reservation.medicineId) },
+        deletedAt: null,
+      },
+      select: { medicineId: true, price: true },
+    });
+
+    return Promise.all(
+      reservations.map(async (reservation) => {
+        const stock = inventory.find((item) => item.medicineId === reservation.medicineId);
+        const unitPrice = stock ? Number(stock.price) : 0;
+        const totalPrice = unitPrice * reservation.quantity;
+        const providerName = reservation.patient.insuranceProvider?.trim();
+
+        let insurancePays = 0;
+        if (providerName && totalPrice > 0) {
+          const provider = await prisma.insuranceProvider.findFirst({
+            where: {
+              OR: [
+                { code: providerName },
+                { name: providerName },
+              ],
+              isActive: true,
+            },
+          });
+
+          if (provider) {
+            const agreement = await prisma.pharmacyInsuranceAgreement.findUnique({
+              where: {
+                insuranceId_pharmacyId: {
+                  insuranceId: provider.id,
+                  pharmacyId: safePharmacyId,
+                },
+              },
+            });
+            const tariff = await prisma.insuranceMedicineTariff.findUnique({
+              where: {
+                insuranceId_medicineId: {
+                  insuranceId: provider.id,
+                  medicineId: reservation.medicineId,
+                },
+              },
+            });
+
+            if (agreement?.status === 'ACTIVE' && tariff?.status === 'ACTIVE' && tariff.isCovered) {
+              const coveragePercentage = agreement.customCoverageRate
+                ? Number(agreement.customCoverageRate)
+                : Number(tariff.coveragePercentage);
+              const coveredBase = Number(tariff.coveredPrice) > 0
+                ? Math.min(unitPrice, Number(tariff.coveredPrice)) * reservation.quantity
+                : totalPrice;
+              insurancePays = tariff.fixedCopayAmount
+                ? Math.max(0, totalPrice - Number(tariff.fixedCopayAmount) * reservation.quantity)
+                : coveredBase * (coveragePercentage / 100);
+            }
+          }
+        }
+
+        return {
+          ...reservation,
+          insuranceProvider: providerName || null,
+          unitPrice,
+          totalPrice,
+          insurancePays: Math.round(insurancePays * 100) / 100,
+          patientPays: Math.round((totalPrice - insurancePays) * 100) / 100,
+        };
+      }),
+    );
   }
 
   async updatePharmacyStatus(

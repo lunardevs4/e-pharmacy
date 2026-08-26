@@ -134,6 +134,24 @@ export class InsuranceDashboardController {
     return this.pharmaciesService.getAgreements(insuranceId, pharmacyId, status);
   }
 
+  @Get('pharmacy/insurances')
+  @Roles(UserRole.PHARMACY, UserRole.PHARMACY_OWNER, UserRole.PHARMACIST)
+  @ApiOperation({ summary: 'List insurance providers and this pharmacy\'s agreements' })
+  async getPharmacyInsuranceOptions(@Req() req: any) {
+    return this.pharmaciesService.getPharmacyInsuranceOptions(req.user.pharmacyId);
+  }
+
+  @Patch('pharmacy/insurances/:insuranceId')
+  @Roles(UserRole.PHARMACY, UserRole.PHARMACY_OWNER)
+  @ApiOperation({ summary: 'Enable or disable an insurance agreement for this pharmacy' })
+  async setPharmacyInsurance(
+    @Param('insuranceId') insuranceId: string,
+    @Body('enabled') enabled: boolean,
+    @Req() req: any,
+  ) {
+    return this.pharmaciesService.setPharmacyInsurance(req.user.pharmacyId, insuranceId, Boolean(enabled), req.user.id);
+  }
+
   @Get('pharmacies/agreements/:id')
   @Roles(UserRole.INSURANCE, UserRole.ADMIN)
   @ApiOperation({ summary: 'Get agreement by ID' })

@@ -99,6 +99,7 @@ model RefreshToken {
 }
 
 model Patient {
+  insuranceProvider String?
   id               String        @id @default(uuid())
   userId           String        @unique
   medicalProfile   String?
