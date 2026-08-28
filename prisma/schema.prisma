@@ -106,6 +106,15 @@ model Patient {
   address          String?
   dateOfBirth      DateTime?
   gender           String?
+  province         String?
+  district         String?
+  sector           String?
+  cell             String?
+  village          String?
+  emergencyContact String?
+  preferredPharmacy String?
+  medicalNotes     String?
+  profilePhoto     String?
   createdAt        DateTime      @default(now())
   updatedAt        DateTime      @updatedAt
 

@@ -32,6 +32,15 @@ export type PatientMinAggregateOutputType = {
   address: string | null
   dateOfBirth: Date | null
   gender: string | null
+  province: string | null
+  district: string | null
+  sector: string | null
+  cell: string | null
+  village: string | null
+  emergencyContact: string | null
+  preferredPharmacy: string | null
+  medicalNotes: string | null
+  profilePhoto: string | null
   createdAt: Date | null
   updatedAt: Date | null
 }
@@ -44,6 +53,15 @@ export type PatientMaxAggregateOutputType = {
   address: string | null
   dateOfBirth: Date | null
   gender: string | null
+  province: string | null
+  district: string | null
+  sector: string | null
+  cell: string | null
+  village: string | null
+  emergencyContact: string | null
+  preferredPharmacy: string | null
+  medicalNotes: string | null
+  profilePhoto: string | null
   createdAt: Date | null
   updatedAt: Date | null
 }
@@ -56,6 +74,15 @@ export type PatientCountAggregateOutputType = {
   address: number
   dateOfBirth: number
   gender: number
+  province: number
+  district: number
+  sector: number
+  cell: number
+  village: number
+  emergencyContact: number
+  preferredPharmacy: number
+  medicalNotes: number
+  profilePhoto: number
   createdAt: number
   updatedAt: number
   _all: number
@@ -70,6 +97,15 @@ export type PatientMinAggregateInputType = {
   address?: true
   dateOfBirth?: true
   gender?: true
+  province?: true
+  district?: true
+  sector?: true
+  cell?: true
+  village?: true
+  emergencyContact?: true
+  preferredPharmacy?: true
+  medicalNotes?: true
+  profilePhoto?: true
   createdAt?: true
   updatedAt?: true
 }
@@ -82,6 +118,15 @@ export type PatientMaxAggregateInputType = {
   address?: true
   dateOfBirth?: true
   gender?: true
+  province?: true
+  district?: true
+  sector?: true
+  cell?: true
+  village?: true
+  emergencyContact?: true
+  preferredPharmacy?: true
+  medicalNotes?: true
+  profilePhoto?: true
   createdAt?: true
   updatedAt?: true
 }
@@ -94,6 +139,15 @@ export type PatientCountAggregateInputType = {
   address?: true
   dateOfBirth?: true
   gender?: true
+  province?: true
+  district?: true
+  sector?: true
+  cell?: true
+  village?: true
+  emergencyContact?: true
+  preferredPharmacy?: true
+  medicalNotes?: true
+  profilePhoto?: true
   createdAt?: true
   updatedAt?: true
   _all?: true
@@ -179,6 +233,15 @@ export type PatientGroupByOutputType = {
   address: string | null
   dateOfBirth: Date | null
   gender: string | null
+  province: string | null
+  district: string | null
+  sector: string | null
+  cell: string | null
+  village: string | null
+  emergencyContact: string | null
+  preferredPharmacy: string | null
+  medicalNotes: string | null
+  profilePhoto: string | null
   createdAt: Date
   updatedAt: Date
   _count: PatientCountAggregateOutputType | null
@@ -212,6 +275,15 @@ export type PatientWhereInput = {
   address?: Prisma.StringNullableFilter<"Patient"> | string | null
   dateOfBirth?: Prisma.DateTimeNullableFilter<"Patient"> | Date | string | null
   gender?: Prisma.StringNullableFilter<"Patient"> | string | null
+  province?: Prisma.StringNullableFilter<"Patient"> | string | null
+  district?: Prisma.StringNullableFilter<"Patient"> | string | null
+  sector?: Prisma.StringNullableFilter<"Patient"> | string | null
+  cell?: Prisma.StringNullableFilter<"Patient"> | string | null
+  village?: Prisma.StringNullableFilter<"Patient"> | string | null
+  emergencyContact?: Prisma.StringNullableFilter<"Patient"> | string | null
+  preferredPharmacy?: Prisma.StringNullableFilter<"Patient"> | string | null
+  medicalNotes?: Prisma.StringNullableFilter<"Patient"> | string | null
+  profilePhoto?: Prisma.StringNullableFilter<"Patient"> | string | null
   createdAt?: Prisma.DateTimeFilter<"Patient"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Patient"> | Date | string
   user?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
@@ -231,6 +303,15 @@ export type PatientOrderByWithRelationInput = {
   address?: Prisma.SortOrderInput | Prisma.SortOrder
   dateOfBirth?: Prisma.SortOrderInput | Prisma.SortOrder
   gender?: Prisma.SortOrderInput | Prisma.SortOrder
+  province?: Prisma.SortOrderInput | Prisma.SortOrder
+  district?: Prisma.SortOrderInput | Prisma.SortOrder
+  sector?: Prisma.SortOrderInput | Prisma.SortOrder
+  cell?: Prisma.SortOrderInput | Prisma.SortOrder
+  village?: Prisma.SortOrderInput | Prisma.SortOrder
+  emergencyContact?: Prisma.SortOrderInput | Prisma.SortOrder
+  preferredPharmacy?: Prisma.SortOrderInput | Prisma.SortOrder
+  medicalNotes?: Prisma.SortOrderInput | Prisma.SortOrder
+  profilePhoto?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   user?: Prisma.UserOrderByWithRelationInput
@@ -253,6 +334,15 @@ export type PatientWhereUniqueInput = Prisma.AtLeast<{
   address?: Prisma.StringNullableFilter<"Patient"> | string | null
   dateOfBirth?: Prisma.DateTimeNullableFilter<"Patient"> | Date | string | null
   gender?: Prisma.StringNullableFilter<"Patient"> | string | null
+  province?: Prisma.StringNullableFilter<"Patient"> | string | null
+  district?: Prisma.StringNullableFilter<"Patient"> | string | null
+  sector?: Prisma.StringNullableFilter<"Patient"> | string | null
+  cell?: Prisma.StringNullableFilter<"Patient"> | string | null
+  village?: Prisma.StringNullableFilter<"Patient"> | string | null
+  emergencyContact?: Prisma.StringNullableFilter<"Patient"> | string | null
+  preferredPharmacy?: Prisma.StringNullableFilter<"Patient"> | string | null
+  medicalNotes?: Prisma.StringNullableFilter<"Patient"> | string | null
+  profilePhoto?: Prisma.StringNullableFilter<"Patient"> | string | null
   createdAt?: Prisma.DateTimeFilter<"Patient"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Patient"> | Date | string
   user?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
@@ -272,6 +362,15 @@ export type PatientOrderByWithAggregationInput = {
   address?: Prisma.SortOrderInput | Prisma.SortOrder
   dateOfBirth?: Prisma.SortOrderInput | Prisma.SortOrder
   gender?: Prisma.SortOrderInput | Prisma.SortOrder
+  province?: Prisma.SortOrderInput | Prisma.SortOrder
+  district?: Prisma.SortOrderInput | Prisma.SortOrder
+  sector?: Prisma.SortOrderInput | Prisma.SortOrder
+  cell?: Prisma.SortOrderInput | Prisma.SortOrder
+  village?: Prisma.SortOrderInput | Prisma.SortOrder
+  emergencyContact?: Prisma.SortOrderInput | Prisma.SortOrder
+  preferredPharmacy?: Prisma.SortOrderInput | Prisma.SortOrder
+  medicalNotes?: Prisma.SortOrderInput | Prisma.SortOrder
+  profilePhoto?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   _count?: Prisma.PatientCountOrderByAggregateInput
@@ -290,6 +389,15 @@ export type PatientScalarWhereWithAggregatesInput = {
   address?: Prisma.StringNullableWithAggregatesFilter<"Patient"> | string | null
   dateOfBirth?: Prisma.DateTimeNullableWithAggregatesFilter<"Patient"> | Date | string | null
   gender?: Prisma.StringNullableWithAggregatesFilter<"Patient"> | string | null
+  province?: Prisma.StringNullableWithAggregatesFilter<"Patient"> | string | null
+  district?: Prisma.StringNullableWithAggregatesFilter<"Patient"> | string | null
+  sector?: Prisma.StringNullableWithAggregatesFilter<"Patient"> | string | null
+  cell?: Prisma.StringNullableWithAggregatesFilter<"Patient"> | string | null
+  village?: Prisma.StringNullableWithAggregatesFilter<"Patient"> | string | null
+  emergencyContact?: Prisma.StringNullableWithAggregatesFilter<"Patient"> | string | null
+  preferredPharmacy?: Prisma.StringNullableWithAggregatesFilter<"Patient"> | string | null
+  medicalNotes?: Prisma.StringNullableWithAggregatesFilter<"Patient"> | string | null
+  profilePhoto?: Prisma.StringNullableWithAggregatesFilter<"Patient"> | string | null
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"Patient"> | Date | string
   updatedAt?: Prisma.DateTimeWithAggregatesFilter<"Patient"> | Date | string
 }
@@ -301,6 +409,15 @@ export type PatientCreateInput = {
   address?: string | null
   dateOfBirth?: Date | string | null
   gender?: string | null
+  province?: string | null
+  district?: string | null
+  sector?: string | null
+  cell?: string | null
+  village?: string | null
+  emergencyContact?: string | null
+  preferredPharmacy?: string | null
+  medicalNotes?: string | null
+  profilePhoto?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   user: Prisma.UserCreateNestedOneWithoutPatientInput
@@ -320,6 +437,15 @@ export type PatientUncheckedCreateInput = {
   address?: string | null
   dateOfBirth?: Date | string | null
   gender?: string | null
+  province?: string | null
+  district?: string | null
+  sector?: string | null
+  cell?: string | null
+  village?: string | null
+  emergencyContact?: string | null
+  preferredPharmacy?: string | null
+  medicalNotes?: string | null
+  profilePhoto?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   reservations?: Prisma.ReservationUncheckedCreateNestedManyWithoutPatientInput
@@ -337,6 +463,15 @@ export type PatientUpdateInput = {
   address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   dateOfBirth?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   gender?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  province?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  district?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  sector?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  cell?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  village?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  emergencyContact?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  preferredPharmacy?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  medicalNotes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  profilePhoto?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   user?: Prisma.UserUpdateOneRequiredWithoutPatientNestedInput
@@ -356,6 +491,15 @@ export type PatientUncheckedUpdateInput = {
   address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   dateOfBirth?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   gender?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  province?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  district?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  sector?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  cell?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  village?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  emergencyContact?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  preferredPharmacy?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  medicalNotes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  profilePhoto?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   reservations?: Prisma.ReservationUncheckedUpdateManyWithoutPatientNestedInput
@@ -374,6 +518,15 @@ export type PatientCreateManyInput = {
   address?: string | null
   dateOfBirth?: Date | string | null
   gender?: string | null
+  province?: string | null
+  district?: string | null
+  sector?: string | null
+  cell?: string | null
+  village?: string | null
+  emergencyContact?: string | null
+  preferredPharmacy?: string | null
+  medicalNotes?: string | null
+  profilePhoto?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -385,6 +538,15 @@ export type PatientUpdateManyMutationInput = {
   address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   dateOfBirth?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   gender?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  province?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  district?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  sector?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  cell?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  village?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  emergencyContact?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  preferredPharmacy?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  medicalNotes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  profilePhoto?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -397,6 +559,15 @@ export type PatientUncheckedUpdateManyInput = {
   address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   dateOfBirth?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   gender?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  province?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  district?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  sector?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  cell?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  village?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  emergencyContact?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  preferredPharmacy?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  medicalNotes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  profilePhoto?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -414,6 +585,15 @@ export type PatientCountOrderByAggregateInput = {
   address?: Prisma.SortOrder
   dateOfBirth?: Prisma.SortOrder
   gender?: Prisma.SortOrder
+  province?: Prisma.SortOrder
+  district?: Prisma.SortOrder
+  sector?: Prisma.SortOrder
+  cell?: Prisma.SortOrder
+  village?: Prisma.SortOrder
+  emergencyContact?: Prisma.SortOrder
+  preferredPharmacy?: Prisma.SortOrder
+  medicalNotes?: Prisma.SortOrder
+  profilePhoto?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
 }
@@ -426,6 +606,15 @@ export type PatientMaxOrderByAggregateInput = {
   address?: Prisma.SortOrder
   dateOfBirth?: Prisma.SortOrder
   gender?: Prisma.SortOrder
+  province?: Prisma.SortOrder
+  district?: Prisma.SortOrder
+  sector?: Prisma.SortOrder
+  cell?: Prisma.SortOrder
+  village?: Prisma.SortOrder
+  emergencyContact?: Prisma.SortOrder
+  preferredPharmacy?: Prisma.SortOrder
+  medicalNotes?: Prisma.SortOrder
+  profilePhoto?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
 }
@@ -438,6 +627,15 @@ export type PatientMinOrderByAggregateInput = {
   address?: Prisma.SortOrder
   dateOfBirth?: Prisma.SortOrder
   gender?: Prisma.SortOrder
+  province?: Prisma.SortOrder
+  district?: Prisma.SortOrder
+  sector?: Prisma.SortOrder
+  cell?: Prisma.SortOrder
+  village?: Prisma.SortOrder
+  emergencyContact?: Prisma.SortOrder
+  preferredPharmacy?: Prisma.SortOrder
+  medicalNotes?: Prisma.SortOrder
+  profilePhoto?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
 }
@@ -574,6 +772,15 @@ export type PatientCreateWithoutUserInput = {
   address?: string | null
   dateOfBirth?: Date | string | null
   gender?: string | null
+  province?: string | null
+  district?: string | null
+  sector?: string | null
+  cell?: string | null
+  village?: string | null
+  emergencyContact?: string | null
+  preferredPharmacy?: string | null
+  medicalNotes?: string | null
+  profilePhoto?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   reservations?: Prisma.ReservationCreateNestedManyWithoutPatientInput
@@ -591,6 +798,15 @@ export type PatientUncheckedCreateWithoutUserInput = {
   address?: string | null
   dateOfBirth?: Date | string | null
   gender?: string | null
+  province?: string | null
+  district?: string | null
+  sector?: string | null
+  cell?: string | null
+  village?: string | null
+  emergencyContact?: string | null
+  preferredPharmacy?: string | null
+  medicalNotes?: string | null
+  profilePhoto?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   reservations?: Prisma.ReservationUncheckedCreateNestedManyWithoutPatientInput
@@ -624,6 +840,15 @@ export type PatientUpdateWithoutUserInput = {
   address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   dateOfBirth?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   gender?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  province?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  district?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  sector?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  cell?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  village?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  emergencyContact?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  preferredPharmacy?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  medicalNotes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  profilePhoto?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   reservations?: Prisma.ReservationUpdateManyWithoutPatientNestedInput
@@ -641,6 +866,15 @@ export type PatientUncheckedUpdateWithoutUserInput = {
   address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   dateOfBirth?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   gender?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  province?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  district?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  sector?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  cell?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  village?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  emergencyContact?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  preferredPharmacy?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  medicalNotes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  profilePhoto?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   reservations?: Prisma.ReservationUncheckedUpdateManyWithoutPatientNestedInput
@@ -658,6 +892,15 @@ export type PatientCreateWithoutReservationsInput = {
   address?: string | null
   dateOfBirth?: Date | string | null
   gender?: string | null
+  province?: string | null
+  district?: string | null
+  sector?: string | null
+  cell?: string | null
+  village?: string | null
+  emergencyContact?: string | null
+  preferredPharmacy?: string | null
+  medicalNotes?: string | null
+  profilePhoto?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   user: Prisma.UserCreateNestedOneWithoutPatientInput
@@ -676,6 +919,15 @@ export type PatientUncheckedCreateWithoutReservationsInput = {
   address?: string | null
   dateOfBirth?: Date | string | null
   gender?: string | null
+  province?: string | null
+  district?: string | null
+  sector?: string | null
+  cell?: string | null
+  village?: string | null
+  emergencyContact?: string | null
+  preferredPharmacy?: string | null
+  medicalNotes?: string | null
+  profilePhoto?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   prescriptions?: Prisma.PrescriptionUncheckedCreateNestedManyWithoutPatientInput
@@ -708,6 +960,15 @@ export type PatientUpdateWithoutReservationsInput = {
   address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   dateOfBirth?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   gender?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  province?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  district?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  sector?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  cell?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  village?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  emergencyContact?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  preferredPharmacy?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  medicalNotes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  profilePhoto?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   user?: Prisma.UserUpdateOneRequiredWithoutPatientNestedInput
@@ -726,6 +987,15 @@ export type PatientUncheckedUpdateWithoutReservationsInput = {
   address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   dateOfBirth?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   gender?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  province?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  district?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  sector?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  cell?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  village?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  emergencyContact?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  preferredPharmacy?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  medicalNotes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  profilePhoto?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   prescriptions?: Prisma.PrescriptionUncheckedUpdateManyWithoutPatientNestedInput
@@ -742,6 +1012,15 @@ export type PatientCreateWithoutPrescriptionsInput = {
   address?: string | null
   dateOfBirth?: Date | string | null
   gender?: string | null
+  province?: string | null
+  district?: string | null
+  sector?: string | null
+  cell?: string | null
+  village?: string | null
+  emergencyContact?: string | null
+  preferredPharmacy?: string | null
+  medicalNotes?: string | null
+  profilePhoto?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   user: Prisma.UserCreateNestedOneWithoutPatientInput
@@ -760,6 +1039,15 @@ export type PatientUncheckedCreateWithoutPrescriptionsInput = {
   address?: string | null
   dateOfBirth?: Date | string | null
   gender?: string | null
+  province?: string | null
+  district?: string | null
+  sector?: string | null
+  cell?: string | null
+  village?: string | null
+  emergencyContact?: string | null
+  preferredPharmacy?: string | null
+  medicalNotes?: string | null
+  profilePhoto?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   reservations?: Prisma.ReservationUncheckedCreateNestedManyWithoutPatientInput
@@ -792,6 +1080,15 @@ export type PatientUpdateWithoutPrescriptionsInput = {
   address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   dateOfBirth?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   gender?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  province?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  district?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  sector?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  cell?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  village?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  emergencyContact?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  preferredPharmacy?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  medicalNotes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  profilePhoto?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   user?: Prisma.UserUpdateOneRequiredWithoutPatientNestedInput
@@ -810,6 +1107,15 @@ export type PatientUncheckedUpdateWithoutPrescriptionsInput = {
   address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   dateOfBirth?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   gender?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  province?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  district?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  sector?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  cell?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  village?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  emergencyContact?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  preferredPharmacy?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  medicalNotes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  profilePhoto?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   reservations?: Prisma.ReservationUncheckedUpdateManyWithoutPatientNestedInput
@@ -826,6 +1132,15 @@ export type PatientCreateWithoutReminderSchedulesInput = {
   address?: string | null
   dateOfBirth?: Date | string | null
   gender?: string | null
+  province?: string | null
+  district?: string | null
+  sector?: string | null
+  cell?: string | null
+  village?: string | null
+  emergencyContact?: string | null
+  preferredPharmacy?: string | null
+  medicalNotes?: string | null
+  profilePhoto?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   user: Prisma.UserCreateNestedOneWithoutPatientInput
@@ -844,6 +1159,15 @@ export type PatientUncheckedCreateWithoutReminderSchedulesInput = {
   address?: string | null
   dateOfBirth?: Date | string | null
   gender?: string | null
+  province?: string | null
+  district?: string | null
+  sector?: string | null
+  cell?: string | null
+  village?: string | null
+  emergencyContact?: string | null
+  preferredPharmacy?: string | null
+  medicalNotes?: string | null
+  profilePhoto?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   reservations?: Prisma.ReservationUncheckedCreateNestedManyWithoutPatientInput
@@ -876,6 +1200,15 @@ export type PatientUpdateWithoutReminderSchedulesInput = {
   address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   dateOfBirth?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   gender?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  province?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  district?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  sector?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  cell?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  village?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  emergencyContact?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  preferredPharmacy?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  medicalNotes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  profilePhoto?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   user?: Prisma.UserUpdateOneRequiredWithoutPatientNestedInput
@@ -894,6 +1227,15 @@ export type PatientUncheckedUpdateWithoutReminderSchedulesInput = {
   address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   dateOfBirth?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   gender?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  province?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  district?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  sector?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  cell?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  village?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  emergencyContact?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  preferredPharmacy?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  medicalNotes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  profilePhoto?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   reservations?: Prisma.ReservationUncheckedUpdateManyWithoutPatientNestedInput
@@ -910,6 +1252,15 @@ export type PatientCreateWithoutReminderLogsInput = {
   address?: string | null
   dateOfBirth?: Date | string | null
   gender?: string | null
+  province?: string | null
+  district?: string | null
+  sector?: string | null
+  cell?: string | null
+  village?: string | null
+  emergencyContact?: string | null
+  preferredPharmacy?: string | null
+  medicalNotes?: string | null
+  profilePhoto?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   user: Prisma.UserCreateNestedOneWithoutPatientInput
@@ -928,6 +1279,15 @@ export type PatientUncheckedCreateWithoutReminderLogsInput = {
   address?: string | null
   dateOfBirth?: Date | string | null
   gender?: string | null
+  province?: string | null
+  district?: string | null
+  sector?: string | null
+  cell?: string | null
+  village?: string | null
+  emergencyContact?: string | null
+  preferredPharmacy?: string | null
+  medicalNotes?: string | null
+  profilePhoto?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   reservations?: Prisma.ReservationUncheckedCreateNestedManyWithoutPatientInput
@@ -960,6 +1320,15 @@ export type PatientUpdateWithoutReminderLogsInput = {
   address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   dateOfBirth?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   gender?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  province?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  district?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  sector?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  cell?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  village?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  emergencyContact?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  preferredPharmacy?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  medicalNotes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  profilePhoto?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   user?: Prisma.UserUpdateOneRequiredWithoutPatientNestedInput
@@ -978,6 +1347,15 @@ export type PatientUncheckedUpdateWithoutReminderLogsInput = {
   address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   dateOfBirth?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   gender?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  province?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  district?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  sector?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  cell?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  village?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  emergencyContact?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  preferredPharmacy?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  medicalNotes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  profilePhoto?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   reservations?: Prisma.ReservationUncheckedUpdateManyWithoutPatientNestedInput
@@ -994,6 +1372,15 @@ export type PatientCreateWithoutInsuredPoliciesInput = {
   address?: string | null
   dateOfBirth?: Date | string | null
   gender?: string | null
+  province?: string | null
+  district?: string | null
+  sector?: string | null
+  cell?: string | null
+  village?: string | null
+  emergencyContact?: string | null
+  preferredPharmacy?: string | null
+  medicalNotes?: string | null
+  profilePhoto?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   user: Prisma.UserCreateNestedOneWithoutPatientInput
@@ -1012,6 +1399,15 @@ export type PatientUncheckedCreateWithoutInsuredPoliciesInput = {
   address?: string | null
   dateOfBirth?: Date | string | null
   gender?: string | null
+  province?: string | null
+  district?: string | null
+  sector?: string | null
+  cell?: string | null
+  village?: string | null
+  emergencyContact?: string | null
+  preferredPharmacy?: string | null
+  medicalNotes?: string | null
+  profilePhoto?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   reservations?: Prisma.ReservationUncheckedCreateNestedManyWithoutPatientInput
@@ -1044,6 +1440,15 @@ export type PatientUpdateWithoutInsuredPoliciesInput = {
   address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   dateOfBirth?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   gender?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  province?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  district?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  sector?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  cell?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  village?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  emergencyContact?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  preferredPharmacy?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  medicalNotes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  profilePhoto?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   user?: Prisma.UserUpdateOneRequiredWithoutPatientNestedInput
@@ -1062,6 +1467,15 @@ export type PatientUncheckedUpdateWithoutInsuredPoliciesInput = {
   address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   dateOfBirth?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   gender?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  province?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  district?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  sector?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  cell?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  village?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  emergencyContact?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  preferredPharmacy?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  medicalNotes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  profilePhoto?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   reservations?: Prisma.ReservationUncheckedUpdateManyWithoutPatientNestedInput
@@ -1078,6 +1492,15 @@ export type PatientCreateWithoutInsuranceClaimsInput = {
   address?: string | null
   dateOfBirth?: Date | string | null
   gender?: string | null
+  province?: string | null
+  district?: string | null
+  sector?: string | null
+  cell?: string | null
+  village?: string | null
+  emergencyContact?: string | null
+  preferredPharmacy?: string | null
+  medicalNotes?: string | null
+  profilePhoto?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   user: Prisma.UserCreateNestedOneWithoutPatientInput
@@ -1096,6 +1519,15 @@ export type PatientUncheckedCreateWithoutInsuranceClaimsInput = {
   address?: string | null
   dateOfBirth?: Date | string | null
   gender?: string | null
+  province?: string | null
+  district?: string | null
+  sector?: string | null
+  cell?: string | null
+  village?: string | null
+  emergencyContact?: string | null
+  preferredPharmacy?: string | null
+  medicalNotes?: string | null
+  profilePhoto?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   reservations?: Prisma.ReservationUncheckedCreateNestedManyWithoutPatientInput
@@ -1128,6 +1560,15 @@ export type PatientUpdateWithoutInsuranceClaimsInput = {
   address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   dateOfBirth?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   gender?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  province?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  district?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  sector?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  cell?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  village?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  emergencyContact?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  preferredPharmacy?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  medicalNotes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  profilePhoto?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   user?: Prisma.UserUpdateOneRequiredWithoutPatientNestedInput
@@ -1146,6 +1587,15 @@ export type PatientUncheckedUpdateWithoutInsuranceClaimsInput = {
   address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   dateOfBirth?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   gender?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  province?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  district?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  sector?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  cell?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  village?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  emergencyContact?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  preferredPharmacy?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  medicalNotes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  profilePhoto?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   reservations?: Prisma.ReservationUncheckedUpdateManyWithoutPatientNestedInput
@@ -1239,6 +1689,15 @@ export type PatientSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs 
   address?: boolean
   dateOfBirth?: boolean
   gender?: boolean
+  province?: boolean
+  district?: boolean
+  sector?: boolean
+  cell?: boolean
+  village?: boolean
+  emergencyContact?: boolean
+  preferredPharmacy?: boolean
+  medicalNotes?: boolean
+  profilePhoto?: boolean
   createdAt?: boolean
   updatedAt?: boolean
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
@@ -1259,6 +1718,15 @@ export type PatientSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Exten
   address?: boolean
   dateOfBirth?: boolean
   gender?: boolean
+  province?: boolean
+  district?: boolean
+  sector?: boolean
+  cell?: boolean
+  village?: boolean
+  emergencyContact?: boolean
+  preferredPharmacy?: boolean
+  medicalNotes?: boolean
+  profilePhoto?: boolean
   createdAt?: boolean
   updatedAt?: boolean
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
@@ -1272,6 +1740,15 @@ export type PatientSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Exten
   address?: boolean
   dateOfBirth?: boolean
   gender?: boolean
+  province?: boolean
+  district?: boolean
+  sector?: boolean
+  cell?: boolean
+  village?: boolean
+  emergencyContact?: boolean
+  preferredPharmacy?: boolean
+  medicalNotes?: boolean
+  profilePhoto?: boolean
   createdAt?: boolean
   updatedAt?: boolean
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
@@ -1285,11 +1762,20 @@ export type PatientSelectScalar = {
   address?: boolean
   dateOfBirth?: boolean
   gender?: boolean
+  province?: boolean
+  district?: boolean
+  sector?: boolean
+  cell?: boolean
+  village?: boolean
+  emergencyContact?: boolean
+  preferredPharmacy?: boolean
+  medicalNotes?: boolean
+  profilePhoto?: boolean
   createdAt?: boolean
   updatedAt?: boolean
 }
 
-export type PatientOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"insuranceProvider" | "id" | "userId" | "medicalProfile" | "address" | "dateOfBirth" | "gender" | "createdAt" | "updatedAt", ExtArgs["result"]["patient"]>
+export type PatientOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"insuranceProvider" | "id" | "userId" | "medicalProfile" | "address" | "dateOfBirth" | "gender" | "province" | "district" | "sector" | "cell" | "village" | "emergencyContact" | "preferredPharmacy" | "medicalNotes" | "profilePhoto" | "createdAt" | "updatedAt", ExtArgs["result"]["patient"]>
 export type PatientInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
   reservations?: boolean | Prisma.Patient$reservationsArgs<ExtArgs>
@@ -1326,6 +1812,15 @@ export type $PatientPayload<ExtArgs extends runtime.Types.Extensions.InternalArg
     address: string | null
     dateOfBirth: Date | null
     gender: string | null
+    province: string | null
+    district: string | null
+    sector: string | null
+    cell: string | null
+    village: string | null
+    emergencyContact: string | null
+    preferredPharmacy: string | null
+    medicalNotes: string | null
+    profilePhoto: string | null
     createdAt: Date
     updatedAt: Date
   }, ExtArgs["result"]["patient"]>
@@ -1765,6 +2260,15 @@ export interface PatientFieldRefs {
   readonly address: Prisma.FieldRef<"Patient", 'String'>
   readonly dateOfBirth: Prisma.FieldRef<"Patient", 'DateTime'>
   readonly gender: Prisma.FieldRef<"Patient", 'String'>
+  readonly province: Prisma.FieldRef<"Patient", 'String'>
+  readonly district: Prisma.FieldRef<"Patient", 'String'>
+  readonly sector: Prisma.FieldRef<"Patient", 'String'>
+  readonly cell: Prisma.FieldRef<"Patient", 'String'>
+  readonly village: Prisma.FieldRef<"Patient", 'String'>
+  readonly emergencyContact: Prisma.FieldRef<"Patient", 'String'>
+  readonly preferredPharmacy: Prisma.FieldRef<"Patient", 'String'>
+  readonly medicalNotes: Prisma.FieldRef<"Patient", 'String'>
+  readonly profilePhoto: Prisma.FieldRef<"Patient", 'String'>
   readonly createdAt: Prisma.FieldRef<"Patient", 'DateTime'>
   readonly updatedAt: Prisma.FieldRef<"Patient", 'DateTime'>
 }
