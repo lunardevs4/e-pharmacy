@@ -84,12 +84,12 @@ export class UsersController {
   @Delete(':id')
   @Roles(UserRole.ADMIN)
   @ApiOperation({
-    summary: 'Soft delete user (admin only)',
-    description: 'Endpoint: DELETE /api/v1/users/:id\n\nSoft deletes a user account by setting deletedAt and deactivating the account.',
+    summary: 'Permanently delete user (admin only)',
+    description: 'Endpoint: DELETE /api/v1/users/:id\n\nPermanently deletes a user account and its cascade-managed related records.',
   })
   @ApiParam({ name: 'id', type: 'string', description: 'User UUID', example: '550e8400-e29b-41d4-a716-446655440000' })
   remove(@Param('id') id: string) {
-    return this.usersService.softDeleteByAdmin(id);
+    return this.usersService.deleteByAdmin(id);
   }
 
   @Get()

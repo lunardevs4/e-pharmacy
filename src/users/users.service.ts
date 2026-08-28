@@ -103,16 +103,20 @@ export class UsersService {
     });
   }
 
-  async softDeleteByAdmin(userId: string) {
+  async deleteByAdmin(userId: string) {
     const prisma = this.prismaService.prisma;
     const safeUserId = validateUuid(userId, 'userId');
     const user = await prisma.user.findUnique({ where: { id: safeUserId } });
     if (!user) {
       throw new NotFoundException('User not found');
     }
-    return prisma.user.update({
+
+    // Admin deletion is permanent. Related records are removed or detached by
+    // the onDelete rules in the Prisma schema (for example, pharmacy-owned
+    // records cascade while audit logs retain their history via SetNull).
+    return prisma.user.delete({
       where: { id: safeUserId },
-      data: { deletedAt: new Date(), isActive: false },
+      select: { id: true },
     });
   }
 
