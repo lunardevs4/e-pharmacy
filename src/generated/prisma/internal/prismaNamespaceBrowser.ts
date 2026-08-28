@@ -137,6 +137,15 @@ export const PatientScalarFieldEnum = {
   address: 'address',
   dateOfBirth: 'dateOfBirth',
   gender: 'gender',
+  province: 'province',
+  district: 'district',
+  sector: 'sector',
+  cell: 'cell',
+  village: 'village',
+  emergencyContact: 'emergencyContact',
+  preferredPharmacy: 'preferredPharmacy',
+  medicalNotes: 'medicalNotes',
+  profilePhoto: 'profilePhoto',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 } as const

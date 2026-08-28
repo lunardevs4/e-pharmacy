@@ -42,12 +42,22 @@ export class UsersService {
     // Flatten the active pharmacy context (owned first, then employed-at)
     const ownedPharmacy = user.pharmacyOwner?.pharmacy ?? null;
     const employedPharmacy = user.pharmacyEmployees?.[0]?.pharmacy ?? null;
-    const { pharmacyOwner, pharmacyEmployees, insuranceProvider, ...rest } = user;
+    const { pharmacyOwner, pharmacyEmployees, insuranceProvider, patient, ...rest } = user;
 
     return {
       ...rest,
       pharmacy: ownedPharmacy || employedPharmacy,
       insuranceProvider: insuranceProvider ?? null,
+      // Include patient-specific fields
+      province: patient?.province ?? null,
+      district: patient?.district ?? null,
+      sector: patient?.sector ?? null,
+      cell: patient?.cell ?? null,
+      village: patient?.village ?? null,
+      emergencyContact: patient?.emergencyContact ?? null,
+      preferredPharmacy: patient?.preferredPharmacy ?? null,
+      medicalNotes: patient?.medicalNotes ?? null,
+      profilePhoto: patient?.profilePhoto ?? null,
     };
   }
 
@@ -55,15 +65,40 @@ export class UsersService {
     const prisma = this.prismaService.prisma;
     const safeUserId = validateUuid(userId, 'userId');
     const safeDto = sanitizeDeep(updateUserDto);
-    const { insuranceProvider, ...userFields } = safeDto;
+    const { 
+      insuranceProvider, 
+      province, 
+      district, 
+      sector, 
+      cell, 
+      village, 
+      emergencyContact, 
+      preferredPharmacy, 
+      medicalNotes, 
+      profilePhoto,
+      ...userFields 
+    } = safeDto;
 
     await prisma.$transaction(async (tx) => {
+      // Update user fields
       await tx.user.update({ where: { id: safeUserId }, data: userFields });
 
-      if (insuranceProvider !== undefined) {
+      // Update patient-specific fields if patient exists
+      const patient = await tx.patient.findUnique({ where: { userId: safeUserId } });
+      if (patient) {
         await tx.patient.update({
           where: { userId: safeUserId },
-          data: { insuranceProvider: insuranceProvider || null },
+          data: {
+            insuranceProvider: insuranceProvider !== undefined ? insuranceProvider || null : undefined,
+            province: province !== undefined ? province : undefined,
+            district: district !== undefined ? district : undefined,
+            sector: sector !== undefined ? sector : undefined,
+            cell: cell !== undefined ? cell : undefined,
+            village: village !== undefined ? village : undefined,
+            emergencyContact: emergencyContact !== undefined ? emergencyContact : undefined,
+            preferredPharmacy: preferredPharmacy !== undefined ? preferredPharmacy : undefined,
+            medicalNotes: medicalNotes !== undefined ? medicalNotes : undefined,
+          },
         });
       }
     });

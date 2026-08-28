@@ -81,6 +81,14 @@ export class InsuranceDashboardController {
     );
   }
 
+  @Get('claims/outstanding')
+  @Roles(UserRole.INSURANCE, UserRole.ADMIN, UserRole.PHARMACY_OWNER, UserRole.PHARMACY, UserRole.PHARMACIST)
+  @ApiOperation({ summary: 'Get outstanding payments' })
+  @ApiQuery({ name: 'pharmacyId', required: false })
+  async getOutstandingPayments(@Query('pharmacyId') pharmacyId?: string) {
+    return this.claimsService.getOutstandingPayments(pharmacyId);
+  }
+
   @Get('claims/:id')
   @Roles(UserRole.INSURANCE, UserRole.ADMIN, UserRole.PHARMACY_OWNER, UserRole.PHARMACY, UserRole.PHARMACIST)
   @ApiOperation({ summary: 'Get claim by ID' })
@@ -109,14 +117,6 @@ export class InsuranceDashboardController {
   @ApiOperation({ summary: 'Batch pay approved claims' })
   async batchPayClaims(@Body() dto: BatchPayClaimsDto) {
     return this.claimsService.batchPayClaims(dto);
-  }
-
-  @Get('claims/outstanding')
-  @Roles(UserRole.INSURANCE, UserRole.ADMIN, UserRole.PHARMACY_OWNER, UserRole.PHARMACY, UserRole.PHARMACIST)
-  @ApiOperation({ summary: 'Get outstanding payments' })
-  @ApiQuery({ name: 'pharmacyId', required: false })
-  async getOutstandingPayments(@Query('pharmacyId') pharmacyId?: string) {
-    return this.claimsService.getOutstandingPayments(pharmacyId);
   }
 
   // Pharmacy Agreements Endpoints
