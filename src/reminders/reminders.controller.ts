@@ -14,9 +14,9 @@ export class RemindersController {
   constructor(private remindersService: RemindersService) { }
 
   @Post('schedules')
-  @Roles(UserRole.PHARMACIST)
+  @Roles(UserRole.PATIENT)
   @ApiOperation({
-    summary: 'Create reminder schedule (pharmacist only)',
+    summary: 'Create reminder schedule (patient only)',
     description: 'Endpoint: POST /api/v1/reminders/schedules',
   })
   @ApiBody({

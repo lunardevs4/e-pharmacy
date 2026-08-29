@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException, ForbiddenException } from '@nestjs/common';
+import { Injectable, NotFoundException, ForbiddenException, BadRequestException } from '@nestjs/common';
 import { PrismaService } from '../common/prisma/prisma.service';
 import { CreateReminderScheduleDto } from './dto/reminders.dto';
 import { UserRole, ReminderStatus } from '@generated/prisma';
@@ -17,15 +17,34 @@ export class RemindersService {
     const prisma = this.prismaService.prisma;
     const safeDto = sanitizeDeep(dto);
 
-    if (user.role !== UserRole.PHARMACIST) {
-      throw new ForbiddenException('Only pharmacists can create medication reminder schedules');
-    }
-
     const startDate = validateDate((safeDto as any).startDate, 'startDate');
     const endDate = validateDate((safeDto as any).endDate, 'endDate');
-    const { startDate: _s, endDate: _e, patientId, ...restDto } = safeDto as any;
+    const { startDate: _s, endDate: _e, patientId, medicineId, medicineName, times, timeOfDay, frequency, dosage, notes, pharmacistInstructions, ...restDto } = safeDto as any;
 
-    const safePatientId = validateUuid(patientId, 'patientId');
+    let safePatientId = patientId ? validateUuid(patientId, 'patientId') : undefined;
+    if (user.role === UserRole.PATIENT) {
+      const currentPatient = await prisma.patient.findFirst({ where: { userId: user.id } });
+      if (!currentPatient) throw new NotFoundException('Patient profile not found');
+      safePatientId = currentPatient.id;
+    } else if (user.role !== UserRole.PHARMACIST) {
+      throw new ForbiddenException('Only patients and pharmacists can create medication reminders');
+    }
+
+    let safeMedicineId = medicineId ? validateUuid(medicineId, 'medicineId') : undefined;
+    if (!safeMedicineId && medicineName) {
+      const medicine = await prisma.medicine.findFirst({
+        where: { tradeName: { equals: medicineName, mode: 'insensitive' } },
+      });
+      if (!medicine) throw new NotFoundException(`Medicine not found: ${medicineName}`);
+      safeMedicineId = medicine.id;
+    }
+    if (!safePatientId) throw new BadRequestException('patientId must be provided');
+    if (!safeMedicineId) throw new BadRequestException('medicineId or medicineName must be provided');
+    if (!startDate) throw new BadRequestException('startDate must be provided');
+
+    const scheduleTimes = timeOfDay || times;
+    if (!scheduleTimes?.length) throw new BadRequestException('timeOfDay or times must be provided');
+    const scheduleEndDate = endDate || new Date(startDate.getTime() + 365 * 24 * 60 * 60 * 1000);
 
     // Verify the patient exists
     const patient = await prisma.patient.findUnique({ where: { id: safePatientId } });
@@ -35,8 +54,12 @@ export class RemindersService {
       data: {
         ...restDto,
         patientId: safePatientId,
-        ...(startDate ? { startDate } : {}),
-        ...(endDate ? { endDate } : {}),
+        medicineId: safeMedicineId,
+        dosage: dosage || 'As directed',
+        startDate,
+        endDate: scheduleEndDate,
+        timeOfDay: scheduleTimes,
+        ...(frequency === 'weekly' ? { intervalHours: 168 } : {}),
       },
     });
   }

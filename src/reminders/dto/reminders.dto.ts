@@ -3,30 +3,58 @@ import { TransformToISODateTime } from '../../common/transformers/date.transform
 
 export class CreateReminderScheduleDto {
   @IsUUID()
-  patientId: string;
+  @IsOptional()
+  patientId?: string;
 
   @IsOptional()
   @IsUUID()
   prescriptionId?: string;
 
   @IsUUID()
-  medicineId: string;
+  @IsOptional()
+  medicineId?: string;
 
+  @IsOptional()
   @IsString()
-  dosage: string;
+  dosage?: string;
 
+  @IsOptional()
   @IsDateString()
   @TransformToISODateTime()
   startDate: string;
 
+  @IsOptional()
   @IsDateString()
   @TransformToISODateTime()
   endDate: string;
 
+  @IsOptional()
   @IsArray()
-  timeOfDay: string[];
+  timeOfDay?: string[];
 
   @IsOptional()
   @IsInt()
   intervalHours?: number;
+
+  // Patient reminder form fields. The service resolves the current patient
+  // and medicine from these values when a patient creates a reminder.
+  @IsOptional()
+  @IsString()
+  medicineName?: string;
+
+  @IsOptional()
+  @IsArray()
+  times?: string[];
+
+  @IsOptional()
+  @IsString()
+  frequency?: string;
+
+  @IsOptional()
+  @IsString()
+  notes?: string;
+
+  @IsOptional()
+  @IsString()
+  pharmacistInstructions?: string;
 }
