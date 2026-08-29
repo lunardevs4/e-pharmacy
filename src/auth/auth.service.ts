@@ -570,12 +570,14 @@ export class AuthService {
       },
     });
 
+    let emailSent = false;
     try {
       await this.emailService.sendTemporaryPasswordEmail(
         staff.email,
         `${staff.firstName} ${staff.lastName}`.trim(),
         tempPassword,
       );
+      emailSent = true;
     } catch (error) {
       console.warn(
         `Staff account created, but temp password email failed for ${staff.email}: ${(error as Error).message}`,
@@ -584,7 +586,7 @@ export class AuthService {
 
     return {
       message: 'Staff account created successfully',
-      tempPassword,
+      emailSent,
       user: {
         id: staff.id,
         email: staff.email,
