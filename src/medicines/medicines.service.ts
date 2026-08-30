@@ -172,7 +172,11 @@ export class MedicinesService {
       },
       // Keep the catalogue deterministic and put newly registered medicines first.
       orderBy: { createdAt: 'desc' },
-      include: { category: true, manufacturer: true },
+      include: {
+        category: true,
+        manufacturer: true,
+        batches: { select: { storageConditions: true, minTemperature: true, maxTemperature: true } },
+      },
     });
   }
 
@@ -181,7 +185,11 @@ export class MedicinesService {
     const safeId = validateUuid(id, 'id');
     return prisma.medicine.findUnique({
       where: { id: safeId },
-      include: { category: true, manufacturer: true },
+      include: {
+        category: true,
+        manufacturer: true,
+        batches: { select: { storageConditions: true, minTemperature: true, maxTemperature: true } },
+      },
     });
   }
 
