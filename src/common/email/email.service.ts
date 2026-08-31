@@ -15,9 +15,31 @@ export class EmailService {
     }
     const transport = nodemailer.createTransport({ service: 'gmail', auth: { user: gmailUser, pass: gmailAppPassword } });
     await transport.sendMail({
-      from: fromAddress, to: recipientEmail, subject,
-      text: [`Hello ${recipientName},`, '', message, '', 'e-Pharmacy Notifications'].join('\n'),
-      html: `<div style="font-family:Arial,sans-serif;line-height:1.6;color:#111827"><p>Hello ${recipientName},</p><p>${message}</p><p style="color:#6b7280">e-Pharmacy Notifications</p></div>`,
+      from: fromAddress,
+      to: recipientEmail,
+      subject,
+      text: [
+        `Hello ${recipientName},`,
+        '',
+        message,
+        '',
+        'Best regards,',
+        'The e-Pharmacy Team',
+      ].join('\n'),
+      html: `
+    <div style="font-family:Arial,sans-serif;line-height:1.6;color:#111827;max-width:600px;margin:0 auto">
+      <p>Hello ${recipientName},</p>
+
+      <p>${message}</p>
+
+      <p>
+        Best regards,<br>
+        The e-Pharmacy Team
+      </p>
+    </div>
+  `,
+
+
     });
     this.logger.log(`Notification email sent to ${recipientEmail}`);
     return true;
@@ -44,25 +66,49 @@ export class EmailService {
     });
 
     await transport.sendMail({
+
       from: fromAddress,
       to: recipientEmail,
       subject: 'Your temporary e-Pharmacy password',
       text: [
         `Hello ${recipientName},`,
         '',
-        `Your account has been created.`,
+        'Your e-Pharmacy account has been created.',
+        '',
         `Temporary password: ${temporaryPassword}`,
         '',
-        'Please sign in and change your password immediately.',
+        'Please sign in using this password and change it after logging in.',
+        '',
+        'If you did not expect this account, please contact the e-Pharmacy team.',
+        '',
+        'Best regards,',
+        'The e-Pharmacy Team',
       ].join('\n'),
       html: `
-        <div style="font-family: Arial, sans-serif; line-height: 1.6; color: #111827;">
-          <p>Hello ${recipientName},</p>
-          <p>Your account has been created.</p>
-          <p><strong>Temporary password:</strong> <code>${temporaryPassword}</code></p>
-          <p>Please sign in and change your password immediately.</p>
-        </div>
-      `,
+    <div style="font-family:Arial,sans-serif;line-height:1.6;color:#111827;max-width:600px;margin:0 auto">
+      <p>Hello ${recipientName},</p>
+
+      <p>Your e-Pharmacy account has been created.</p>
+
+      <p>Your temporary password is:</p>
+
+      <p>
+        <code style="display:inline-block;background:#f3f4f6;padding:8px 12px;border-radius:6px;font-family:monospace;font-size:14px">
+          ${temporaryPassword}
+        </code>
+      </p>
+
+      <p>Please sign in using this password and change it after logging in.</p>
+
+      <p>If you did not expect this account, please contact the e-Pharmacy team.</p>
+
+      <p>
+        Best regards,<br>
+        The e-Pharmacy Team
+      </p>
+    </div>
+  `,
+
     });
 
     this.logger.log(`Temporary password email sent to ${recipientEmail}`);
@@ -79,9 +125,53 @@ export class EmailService {
     }
     const transport = nodemailer.createTransport({ service: 'gmail', auth: { user: gmailUser, pass: gmailAppPassword } });
     await transport.sendMail({
-      from: fromAddress, to: recipientEmail, subject: 'Verify your e-Pharmacy email',
-      text: [`Hello ${recipientName},`, '', 'Please verify your e-Pharmacy email address:', verificationUrl, '', 'This link expires in 24 hours.'].join('\n'),
-      html: `<div style="font-family:Arial,sans-serif;line-height:1.6;color:#111827"><p>Hello ${recipientName},</p><p>Please verify your e-Pharmacy email address.</p><p><a href="${verificationUrl}" style="background:#059669;color:#fff;padding:10px 16px;border-radius:6px;text-decoration:none">Verify email</a></p><p>This link expires in 24 hours.</p></div>`,
+
+      from: fromAddress,
+      to: recipientEmail,
+      subject: 'Verify your e-Pharmacy email',
+      text: [
+        `Hello ${recipientName},`,
+        '',
+        'Thank you for creating an e-Pharmacy account.',
+        '',
+        'Please verify your email address by clicking the link below:',
+        verificationUrl,
+        '',
+        'This verification link will expire in 24 hours.',
+        '',
+        'If you did not create this account, you can safely ignore this email.',
+        '',
+        'Best regards,',
+        'The e-Pharmacy Team',
+      ].join('\n'),
+      html: `
+    <div style="font-family:Arial,sans-serif;line-height:1.6;color:#111827;max-width:600px;margin:0 auto">
+      <p>Hello ${recipientName},</p>
+
+      <p>Thank you for creating an e-Pharmacy account.</p>
+
+      <p>Please verify your email address by clicking the button below:</p>
+
+      <p>
+        <a
+          href="${verificationUrl}"
+          style="display:inline-block;background:#059669;color:#fff;padding:10px 16px;border-radius:6px;text-decoration:none"
+        >
+          Verify email
+        </a>
+      </p>
+
+      <p>This verification link will expire in 24 hours.</p>
+
+      <p>If you did not create this account, you can safely ignore this email.</p>
+
+      <p>
+        Best regards,<br>
+        The e-Pharmacy Team
+      </p>
+    </div>
+  `,
+
     });
     this.logger.log(`Verification email sent to ${recipientEmail}`);
     return true;

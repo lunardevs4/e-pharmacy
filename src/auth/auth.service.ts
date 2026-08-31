@@ -119,8 +119,6 @@ export class AuthService {
     );
 
     if (!delivered) {
-      // Email delivery is unavailable or failing — never strand the user in
-      // an unverified state they cannot escape. Activate immediately.
       await this.prismaService.prisma.user.update({
         where: { id: user.id },
         data: { emailVerified: true, emailVerificationTokenHash: null, emailVerificationExpiresAt: null },
@@ -176,7 +174,6 @@ export class AuthService {
       });
     }
 
-    // Create a placeholder Pharmacy record for immediate linking so that other database features function properly
     const pharmacy = await prisma.pharmacy.create({
       data: {
         ownerId: owner.id,
@@ -232,8 +229,6 @@ export class AuthService {
     const nameParts = (safeDto.fullname || '').split(' ');
     const firstName = nameParts[0] || 'Insurance';
     const lastName = nameParts.slice(1).join(' ') || 'Provider';
-
-    // Build a unique code from the company name if not explicitly provided
     const code = safeDto.code
       ? validateSafeString(safeDto.code, 'code', 20).toUpperCase()
       : safeDto.fullname
@@ -413,11 +408,6 @@ export class AuthService {
     await this.prismaService.prisma.user.delete({ where: { id: userId } });
   }
 
-  /**
-   * Sends the verification email and reports whether delivery actually
-   * succeeded. Callers decide what to do when it did not — a user must never
-   * be stranded unverified because SMTP is unavailable or misconfigured.
-   */
   private async tryIssueVerificationEmail(
     userId: string,
     email: string,

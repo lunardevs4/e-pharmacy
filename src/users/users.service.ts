@@ -38,8 +38,6 @@ export class UsersService {
     if (!user) {
       throw new NotFoundException('User not found');
     }
-
-    // Flatten the active pharmacy context (owned first, then employed-at)
     const ownedPharmacy = user.pharmacyOwner?.pharmacy ?? null;
     const employedPharmacy = user.pharmacyEmployees?.[0]?.pharmacy ?? null;
     const { pharmacyOwner, pharmacyEmployees, insuranceProvider, patient, ...rest } = user;
@@ -48,7 +46,6 @@ export class UsersService {
       ...rest,
       pharmacy: ownedPharmacy || employedPharmacy,
       insuranceProvider: insuranceProvider ?? null,
-      // Include patient-specific fields
       province: patient?.province ?? null,
       district: patient?.district ?? null,
       sector: patient?.sector ?? null,
@@ -80,10 +77,7 @@ export class UsersService {
     } = safeDto;
 
     await prisma.$transaction(async (tx) => {
-      // Update user fields
       await tx.user.update({ where: { id: safeUserId }, data: userFields });
-
-      // Update patient-specific fields if patient exists
       const patient = await tx.patient.findUnique({ where: { userId: safeUserId } });
       if (patient) {
         await tx.patient.update({
@@ -146,9 +140,6 @@ export class UsersService {
       throw new NotFoundException('User not found');
     }
 
-    // Admin deletion is permanent. Related records are removed or detached by
-    // the onDelete rules in the Prisma schema (for example, pharmacy-owned
-    // records cascade while audit logs retain their history via SetNull).
     return prisma.user.delete({
       where: { id: safeUserId },
       select: { id: true },
