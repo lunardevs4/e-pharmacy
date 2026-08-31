@@ -91,7 +91,6 @@ export class SearchService {
             : null,
       };
 
-      // Add insurance coverage if insuranceId is provided
       if (insuranceId) {
         const insuranceCoverage = await this.calculateInsuranceCoverage(
           insuranceId,
@@ -188,7 +187,6 @@ export class SearchService {
     retailPrice: number,
     prisma: any,
   ) {
-    // Check if pharmacy has active agreement with insurance
     const agreement = await prisma.pharmacyInsuranceAgreement.findUnique({
       where: {
         insuranceId_pharmacyId: {
@@ -218,7 +216,6 @@ export class SearchService {
       };
     }
 
-    // Get medicine tariff
     const tariff = await prisma.insuranceMedicineTariff.findUnique({
       where: {
         insuranceId_medicineId: {
@@ -240,7 +237,6 @@ export class SearchService {
       };
     }
 
-    // Use custom coverage rate from agreement if available, otherwise use tariff rate
     const coveragePercentage = agreement.customCoverageRate
       ? Number(agreement.customCoverageRate)
       : Number(tariff.coveragePercentage);
@@ -249,11 +245,9 @@ export class SearchService {
     let patientPays: number;
 
     if (tariff.fixedCopayAmount) {
-      // Fixed copay amount
       insurancePays = Math.max(0, retailPrice - Number(tariff.fixedCopayAmount));
       patientPays = Number(tariff.fixedCopayAmount);
     } else {
-      // Percentage-based copay
       insurancePays = retailPrice * (coveragePercentage / 100);
       patientPays = retailPrice - insurancePays;
     }

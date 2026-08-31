@@ -55,7 +55,6 @@ export class InsurancePharmaciesService {
   async createAgreement(dto: CreatePharmacyAgreementDto) {
     const prisma = this.prismaService.prisma;
 
-    // Verify insurance exists
     const insurance = await prisma.insuranceProvider.findUnique({
       where: { id: dto.insuranceId },
     });
@@ -64,7 +63,6 @@ export class InsurancePharmaciesService {
       throw new NotFoundException('Insurance provider not found');
     }
 
-    // Verify pharmacy exists
     const pharmacy = await prisma.pharmacy.findUnique({
       where: { id: dto.pharmacyId },
     });
@@ -73,7 +71,6 @@ export class InsurancePharmaciesService {
       throw new NotFoundException('Pharmacy not found');
     }
 
-    // Check if agreement already exists
     const existingAgreement = await prisma.pharmacyInsuranceAgreement.findUnique({
       where: {
         insuranceId_pharmacyId: {
@@ -282,7 +279,6 @@ export class InsurancePharmaciesService {
   async syncTariffUpdates(insuranceId: string) {
     const prisma = this.prismaService.prisma;
 
-    // Get all active agreements for this insurance
     const agreements = await prisma.pharmacyInsuranceAgreement.findMany({
       where: {
         insuranceId,
@@ -293,7 +289,6 @@ export class InsurancePharmaciesService {
       },
     });
 
-    // Get all tariffs for this insurance
     const tariffs = await prisma.insuranceMedicineTariff.findMany({
       where: {
         insuranceId,
@@ -301,8 +296,6 @@ export class InsurancePharmaciesService {
       },
     });
 
-    // In a real implementation, this would trigger events or update pharmacy pricing
-    // For now, we return the affected pharmacies and tariff count
     return {
       insuranceId,
       affectedPharmacies: agreements.length,

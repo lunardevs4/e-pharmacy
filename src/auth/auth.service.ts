@@ -256,7 +256,6 @@ export class AuthService {
         },
       });
 
-      // Ensure the code is unique by appending a short suffix if needed
       let uniqueCode = code;
       const existing = await tx.insuranceProvider.findFirst({ where: { code } });
       if (existing) {

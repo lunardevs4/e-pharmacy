@@ -13,7 +13,6 @@ export class InsuranceClaimsService {
   async createClaim(dto: CreateInsuranceClaimDto) {
     const prisma = this.prismaService.prisma;
 
-    // Verify insurance exists
     const insurance = await prisma.insuranceProvider.findUnique({
       where: { id: dto.insuranceId },
     });
@@ -22,7 +21,6 @@ export class InsuranceClaimsService {
       throw new NotFoundException('Insurance provider not found');
     }
 
-    // Verify pharmacy exists
     const pharmacy = await prisma.pharmacy.findUnique({
       where: { id: dto.pharmacyId },
     });
@@ -31,7 +29,6 @@ export class InsuranceClaimsService {
       throw new NotFoundException('Pharmacy not found');
     }
 
-    // Verify medicine exists
     const medicine = await prisma.medicine.findUnique({
       where: { id: dto.medicineId },
     });
@@ -40,7 +37,6 @@ export class InsuranceClaimsService {
       throw new NotFoundException('Medicine not found');
     }
 
-    // Calculate insurance payment using the calculation service
     const calculation = await this.calculationService.calculatePayments({
       pharmacyId: dto.pharmacyId,
       insuranceId: dto.insuranceId,
@@ -55,7 +51,6 @@ export class InsuranceClaimsService {
 
     const medicineCalculation = calculation.medicines[0];
 
-    // Generate claim number
     const claimNumber = await this.generateClaimNumber(dto.insuranceId);
 
     const claim = await prisma.insuranceClaim.create({
@@ -271,7 +266,6 @@ export class InsuranceClaimsService {
       throw new NotFoundException('Claim not found');
     }
 
-    // Validate status transitions
     const validTransitions: Record<string, string[]> = {
       PENDING: ['APPROVED', 'REJECTED'],
       APPROVED: ['PAID', 'REJECTED'],
@@ -432,7 +426,6 @@ export class InsuranceClaimsService {
     const year = new Date().getFullYear();
     const prefix = `${insurance.code}-${year}`;
 
-    // Find the latest claim number for this insurance
     const latestClaim = await prisma.insuranceClaim.findFirst({
       where: {
         insuranceId,

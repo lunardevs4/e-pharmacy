@@ -53,7 +53,6 @@ export class RemindersService {
     if (!scheduleTimes?.length) throw new BadRequestException('timeOfDay or times must be provided');
     const scheduleEndDate = endDate || new Date(startDate.getTime() + 365 * 24 * 60 * 60 * 1000);
 
-    // Verify the patient exists
     const patient = await prisma.patient.findUnique({ where: { id: safePatientId } });
     if (!patient) throw new NotFoundException('Patient profile not found');
 

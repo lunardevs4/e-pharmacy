@@ -41,7 +41,6 @@ export class InsuranceDashboardController {
     private calculationService: InsuranceCalculationService,
   ) {}
 
-  // Dashboard Summary
   @Get('summary')
   @Roles(UserRole.INSURANCE, UserRole.ADMIN)
   @ApiOperation({ summary: 'Get insurance dashboard summary' })
@@ -50,7 +49,6 @@ export class InsuranceDashboardController {
     return this.dashboardService.getSummary(insuranceId);
   }
 
-  // Claims Endpoints
   @Get('claims')
   @Roles(UserRole.INSURANCE, UserRole.ADMIN, UserRole.PHARMACY_OWNER, UserRole.PHARMACY, UserRole.PHARMACIST)
   @ApiOperation({ summary: 'Get insurance claims with filtering' })
@@ -119,7 +117,6 @@ export class InsuranceDashboardController {
     return this.claimsService.batchPayClaims(dto);
   }
 
-  // Pharmacy Agreements Endpoints
   @Get('pharmacies')
   @Roles(UserRole.INSURANCE, UserRole.ADMIN)
   @ApiOperation({ summary: 'Get pharmacy agreements' })
@@ -191,7 +188,6 @@ export class InsuranceDashboardController {
     return this.pharmaciesService.syncTariffUpdates(insuranceId);
   }
 
-  // Tariffs Endpoints
   @Get('tariffs')
   @Roles(UserRole.INSURANCE, UserRole.ADMIN)
   @ApiOperation({ summary: 'Get medicine tariffs' })
@@ -250,7 +246,6 @@ export class InsuranceDashboardController {
     return this.tariffsService.calculateCopay(insuranceId, medicineId, parseFloat(retailPrice));
   }
 
-  // Insured Patients Endpoints
   @Get('patients')
   @Roles(UserRole.INSURANCE, UserRole.ADMIN)
   @ApiOperation({ summary: 'Get insured patients' })
@@ -321,7 +316,6 @@ export class InsuranceDashboardController {
     return this.patientsService.searchByNationalId(nationalId);
   }
 
-  // Insurance Providers Endpoints
   @Get('providers')
   @ApiOperation({ summary: 'Get insurance providers' })
   async getProviders() {
@@ -360,7 +354,6 @@ export class InsuranceDashboardController {
     return this.dashboardService.updateProvider(id, data, req.user);
   }
 
-  // Insurance Calculation Endpoints
 
   @Post('calculate')
   @ApiOperation({

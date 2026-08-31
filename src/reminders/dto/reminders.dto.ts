@@ -36,8 +36,6 @@ export class CreateReminderScheduleDto {
   @IsInt()
   intervalHours?: number;
 
-  // Patient reminder form fields. The service resolves the current patient
-  // and medicine from these values when a patient creates a reminder.
   @IsOptional()
   @IsString()
   medicineName?: string;

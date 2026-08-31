@@ -21,7 +21,6 @@ export enum AgreementStatus {
   TERMINATED = 'TERMINATED',
 }
 
-// Insurance Provider DTOs
 export class CreateInsuranceProviderDto {
   @ApiProperty({ example: 'RSSB' })
   @IsString()
@@ -122,7 +121,6 @@ export class UpdateInsuranceProviderDto {
   isActive?: boolean;
 }
 
-// Pharmacy Agreement DTOs
 export class CreatePharmacyAgreementDto {
   @ApiProperty({ example: 'uuid-of-insurance' })
   @IsUUID()
@@ -198,7 +196,6 @@ export class UpdatePharmacyAgreementDto {
   status?: AgreementStatus;
 }
 
-// Medicine Tariff DTOs
 export class SetMedicineTariffDto {
   @ApiProperty({ example: 'uuid-of-insurance' })
   @IsUUID()
@@ -260,7 +257,6 @@ export class BatchUpdateTariffDto {
   tariffs: SetMedicineTariffDto[];
 }
 
-// Insurance Claim DTOs
 export class CreateInsuranceClaimDto {
   @ApiProperty({ example: 'uuid-of-insurance' })
   @IsUUID()
@@ -304,8 +300,6 @@ export class CreateInsuranceClaimDto {
   @Min(0)
   unitPrice: number;
 
-  // Amounts are recomputed server-side from tariffs/agreements; client values
-  // are accepted for backwards compatibility but never trusted.
   @ApiPropertyOptional({ example: 10000.00 })
   @IsOptional()
   @IsNumber()
@@ -348,7 +342,6 @@ export class BatchPayClaimsDto {
   claimIds: string[];
 }
 
-// Insured Patient DTOs
 export class RegisterInsuredPatientDto {
   @ApiProperty({ example: 'uuid-of-insurance' })
   @IsUUID()
@@ -426,7 +419,6 @@ export class VerifyPolicyDto {
   nationalId?: string;
 }
 
-// Dashboard Query DTOs
 export class InsuranceDashboardQueryDto {
   @ApiPropertyOptional({ example: 'uuid-of-insurance' })
   @IsOptional()
@@ -454,7 +446,6 @@ export class InsuranceDashboardQueryDto {
   pharmacyId?: string;
 }
 
-// Insurance Calculation DTOs
 export class MedicineCalculationDto {
   @ApiProperty({ example: 'uuid-of-medicine' })
   @IsUUID()

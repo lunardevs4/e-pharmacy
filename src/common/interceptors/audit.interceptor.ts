@@ -20,7 +20,6 @@ export class AuditInterceptor implements NestInterceptor {
     const req = context.switchToHttp().getRequest();
     const method: string = req.method?.toUpperCase();
 
-    // Only audit mutating methods
     if (!['POST', 'PUT', 'PATCH', 'DELETE'].includes(method)) {
       return next.handle();
     }
@@ -31,7 +30,6 @@ export class AuditInterceptor implements NestInterceptor {
       (rule) => rule.method === method && rule.pattern.test(path),
     );
 
-    // No mapping defined for this route — let it pass silently
     if (!match) {
       return next.handle();
     }
@@ -39,14 +37,11 @@ export class AuditInterceptor implements NestInterceptor {
     return next.handle().pipe(
       tap({
         next: (responseBody: any) => {
-          // Extract the authenticated user (set by JwtAuthGuard)
           const user = req.user as { id?: string } | undefined;
           const userId = user?.id ?? null;
 
-          // Best-effort entity ID extraction from the response or URL params
           const entityId = this.extractEntityId(responseBody, req);
 
-          // Fire-and-forget — never block the response
           this.auditLogsService
             .log({
               userId,
@@ -68,16 +63,13 @@ export class AuditInterceptor implements NestInterceptor {
     );
   }
 
-  /** Pull the entity ID from the response body (id field) or the URL :id param */
   private extractEntityId(body: any, req: any): string | null {
-    // Unwrap TransformInterceptor envelope { success, data, timestamp }
     const payload = body?.data ?? body;
 
     if (payload?.id && typeof payload.id === 'string') {
       return payload.id;
     }
 
-    // Fall back to URL param
     const paramId = req.params?.id;
     if (paramId && typeof paramId === 'string') {
       return paramId;
@@ -86,13 +78,11 @@ export class AuditInterceptor implements NestInterceptor {
     return null;
   }
 
-  /** Attach pharmacy-scoped mutations to the pharmacy activity feed. */
   private extractPharmacyId(req: any): string | null {
     const pharmacyId = req.params?.pharmacyId;
     return typeof pharmacyId === 'string' ? pharmacyId : null;
   }
 
-  /** Strip any password/token fields before storing the request body as changes */
   private sanitizeChanges(body: any): Record<string, any> | null {
     if (!body || typeof body !== 'object') return null;
 
@@ -115,7 +105,6 @@ export class AuditInterceptor implements NestInterceptor {
     return sanitized;
   }
 
-  /** Handle X-Forwarded-For and direct socket address */
   private extractIp(req: any): string | null {
     const forwarded = req.headers?.['x-forwarded-for'];
     if (forwarded) {

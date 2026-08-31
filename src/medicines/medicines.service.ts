@@ -38,7 +38,6 @@ export class MedicinesService {
     );
 
     if (existingMedicine) {
-      // Medicine already exists - update its batch/stock instead of creating duplicate
       const batch = safeDto.initialBatch;
       const updatedMedicine = await prisma.medicine.update({
         where: { id: existingMedicine.id },
@@ -67,7 +66,6 @@ export class MedicinesService {
       return updatedMedicine;
     }
 
-    // Find or create category
     const category = safeDto.categoryId
       ? await prisma.category.findUnique({
           where: { id: validateUuid(safeDto.categoryId, 'categoryId') },
@@ -79,7 +77,6 @@ export class MedicinesService {
         });
     if (!category) throw new NotFoundException('Category not found');
 
-    // Find or create manufacturer
     const manufacturer = safeDto.manufacturerId
       ? await prisma.manufacturer.findUnique({
           where: {
@@ -170,7 +167,6 @@ export class MedicinesService {
             }
           : {}),
       },
-      // Keep the catalogue deterministic and put newly registered medicines first.
       orderBy: { createdAt: 'desc' },
       include: {
         category: true,
@@ -277,7 +273,6 @@ export class MedicinesService {
               : null,
         };
 
-        // Add insurance coverage if insuranceId is provided
         if (insuranceId) {
           const insuranceCoverage = await this.calculateInsuranceCoverage(
             insuranceId,
@@ -350,7 +345,6 @@ export class MedicinesService {
     retailPrice: number,
     prisma: any,
   ) {
-    // Check if pharmacy has active agreement with insurance
     const agreement = await prisma.pharmacyInsuranceAgreement.findUnique({
       where: {
         insuranceId_pharmacyId: {
@@ -380,7 +374,6 @@ export class MedicinesService {
       };
     }
 
-    // Get medicine tariff
     const tariff = await prisma.insuranceMedicineTariff.findUnique({
       where: {
         insuranceId_medicineId: {
@@ -402,7 +395,6 @@ export class MedicinesService {
       };
     }
 
-    // Use custom coverage rate from agreement if available, otherwise use tariff rate
     const coveragePercentage = agreement.customCoverageRate
       ? Number(agreement.customCoverageRate)
       : Number(tariff.coveragePercentage);
@@ -411,11 +403,9 @@ export class MedicinesService {
     let patientPays: number;
 
     if (tariff.fixedCopayAmount) {
-      // Fixed copay amount
       insurancePays = Math.max(0, retailPrice - Number(tariff.fixedCopayAmount));
       patientPays = Number(tariff.fixedCopayAmount);
     } else {
-      // Percentage-based copay
       insurancePays = retailPrice * (coveragePercentage / 100);
       patientPays = retailPrice - insurancePays;
     }

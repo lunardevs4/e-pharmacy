@@ -23,11 +23,8 @@ export class RolesGuard implements CanActivate {
       throw new ForbiddenException('User does not have a valid role assignment');
     }
     const hasRequiredRole = requiredRoles.some((role) => {
-      // Direct match
       if (user.role === role) return true;
-      // ADMIN has access to all roles
       if (user.role === 'ADMIN') return true;
-      // PHARMACY and PHARMACY_OWNER are treated symmetrically
       if (user.role === 'PHARMACY' && role === 'PHARMACY_OWNER') return true;
       if (user.role === 'PHARMACY_OWNER' && role === 'PHARMACY') return true;
       return false;

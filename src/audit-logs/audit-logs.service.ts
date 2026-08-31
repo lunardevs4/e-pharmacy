@@ -29,7 +29,6 @@ export interface CreateAuditLogDto {
 export class AuditLogsService {
   constructor(private prismaService: PrismaService) { }
 
-  /** Write a single audit log entry. Used by AuditInterceptor. */
   async log(dto: CreateAuditLogDto): Promise<void> {
     const prisma = this.prismaService.prisma;
     await prisma.auditLog.create({
@@ -137,9 +136,6 @@ export class AuditLogsService {
       const employee = await prisma.pharmacyEmployee.findFirst({ where: { pharmacyId: safePharmacyId, userId: user.id, role: UserRole.PHARMACIST } });
       if (!employee) throw new ForbiddenException('You are not employed at this pharmacy');
     }
-    // Older audit rows were created before pharmacyId was attached by the
-    // interceptor. Resolve those rows through the pharmacy-scoped entities so
-    // they still appear in the pharmacy activity feed.
     const [reservations, inventory] = await Promise.all([
       prisma.reservation.findMany({ where: { pharmacyId: safePharmacyId }, select: { id: true } }),
       prisma.inventory.findMany({ where: { pharmacyId: safePharmacyId }, select: { id: true } }),

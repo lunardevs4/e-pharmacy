@@ -13,7 +13,6 @@ export class CreateReservationDto {
   @Min(1)
   quantity: number;
 
-  // Optional — the service defaults the pickup window to 24h when omitted.
   @IsOptional()
   @IsDateString()
   @TransformToISODateTime()

@@ -9,7 +9,6 @@ export class InsuredPatientsService {
   async registerPatient(dto: RegisterInsuredPatientDto) {
     const prisma = this.prismaService.prisma;
 
-    // Verify insurance exists
     const insurance = await prisma.insuranceProvider.findUnique({
       where: { id: dto.insuranceId },
     });
@@ -18,7 +17,6 @@ export class InsuredPatientsService {
       throw new NotFoundException('Insurance provider not found');
     }
 
-    // If patientId is provided, verify patient exists
     if (dto.patientId) {
       const patient = await prisma.patient.findUnique({
         where: { id: dto.patientId },
@@ -29,7 +27,6 @@ export class InsuredPatientsService {
       }
     }
 
-    // Check if policy number already exists
     const existingPolicy = await prisma.insuredPatient.findUnique({
       where: { policyNumber: dto.policyNumber },
     });
@@ -38,7 +35,6 @@ export class InsuredPatientsService {
       throw new BadRequestException('Policy number already exists');
     }
 
-    // Check if national ID is already registered with this insurance
     if (dto.nationalId) {
       const existingNationalId = await prisma.insuredPatient.findFirst({
         where: {
@@ -262,7 +258,6 @@ export class InsuredPatientsService {
       };
     }
 
-    // Verify national ID if provided
     if (dto.nationalId && patient.nationalId !== dto.nationalId) {
       return {
         valid: false,
@@ -270,7 +265,6 @@ export class InsuredPatientsService {
       };
     }
 
-    // Check if insurance is active
     if (!patient.insurance.isActive || patient.insurance.status !== 'ACTIVE') {
       return {
         valid: false,
@@ -278,7 +272,6 @@ export class InsuredPatientsService {
       };
     }
 
-    // Check if patient policy is active
     if (patient.status !== 'ACTIVE') {
       return {
         valid: false,
@@ -286,7 +279,6 @@ export class InsuredPatientsService {
       };
     }
 
-    // Check if policy has expired
     const now = new Date();
     if (patient.endDate && patient.endDate < now) {
       return {
@@ -295,7 +287,6 @@ export class InsuredPatientsService {
       };
     }
 
-    // Check if policy has started
     if (patient.startDate > now) {
       return {
         valid: false,
@@ -334,7 +325,6 @@ export class InsuredPatientsService {
       throw new NotFoundException('Insured patient not found');
     }
 
-    // Check if new policy number conflicts with existing
     if (dto.policyNumber && dto.policyNumber !== patient.policyNumber) {
       const existingPolicy = await prisma.insuredPatient.findUnique({
         where: { policyNumber: dto.policyNumber },

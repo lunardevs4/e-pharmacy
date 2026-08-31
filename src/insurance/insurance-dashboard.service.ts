@@ -14,12 +14,10 @@ export class InsuranceDashboardService {
 
     const whereClause = insuranceId ? { insuranceId } : {};
 
-    // Total insured patients count
     const totalInsuredPatients = await prisma.insuredPatient.count({
       where: { ...whereClause, status: 'ACTIVE' },
     });
 
-    // New patients this month
     const newPatientsThisMonth = await prisma.insuredPatient.count({
       where: {
         ...whereClause,
@@ -28,7 +26,6 @@ export class InsuranceDashboardService {
       },
     });
 
-    // Total claims amount this month
     const claimsThisMonth = await prisma.insuranceClaim.aggregate({
       where: {
         ...whereClause,
@@ -41,7 +38,6 @@ export class InsuranceDashboardService {
 
     const totalClaimsAmountThisMonth = Number(claimsThisMonth._sum.totalAmount || 0);
 
-    // Total claims amount previous month for growth calculation
     const claimsPreviousMonth = await prisma.insuranceClaim.aggregate({
       where: {
         ...whereClause,
@@ -61,7 +57,6 @@ export class InsuranceDashboardService {
         ? ((totalClaimsAmountThisMonth - totalClaimsAmountPreviousMonth) / totalClaimsAmountPreviousMonth) * 100
         : 0;
 
-    // Approved claims count and approval percentage
     const totalClaimsCount = await prisma.insuranceClaim.count({
       where: { ...whereClause },
     });
@@ -82,7 +77,6 @@ export class InsuranceDashboardService {
       where: { ...whereClause, status: 'PAID' },
     });
 
-    // Amount breakdowns
     const approvedClaimsAgg = await prisma.insuranceClaim.aggregate({
       where: { ...whereClause, status: 'APPROVED' },
       _sum: { insuranceAmount: true, totalAmount: true },
@@ -107,7 +101,6 @@ export class InsuranceDashboardService {
     });
     const paidClaimsAmount = Number(paidClaimsAgg._sum.insuranceAmount || 0);
 
-    // Active partnership & tariff counts for dashboard cards
     const totalActiveAgreements = await prisma.pharmacyInsuranceAgreement.count({
       where: { ...whereClause, status: 'ACTIVE' },
     });
@@ -119,7 +112,6 @@ export class InsuranceDashboardService {
     const approvalPercentage =
       totalClaimsCount > 0 ? (approvedClaimsCount / totalClaimsCount) * 100 : 0;
 
-    // Outstanding payments amount and count of pharmacies awaiting payout
     const outstandingClaims = await prisma.insuranceClaim.findMany({
       where: {
         ...whereClause,
@@ -140,7 +132,6 @@ export class InsuranceDashboardService {
       outstandingClaims.map((claim) => claim.pharmacyId),
     ).size;
 
-    // Monthly claims trend (last 7 months)
     const monthlyTrend = [];
     for (let i = 6; i >= 0; i--) {
       const monthStart = new Date(now.getFullYear(), now.getMonth() - i, 1);
@@ -167,7 +158,6 @@ export class InsuranceDashboardService {
       });
     }
 
-    // Claims by status distribution
     const statusDistribution = await prisma.insuranceClaim.groupBy({
       by: ['status'],
       where: { ...whereClause },
@@ -185,7 +175,6 @@ export class InsuranceDashboardService {
       claimsByStatus[item.status as keyof typeof claimsByStatus] = item._count;
     });
 
-    // Recent claims list
     const recentClaims = await prisma.insuranceClaim.findMany({
       where: { ...whereClause },
       include: {
@@ -345,14 +334,12 @@ export class InsuranceDashboardService {
       throw new NotFoundException('Insurance provider not found');
     }
 
-    // Authorization check: only insurance user associated with this provider or admin can update
     if (user && user.role !== 'ADMIN') {
       if (provider.userId !== user.id) {
         throw new ForbiddenException('You do not have permission to update this insurance provider');
       }
     }
 
-    // Validate coverage and copay percentages
     if (data.defaultCoveragePercentage !== undefined) {
       if (data.defaultCoveragePercentage < 0 || data.defaultCoveragePercentage > 100) {
         throw new BadRequestException('Coverage percentage must be between 0 and 100');
@@ -365,7 +352,6 @@ export class InsuranceDashboardService {
       }
     }
 
-    // Validate that coverage + copay = 100 if both are provided
     if (data.defaultCoveragePercentage !== undefined && data.defaultCopayPercentage !== undefined) {
       const total = data.defaultCoveragePercentage + data.defaultCopayPercentage;
       if (Math.abs(total - 100) > 0.01) {

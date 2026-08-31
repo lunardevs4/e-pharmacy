@@ -9,7 +9,6 @@ export class InsuranceTariffsService {
   async setTariff(dto: SetMedicineTariffDto) {
     const prisma = this.prismaService.prisma;
 
-    // Verify insurance exists
     const insurance = await prisma.insuranceProvider.findUnique({
       where: { id: dto.insuranceId },
     });
@@ -18,7 +17,6 @@ export class InsuranceTariffsService {
       throw new NotFoundException('Insurance provider not found');
     }
 
-    // Verify medicine exists
     const medicine = await prisma.medicine.findUnique({
       where: { id: dto.medicineId },
     });
@@ -27,7 +25,6 @@ export class InsuranceTariffsService {
       throw new NotFoundException('Medicine not found');
     }
 
-    // Check if tariff already exists
     const existingTariff = await prisma.insuranceMedicineTariff.findUnique({
       where: {
         insuranceId_medicineId: {
@@ -38,7 +35,6 @@ export class InsuranceTariffsService {
     });
 
     if (existingTariff) {
-      // Update existing tariff
       const updatedTariff = await prisma.insuranceMedicineTariff.update({
         where: { id: existingTariff.id },
         data: {
@@ -72,7 +68,6 @@ export class InsuranceTariffsService {
       return updatedTariff;
     }
 
-    // Create new tariff
     const tariff = await prisma.insuranceMedicineTariff.create({
       data: {
         insuranceId: dto.insuranceId,
@@ -303,11 +298,9 @@ export class InsuranceTariffsService {
     let patientPays: number;
 
     if (tariff.fixedCopayAmount) {
-      // Fixed copay amount
       insurancePays = Math.min(retailPrice, retailPrice - Number(tariff.fixedCopayAmount));
       patientPays = Number(tariff.fixedCopayAmount);
     } else {
-      // Percentage-based copay
       const coverageRate = Number(tariff.coveragePercentage) / 100;
       insurancePays = retailPrice * coverageRate;
       patientPays = retailPrice - insurancePays;

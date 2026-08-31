@@ -178,7 +178,6 @@ export class PharmaciesController {
     return this.pharmaciesService.removeEmployee(id, req.user.id, employeeId);
   }
 
-  // Pharmacy Insurance Management Endpoints
 
   @Get(':id/insurance')
   @Public()

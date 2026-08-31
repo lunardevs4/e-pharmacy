@@ -79,7 +79,6 @@ export function noSqlSanitize(options: NoSqlSanitizeOptions = {}) {
         try {
           sanitizeNode(container as any, { replaceWith, allowDots, onSanitize, req });
         } catch {
-          // swallow on frozen / immutable containers
         }
       }
     }

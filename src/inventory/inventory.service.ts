@@ -55,10 +55,8 @@ export class InventoryService {
     const pharmacy = await prisma.pharmacy.findUnique({ where: { id: pharmacyId } });
     if (!pharmacy) throw new NotFoundException('Pharmacy not found');
 
-    // ADMIN always has write access
     if (user.role === UserRole.ADMIN) return pharmacy;
 
-    // PHARMACY_OWNER / PHARMACY: must own the pharmacy
     if (user.role === UserRole.PHARMACY_OWNER || (user.role as string) === 'PHARMACY') {
       if (pharmacy.ownerId !== user.id) {
         throw new ForbiddenException('You do not own this pharmacy');
@@ -66,7 +64,6 @@ export class InventoryService {
       return pharmacy;
     }
 
-    // PHARMACIST: must be employed at this pharmacy
     if (user.role === UserRole.PHARMACIST) {
       const employee = await prisma.pharmacyEmployee.findFirst({
         where: { pharmacyId, userId: user.id },
@@ -245,7 +242,6 @@ export class InventoryService {
 
     let rows: any[] = [];
 
-    // Parse CSV or Excel
     if (mimeType === 'text/csv' || mimeType === 'application/vnd.ms-excel') {
       rows = await this.parseCSV(fileBuffer);
     } else if (mimeType === 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet') {
@@ -266,7 +262,6 @@ export class InventoryService {
       const rowNum = i + 1;
 
       try {
-        // Validate required fields
         if (!row.tradeName || !row.quantity || !row.price) {
           throw new Error('Missing required fields: tradeName, quantity, or price');
         }
@@ -284,7 +279,6 @@ export class InventoryService {
           expiryDate = validateDate(row.expiryDate, 'expiryDate');
         }
 
-        // Find or create category
         let categoryId: string | undefined;
         if (row.category) {
           const safeCategory = validateSafeString(row.category, 'category', 100);
@@ -301,7 +295,6 @@ export class InventoryService {
           }
         }
 
-        // Find or create manufacturer
         let manufacturerId: string | undefined;
         if (row.manufacturer) {
           const safeManufacturer = validateSafeString(row.manufacturer, 'manufacturer', 255);
@@ -318,7 +311,6 @@ export class InventoryService {
           }
         }
 
-        // Find or create medicine
         const existingMedicine = await prisma.medicine.findFirst({
           where: {
             tradeName: safeTradeName,
@@ -340,7 +332,6 @@ export class InventoryService {
           });
         }
 
-        // Create or update inventory
         const existingInventory = await prisma.inventory.findFirst({
           where: {
             pharmacyId: safePharmacyId,
@@ -350,7 +341,6 @@ export class InventoryService {
         });
 
         if (existingInventory) {
-          // Update existing inventory
           await prisma.inventory.update({
             where: { id: existingInventory.id },
             data: {
@@ -381,7 +371,6 @@ export class InventoryService {
             },
           });
         } else {
-          // Create new inventory
           const inventory = await prisma.inventory.create({
             data: {
               pharmacyId: safePharmacyId,
@@ -414,7 +403,6 @@ export class InventoryService {
           });
         }
 
-        // Create batch if provided
         if (safeBatchNumber) {
           const existingBatch = await prisma.medicineBatch.findFirst({
             where: {

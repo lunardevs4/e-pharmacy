@@ -35,7 +35,6 @@ export class ReminderSchedulerService {
       try {
         await prisma.$disconnect();
       } catch {
-        // Ignore disconnect errors and try a fresh connection below.
       }
 
       await prisma.$connect();
@@ -43,27 +42,19 @@ export class ReminderSchedulerService {
     }
   }
 
-  /**
-   * Runs every minute. Finds all active reminder schedules whose timeOfDay
-   * matches the current HH:MM, creates a ReminderLog and an in-app Notification
-   * for the patient — unless one has already been created for that dose today.
-   */
   @Cron(CronExpression.EVERY_MINUTE)
   async dispatchDueReminders() {
     await this.runWithReconnect(async () => {
       const prisma = this.prismaService.prisma;
       const now = new Date();
 
-      // Current time as "HH:MM" in local time (server timezone)
       const currentHHMM = now.toTimeString().slice(0, 5); // e.g. "08:00"
 
-      // Window: start of today and end of today for dedup checks
       const todayStart = new Date(now);
       todayStart.setHours(0, 0, 0, 0);
       const todayEnd = new Date(now);
       todayEnd.setHours(23, 59, 59, 999);
 
-      // Fetch all schedules that are currently active (today falls within start/end)
       const activeSchedules = await prisma.reminderSchedule.findMany({
         where: {
           startDate: { lte: now },
@@ -81,7 +72,6 @@ export class ReminderSchedulerService {
 
       if (activeSchedules.length === 0) return;
 
-      // Filter to schedules that have a dose due right now
       const dueSchedules = activeSchedules.filter((schedule) =>
         schedule.timeOfDay.includes(currentHHMM),
       );
@@ -94,17 +84,13 @@ export class ReminderSchedulerService {
 
       for (const schedule of dueSchedules) {
         try {
-          // Dedup: skip if a log already exists for this schedule + time slot today
           const existing = await prisma.reminderLog.findFirst({
             where: {
               scheduleId: schedule.id,
               createdAt: { gte: todayStart, lte: todayEnd },
-              // Match logs created within a 2-minute window around this slot
-              // to handle any edge cases with re-runs
             },
           });
 
-          // Narrow dedup to within ±2 minutes of the current time
           if (existing) {
             const diffMs = Math.abs(
               now.getTime() - existing.createdAt.getTime(),
@@ -120,7 +106,6 @@ export class ReminderSchedulerService {
           const patientUserId = schedule.patient.user.id;
           const medicineName = schedule.medicine.tradeName;
 
-          // Create the reminder log and notification in a transaction
           await prisma.$transaction([
             prisma.reminderLog.create({
               data: {
@@ -158,7 +143,6 @@ export class ReminderSchedulerService {
             `Dispatched reminder for patient ${schedule.patientId} | medicine: ${medicineName} | time: ${currentHHMM}`,
           );
         } catch (err) {
-          // Log the failure and record it without crashing the loop
           this.logger.error(
             `Failed to dispatch reminder for schedule ${schedule.id}: ${(err as Error).message}`,
           );
@@ -188,10 +172,6 @@ export class ReminderSchedulerService {
     });
   }
 
-  /**
-   * Runs daily at midnight. Marks any PENDING/SENT logs from yesterday
-   * that were never completed by the patient as MISSED.
-   */
   @Cron(CronExpression.EVERY_DAY_AT_MIDNIGHT)
   async markMissedDoses() {
     await this.runWithReconnect(async () => {

@@ -65,8 +65,6 @@ export class ReservationsService {
       );
     }
 
-    // Auto-provision the patient profile so accounts created before the
-    // profile link existed (or via other flows) never 404 here.
     const patient = await prisma.patient.upsert({
       where: { userId: safeUserId },
       update: {},
@@ -80,7 +78,6 @@ export class ReservationsService {
     });
   }
 
-  /** Patient's reservations whose pickup window has passed without collection. */
   async findLateForPatient(user: AuthenticatedUser) {
     const prisma = this.prismaService.prisma;
     const safeUserId = validateUuid(user.id, 'userId');
@@ -245,9 +242,6 @@ export class ReservationsService {
       orderBy: { createdAt: 'desc' },
     });
 
-    // Reservations intentionally keep stock prices in Inventory rather than
-    // duplicating them. Enrich the pharmacy response with the current total
-    // and the patient's actual co-pay so the portal does not display zero.
     const inventory = await prisma.inventory.findMany({
       where: {
         pharmacyId: safePharmacyId,
@@ -343,10 +337,8 @@ export class ReservationsService {
       throw new NotFoundException('Reservation not found');
     }
 
-    // Decrement inventory when reservation is collected
     if (safeDto.status === ReservationStatus.COLLECTED) {
       if (reservation.status !== ReservationStatus.COLLECTED) {
-        // Find inventory for this medicine at this pharmacy
         const inventory = await prisma.inventory.findFirst({
           where: {
             pharmacyId: safePharmacyId,
@@ -362,7 +354,6 @@ export class ReservationsService {
             data: { quantity: newQuantity },
           });
 
-          // Record stock movement
           await prisma.stockMovement.create({
             data: {
               inventoryId: inventory.id,

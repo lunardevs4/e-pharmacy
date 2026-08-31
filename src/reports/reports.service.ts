@@ -161,7 +161,6 @@ export class ReportsService {
     const safeStartDate = startDate ? validateDate(startDate, 'startDate') : undefined;
     const safeEndDate = endDate ? validateDate(endDate, 'endDate') : undefined;
 
-    // Auto-provision patient profile like reservations service does
     const patient = await prisma.patient.upsert({
       where: { userId: safeUserId },
       update: {},

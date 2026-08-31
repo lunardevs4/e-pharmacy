@@ -61,19 +61,9 @@ export interface CalculationResult {
 export class InsuranceCalculationService {
   constructor(private prismaService: PrismaService) {}
 
-  /**
-   * Calculate insurance coverage and payment amounts for a transaction
-   * 
-   * Coverage Resolution Priority:
-   * 1. Patient-specific coverage (if patient has custom coverage)
-   * 2. Pharmacy-specific agreement custom coverage rate
-   * 3. Medicine-specific tariff coverage percentage
-   * 4. Insurance provider default coverage percentage
-   */
   async calculatePayments(input: CalculationInput): Promise<CalculationResult> {
     const prisma = this.prismaService.prisma;
 
-    // Verify pharmacy exists
     const pharmacy = await prisma.pharmacy.findUnique({
       where: { id: input.pharmacyId },
     });
@@ -82,7 +72,6 @@ export class InsuranceCalculationService {
       throw new NotFoundException('Pharmacy not found');
     }
 
-    // Verify insurance exists
     const insurance = await prisma.insuranceProvider.findUnique({
       where: { id: input.insuranceId },
     });
@@ -97,7 +86,6 @@ export class InsuranceCalculationService {
 
     const defaultCoverage = Number(insurance.defaultCoveragePercentage || 0);
 
-    // Verify pharmacy has active agreement with insurance
     const agreement = await prisma.pharmacyInsuranceAgreement.findUnique({
       where: {
         insuranceId_pharmacyId: {
@@ -111,7 +99,6 @@ export class InsuranceCalculationService {
       throw new BadRequestException('No active agreement between pharmacy and insurance provider');
     }
 
-    // Verify patient insurance if patientId is provided
     let patientCoverage: number | null = null;
     if (input.patientId || input.insuredPatientId) {
       const patient = await prisma.insuredPatient.findFirst({
@@ -124,7 +111,6 @@ export class InsuranceCalculationService {
       });
 
       if (patient) {
-        // Check if policy is valid
         const now = new Date();
         if (patient.endDate && patient.endDate < now) {
           throw new BadRequestException('Patient insurance policy has expired');
@@ -138,7 +124,6 @@ export class InsuranceCalculationService {
       }
     }
 
-    // Calculate each medicine
     const medicineResults: MedicineCalculationResult[] = [];
     let totalMedicineCost = 0;
     let totalInsuranceContribution = 0;
@@ -188,9 +173,6 @@ export class InsuranceCalculationService {
     };
   }
 
-  /**
-   * Calculate payment for a single medicine
-   */
   private async calculateMedicinePayment(
     input: MedicineCalculationInput,
     pharmacyId: string,
@@ -200,7 +182,6 @@ export class InsuranceCalculationService {
     defaultCoverage: number,
     prisma: any,
   ): Promise<MedicineCalculationResult> {
-    // Get medicine details
     const medicine = await prisma.medicine.findUnique({
       where: { id: input.medicineId },
       select: {
@@ -216,7 +197,6 @@ export class InsuranceCalculationService {
 
     const totalAmount = input.unitPrice * input.quantity;
 
-    // Get medicine tariff
     const tariff = await prisma.insuranceMedicineTariff.findUnique({
       where: {
         insuranceId_medicineId: {
@@ -226,24 +206,18 @@ export class InsuranceCalculationService {
       },
     });
 
-    // Determine applicable coverage percentage (priority order)
     let coveragePercentage = defaultCoverage;
 
-    // Priority 1: Patient-specific coverage
     if (patientCoverage !== null) {
       coveragePercentage = patientCoverage;
     }
-    // Priority 2: Pharmacy agreement custom coverage
     else if (agreementCustomCoverage !== null) {
       coveragePercentage = Number(agreementCustomCoverage);
     }
-    // Priority 3: Medicine-specific tariff coverage
     else if (tariff && tariff.coveragePercentage !== null) {
       coveragePercentage = Number(tariff.coveragePercentage);
     }
-    // Priority 4: Insurance default coverage (already set)
 
-    // Check if medicine is covered
     if (!tariff || !tariff.isCovered || tariff.status !== 'ACTIVE') {
       return {
         medicineId: input.medicineId,
@@ -262,16 +236,13 @@ export class InsuranceCalculationService {
       };
     }
 
-    // Calculate payment amounts
     let insurancePays: number;
     let patientPays: number;
 
     if (tariff.fixedCopayAmount) {
-      // Fixed copay amount
       insurancePays = Math.max(0, totalAmount - Number(tariff.fixedCopayAmount));
       patientPays = Number(tariff.fixedCopayAmount);
     } else {
-      // Percentage-based copay
       insurancePays = totalAmount * (coveragePercentage / 100);
       patientPays = totalAmount - insurancePays;
     }
@@ -296,9 +267,6 @@ export class InsuranceCalculationService {
     };
   }
 
-  /**
-   * Get insurance coverage for a single medicine (for search results)
-   */
   async getMedicineCoverage(
     pharmacyId: string,
     insuranceId: string,
@@ -307,7 +275,6 @@ export class InsuranceCalculationService {
   ) {
     const prisma = this.prismaService.prisma;
 
-    // Check if pharmacy has active agreement with insurance
     const agreement = await prisma.pharmacyInsuranceAgreement.findUnique({
       where: {
         insuranceId_pharmacyId: {
@@ -339,7 +306,6 @@ export class InsuranceCalculationService {
       };
     }
 
-    // Get medicine tariff
     const tariff = await prisma.insuranceMedicineTariff.findUnique({
       where: {
         insuranceId_medicineId: {
@@ -363,7 +329,6 @@ export class InsuranceCalculationService {
       };
     }
 
-    // Use custom coverage rate from agreement if available, otherwise use tariff rate
     const coveragePercentage = agreement.customCoverageRate
       ? Number(agreement.customCoverageRate)
       : Number(tariff.coveragePercentage);
@@ -394,9 +359,6 @@ export class InsuranceCalculationService {
     };
   }
 
-  /**
-   * Validate that a patient has valid insurance with a provider
-   */
   async validatePatientInsurance(
     patientId: string,
     insuranceId: string,
@@ -430,7 +392,6 @@ export class InsuranceCalculationService {
       };
     }
 
-    // Check if insurance is active
     if (!patient.insurance.isActive || patient.insurance.status !== 'ACTIVE') {
       return {
         valid: false,
@@ -438,7 +399,6 @@ export class InsuranceCalculationService {
       };
     }
 
-    // Check if policy has expired
     const now = new Date();
     if (patient.endDate && patient.endDate < now) {
       return {
@@ -447,7 +407,6 @@ export class InsuranceCalculationService {
       };
     }
 
-    // Check if policy has started
     if (patient.startDate > now) {
       return {
         valid: false,

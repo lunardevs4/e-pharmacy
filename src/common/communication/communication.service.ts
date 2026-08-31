@@ -94,22 +94,6 @@ export class CommunicationService {
         `Sending SMS to ${phone} via configured provider (key: ${apiKey?.substring(0, 4)}...)`,
       );
 
-      // Real SMS integration point - plug in your provider here
-      // Example with Africa's Talking, Twilio, or Infobip:
-      //
-      // const response = await fetch('https://api.smsprovider.com/send', {
-      //   method: 'POST',
-      //   headers: {
-      //     'Authorization': `Bearer ${apiSecret}`,
-      //     'Content-Type': 'application/json',
-      //   },
-      //   body: JSON.stringify({ from: fromNumber, to: phone, message }),
-      // });
-      // const data = await response.json();
-      // return {
-      //   channel: 'SMS', recipient: phone, status: 'SENT',
-      //   messageId: data.messageId, timestamp: new Date(),
-      // };
 
       return {
         channel: 'SMS',
@@ -144,16 +128,6 @@ export class CommunicationService {
         `Initiating voice call to ${phone} via configured provider (key: ${apiKey?.substring(0, 4)}...)`,
       );
 
-      // Real voice integration point
-      //
-      // const response = await fetch('https://api.voiceprovider.com/call', {
-      //   method: 'POST',
-      //   headers: {
-      //     'Authorization': `Bearer ${apiSecret}`,
-      //     'Content-Type': 'application/json',
-      //   },
-      //   body: JSON.stringify({ to: phone, message, language: 'rw' }),
-      // });
 
       return {
         channel: 'VOICE',

@@ -110,9 +110,6 @@ export class PharmaciesService {
       ownershipType,
     } = safeDto;
 
-    // Registration activation: when the placeholder licence is replaced with a
-    // real one, or a rejected owner re-submits details, push the pharmacy back
-    // into the government review queue.
     const isInitialActivation = pharmacy.licenseNumber === 'PENDING' && !!licenseNumber && licenseNumber !== 'PENDING';
     const isReapplication = (pharmacy.status as string) === 'REJECTED';
     const shouldResetToPending =
@@ -133,8 +130,6 @@ export class PharmaciesService {
         managerName,
         category,
         ownershipType,
-        // PENDING status alone gates public visibility; do not deactivate the
-        // record itself or it stays hidden even after approval.
         ...(shouldResetToPending ? { status: PharmacyStatus.PENDING } : {}),
       },
     });
@@ -147,8 +142,6 @@ export class PharmaciesService {
     const pharmacy = await prisma.pharmacy.findUnique({ where: { id: safeId } });
     if (!pharmacy) throw new NotFoundException('Pharmacy not found');
 
-    // Approval must reactivate the record so it appears in patient-facing
-    // availability searches; rejection/pending keeps it out of search.
     const reactivate = safeDto.status === PharmacyStatus.APPROVED;
 
     return prisma.pharmacy.update({
@@ -188,7 +181,6 @@ export class PharmaciesService {
     return prisma.pharmacyEmployee.delete({ where: { id: safeEmployeeId } });
   }
 
-  // Pharmacy Insurance Management Methods
 
   async getInsuranceProviders(pharmacyId: string) {
     const prisma = this.prismaService.prisma;
