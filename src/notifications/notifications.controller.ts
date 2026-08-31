@@ -1,4 +1,4 @@
-import { Controller, Get, Patch, Param, UseGuards, Req } from '@nestjs/common';
+import { Controller, Get, Patch, Param, UseGuards, Req, Body } from '@nestjs/common';
 import { ApiTags, ApiBearerAuth, ApiOperation, ApiParam } from '@nestjs/swagger';
 import { NotificationsService } from './notifications.service';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
@@ -20,6 +20,16 @@ export class NotificationsController {
   })
   findAll(@Req() req: any) {
     return this.notificationsService.findAll(req.user);
+  }
+
+  @Get('email-preferences')
+  getEmailPreferences(@Req() req: any) {
+    return this.notificationsService.getEmailPreferences(req.user.id);
+  }
+
+  @Patch('email-preferences')
+  updateEmailPreferences(@Req() req: any, @Body() body: Record<string, unknown>) {
+    return this.notificationsService.updateEmailPreferences(req.user.id, body);
   }
 
   @Patch(':id/read')

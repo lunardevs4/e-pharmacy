@@ -5,6 +5,24 @@ import * as nodemailer from 'nodemailer';
 export class EmailService {
   private readonly logger = new Logger(EmailService.name);
 
+  async sendNotificationEmail(recipientEmail: string, recipientName: string, subject: string, message: string) {
+    const gmailUser = process.env.GMAIL_USER?.trim();
+    const gmailAppPassword = process.env.GMAIL_APP_PASSWORD?.trim();
+    const fromAddress = process.env.GMAIL_FROM?.trim() || gmailUser;
+    if (!gmailUser || !gmailAppPassword || !fromAddress) {
+      this.logger.warn(`Gmail email is not configured. Skipping notification email to ${recipientEmail}.`);
+      return false;
+    }
+    const transport = nodemailer.createTransport({ service: 'gmail', auth: { user: gmailUser, pass: gmailAppPassword } });
+    await transport.sendMail({
+      from: fromAddress, to: recipientEmail, subject,
+      text: [`Hello ${recipientName},`, '', message, '', 'e-Pharmacy Notifications'].join('\n'),
+      html: `<div style="font-family:Arial,sans-serif;line-height:1.6;color:#111827"><p>Hello ${recipientName},</p><p>${message}</p><p style="color:#6b7280">e-Pharmacy Notifications</p></div>`,
+    });
+    this.logger.log(`Notification email sent to ${recipientEmail}`);
+    return true;
+  }
+
   async sendTemporaryPasswordEmail(recipientEmail: string, recipientName: string, temporaryPassword: string) {
     const gmailUser = process.env.GMAIL_USER?.trim();
     const gmailAppPassword = process.env.GMAIL_APP_PASSWORD?.trim();

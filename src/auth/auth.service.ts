@@ -645,8 +645,9 @@ export class AuthService {
       },
     });
 
+    let emailSent = false;
     try {
-      await this.emailService.sendTemporaryPasswordEmail(
+      emailSent = await this.emailService.sendTemporaryPasswordEmail(
         user.email,
         `${user.firstName} ${user.lastName}`.trim(),
         tempPassword,
@@ -659,7 +660,7 @@ export class AuthService {
 
     return {
       message: 'Managed user created successfully',
-      tempPassword,
+      emailSent,
       user: { id: user.id, email: user.email, role: user.role },
     };
   }

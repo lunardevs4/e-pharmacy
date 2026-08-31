@@ -6,6 +6,7 @@ import { UserRole } from '@generated/prisma';
 import csv from 'csv-parser';
 import * as xlsx from 'xlsx';
 import { Readable } from 'stream';
+import { EmailService } from '../common/email/email.service';
 
 interface AuthenticatedUser {
   id: string;
@@ -14,7 +15,7 @@ interface AuthenticatedUser {
 
 @Injectable()
 export class InventoryService {
-  constructor(private prismaService: PrismaService) { }
+  constructor(private prismaService: PrismaService, private emailService: EmailService) { }
 
   private async ensureViewAccess(pharmacyId: string, user: AuthenticatedUser) {
     const prisma = this.prismaService.prisma;
@@ -195,6 +196,26 @@ export class InventoryService {
           changedBy: safeUserId,
         },
       });
+    }
+
+    const newQuantity = safeDto.quantity ?? inventory.quantity;
+    if (inventory.quantity >= 10 && newQuantity < 10) {
+      const details = await prisma.inventory.findUnique({
+        where: { id: safeId },
+        include: { medicine: true, pharmacy: { include: { owner: true } } },
+      });
+      const owner = details?.pharmacy.owner;
+      if (owner) {
+        const setting = await prisma.systemSetting.findUnique({ where: { key: `email_notifications:${owner.id}` } });
+        const emailEnabled = setting ? JSON.parse(setting.value).lowStock !== false : true;
+        const message = `${details.medicine.tradeName} at ${details.pharmacy.name} is low on stock (${newQuantity} units remaining).`;
+        await prisma.notification.create({
+          data: { userId: owner.id, type: 'IN_APP', title: 'Low Stock Alert', message },
+        });
+        if (emailEnabled) {
+          await this.emailService.sendNotificationEmail(owner.email, `${owner.firstName} ${owner.lastName}`.trim(), 'Low Stock Alert', message);
+        }
+      }
     }
 
     return updated;

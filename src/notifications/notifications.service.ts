@@ -12,6 +12,35 @@ interface AuthenticatedUser {
 export class NotificationsService {
   constructor(private prismaService: PrismaService) { }
 
+  async getEmailPreferences(userId: string) {
+    const prisma = this.prismaService.prisma;
+    const safeUserId = validateUuid(userId, 'userId');
+    const setting = await prisma.systemSetting.findUnique({
+      where: { key: `email_notifications:${safeUserId}` },
+    });
+    return {
+      reminders: true,
+      lowStock: true,
+      reservations: false,
+      billing: false,
+      system: false,
+      ...(setting ? JSON.parse(setting.value) : {}),
+    };
+  }
+
+  async updateEmailPreferences(userId: string, preferences: Record<string, unknown>) {
+    const prisma = this.prismaService.prisma;
+    const safeUserId = validateUuid(userId, 'userId');
+    const allowed = ['reminders', 'lowStock', 'reservations', 'billing', 'system'];
+    const value = Object.fromEntries(allowed.map((key) => [key, preferences[key] === true]));
+    await prisma.systemSetting.upsert({
+      where: { key: `email_notifications:${safeUserId}` },
+      create: { key: `email_notifications:${safeUserId}`, value: JSON.stringify(value) },
+      update: { value: JSON.stringify(value) },
+    });
+    return value;
+  }
+
   async findAll(user: AuthenticatedUser) {
     const prisma = this.prismaService.prisma;
     const safeUserId = validateUuid(user.id, 'userId');

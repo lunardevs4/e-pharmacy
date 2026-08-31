@@ -2,12 +2,13 @@ import { Injectable, Logger } from '@nestjs/common';
 import { Cron, CronExpression } from '@nestjs/schedule';
 import { PrismaService } from '../common/prisma/prisma.service';
 import { NotificationType, ReminderStatus } from '@generated/prisma';
+import { EmailService } from '../common/email/email.service';
 
 @Injectable()
 export class ReminderSchedulerService {
   private readonly logger = new Logger(ReminderSchedulerService.name);
 
-  constructor(private prismaService: PrismaService) {}
+  constructor(private prismaService: PrismaService, private emailService: EmailService) {}
 
   private isTransientDbError(error: unknown) {
     const err = error as { code?: string; message?: string };
@@ -139,6 +140,19 @@ export class ReminderSchedulerService {
               },
             }),
           ]);
+
+          const preference = await prisma.systemSetting.findUnique({
+            where: { key: `email_notifications:${patientUserId}` },
+          });
+          const emailEnabled = preference ? JSON.parse(preference.value).reminders !== false : true;
+          if (emailEnabled && schedule.patient.user.email) {
+            await this.emailService.sendNotificationEmail(
+              schedule.patient.user.email,
+              `${schedule.patient.user.firstName} ${schedule.patient.user.lastName}`.trim(),
+              'Medication Reminder',
+              `It is time to take your ${medicineName} — ${schedule.dosage}.`,
+            );
+          }
 
           this.logger.log(
             `Dispatched reminder for patient ${schedule.patientId} | medicine: ${medicineName} | time: ${currentHHMM}`,

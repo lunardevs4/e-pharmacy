@@ -33,7 +33,14 @@ export class RemindersService {
     let safeMedicineId = medicineId ? validateUuid(medicineId, 'medicineId') : undefined;
     if (!safeMedicineId && medicineName) {
       const medicine = await prisma.medicine.findFirst({
-        where: { tradeName: { equals: medicineName, mode: 'insensitive' } },
+        where: {
+          OR: [
+            { tradeName: { equals: medicineName, mode: 'insensitive' } },
+            { tradeName: { contains: medicineName, mode: 'insensitive' } },
+            { genericName: { equals: medicineName, mode: 'insensitive' } },
+            { genericName: { contains: medicineName, mode: 'insensitive' } },
+          ],
+        },
       });
       if (!medicine) throw new NotFoundException(`Medicine not found: ${medicineName}`);
       safeMedicineId = medicine.id;
