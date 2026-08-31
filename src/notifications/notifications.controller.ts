@@ -8,7 +8,7 @@ import { UserRole } from '@generated/prisma';
 @ApiTags('Notifications')
 @Controller('api/v1/notifications')
 @UseGuards(JwtAuthGuard)
-@Roles(UserRole.PATIENT, UserRole.PHARMACY_OWNER, UserRole.PHARMACIST, UserRole.GOVERNMENT, UserRole.ADMIN)
+@Roles(UserRole.PATIENT, UserRole.PHARMACY_OWNER, UserRole.PHARMACIST, UserRole.GOVERNMENT, UserRole.ADMIN, UserRole.INSURANCE)
 @ApiBearerAuth()
 export class NotificationsController {
   constructor(private notificationsService: NotificationsService) { }
