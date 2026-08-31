@@ -1,7 +1,7 @@
-import { Controller, Get, Post, Body, Patch, Param, UseGuards, Req } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Delete, Param, UseGuards, Req } from '@nestjs/common';
 import { ApiTags, ApiBearerAuth, ApiOperation, ApiBody, ApiParam } from '@nestjs/swagger';
 import { RemindersService } from './reminders.service';
-import { CreateReminderScheduleDto } from './dto/reminders.dto';
+import { CreateReminderScheduleDto, UpdateReminderScheduleDto } from './dto/reminders.dto';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { Roles } from '../common/guards/roles.decorator';
 import { UserRole } from '@generated/prisma';
@@ -67,6 +67,18 @@ export class RemindersController {
   })
   getSchedules(@Req() req: any) {
     return this.remindersService.getSchedules(req.user);
+  }
+
+  @Patch('schedules/:id')
+  @Roles(UserRole.PATIENT)
+  updateSchedule(@Param('id') id: string, @Req() req: any, @Body() dto: UpdateReminderScheduleDto) {
+    return this.remindersService.updateSchedule(req.user, id, dto);
+  }
+
+  @Delete('schedules/:id')
+  @Roles(UserRole.PATIENT)
+  deleteSchedule(@Param('id') id: string, @Req() req: any) {
+    return this.remindersService.deleteSchedule(req.user, id);
   }
 
   @Patch('logs/:logId/complete')

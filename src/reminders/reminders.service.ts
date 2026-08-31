@@ -1,6 +1,6 @@
 import { Injectable, NotFoundException, ForbiddenException, BadRequestException } from '@nestjs/common';
 import { PrismaService } from '../common/prisma/prisma.service';
-import { CreateReminderScheduleDto } from './dto/reminders.dto';
+import { CreateReminderScheduleDto, UpdateReminderScheduleDto } from './dto/reminders.dto';
 import { UserRole, ReminderStatus } from '@generated/prisma';
 import { validateUuid, sanitizeDeep, validateDate } from '../common/security/security.util';
 
@@ -151,6 +151,35 @@ export class RemindersService {
       include: { medicine: true, prescription: true },
       orderBy: { createdAt: 'desc' },
     });
+  }
+
+  async updateSchedule(user: AuthenticatedUser, id: string, dto: UpdateReminderScheduleDto) {
+    const prisma = this.prismaService.prisma;
+    if (user.role !== UserRole.PATIENT) throw new ForbiddenException('Only patients can update reminders');
+    const patient = await prisma.patient.findFirst({ where: { userId: validateUuid(user.id, 'userId') } });
+    if (!patient) throw new NotFoundException('Patient profile not found');
+    const safeId = validateUuid(id, 'id');
+    const schedule = await prisma.reminderSchedule.findUnique({ where: { id: safeId } });
+    if (!schedule || schedule.patientId !== patient.id) throw new NotFoundException('Reminder not found');
+    const safeDto = sanitizeDeep(dto) as any;
+    const data: any = {};
+    if (safeDto.times !== undefined) data.timeOfDay = safeDto.times;
+    if (safeDto.startDate !== undefined) data.startDate = validateDate(safeDto.startDate, 'startDate');
+    if (safeDto.endDate !== undefined) data.endDate = validateDate(safeDto.endDate, 'endDate');
+    if (safeDto.isActive === false) data.endDate = new Date();
+    if (safeDto.isActive === true && safeDto.endDate === undefined) data.endDate = new Date('2099-12-31T23:59:59.999Z');
+    return prisma.reminderSchedule.update({ where: { id: safeId }, data });
+  }
+
+  async deleteSchedule(user: AuthenticatedUser, id: string) {
+    const prisma = this.prismaService.prisma;
+    if (user.role !== UserRole.PATIENT) throw new ForbiddenException('Only patients can delete reminders');
+    const patient = await prisma.patient.findFirst({ where: { userId: validateUuid(user.id, 'userId') } });
+    if (!patient) throw new NotFoundException('Patient profile not found');
+    const safeId = validateUuid(id, 'id');
+    const schedule = await prisma.reminderSchedule.findUnique({ where: { id: safeId } });
+    if (!schedule || schedule.patientId !== patient.id) throw new NotFoundException('Reminder not found');
+    return prisma.reminderSchedule.delete({ where: { id: safeId } });
   }
 
   async markIntake(user: AuthenticatedUser, logId: string) {
