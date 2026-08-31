@@ -97,7 +97,7 @@ export class GovernmentDashboardService {
       result.map(async (item) => {
         const medicine = await prisma.medicine.findUnique({
           where: { id: item.medicineId },
-           select: { id: true, tradeName: true, genericName: true },
+           select: { id: true, tradeName: true, genericName: true, category: { select: { name: true } } },
         });
         return {
           medicine,
