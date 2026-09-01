@@ -15,7 +15,7 @@ export class EmailService {
     }
     const transport = nodemailer.createTransport({ service: 'gmail', auth: { user: gmailUser, pass: gmailAppPassword } });
     await transport.sendMail({
-      from: fromAddress,
+      from: `"Rwanda E-pharmacy" <${fromAddress}>`,
       to: recipientEmail,
       subject,
       text: [
@@ -67,7 +67,7 @@ export class EmailService {
 
     await transport.sendMail({
 
-      from: fromAddress,
+      from: `"Rwanda E-pharmacy" <${fromAddress}>`,
       to: recipientEmail,
       subject: 'Your temporary e-Pharmacy password',
       text: [
@@ -126,7 +126,7 @@ export class EmailService {
     const transport = nodemailer.createTransport({ service: 'gmail', auth: { user: gmailUser, pass: gmailAppPassword } });
     await transport.sendMail({
 
-      from: fromAddress,
+      from: `"Rwanda E-pharmacy" <${fromAddress}>`,
       to: recipientEmail,
       subject: 'Verify your e-Pharmacy email',
       text: [
