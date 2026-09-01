@@ -6,10 +6,13 @@ import { InsuranceTariffsService } from './insurance-tariffs.service';
 import { InsuranceClaimsService } from './insurance-claims.service';
 import { InsuredPatientsService } from './insured-patients.service';
 import { InsuranceCalculationService } from './insurance-calculation.service';
+import { InsuranceReportsService } from './insurance-reports.service';
 import { Roles } from '../common/guards/roles.decorator';
 import { UserRole } from '../generated/prisma';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { RolesGuard } from '../common/guards/roles.guard';
+import { Response } from 'express';
+import { Res } from '@nestjs/common';
 import {
   CreateInsuranceProviderDto,
   UpdateInsuranceProviderDto,
@@ -39,6 +42,7 @@ export class InsuranceDashboardController {
     private claimsService: InsuranceClaimsService,
     private patientsService: InsuredPatientsService,
     private calculationService: InsuranceCalculationService,
+    private reportsService: InsuranceReportsService,
   ) {}
 
   @Get('summary')
@@ -373,5 +377,53 @@ export class InsuranceDashboardController {
   @ApiBody({ type: ValidatePatientInsuranceDto })
   async validatePatientInsurance(@Body() dto: ValidatePatientInsuranceDto) {
     return this.calculationService.validatePatientInsurance(dto.patientId, dto.insuranceId);
+  }
+
+  // --- Reports ---
+
+  @Get('reports/monthly-summary')
+  @Roles(UserRole.INSURANCE, UserRole.ADMIN)
+  @ApiOperation({ summary: 'Export Monthly Claims Summary (PDF)' })
+  @ApiQuery({ name: 'insuranceId', required: true })
+  async exportMonthlySummary(
+    @Query('insuranceId') insuranceId: string,
+    @Res() res: Response
+  ) {
+    await this.reportsService.generateMonthlySummary(insuranceId, res);
+  }
+
+  @Get('reports/payout-register')
+  @Roles(UserRole.INSURANCE, UserRole.ADMIN)
+  @ApiOperation({ summary: 'Export Pharmacy Payout Register (CSV)' })
+  @ApiQuery({ name: 'insuranceId', required: true })
+  async exportPayoutRegister(
+    @Query('insuranceId') insuranceId: string,
+    @Res() res: Response
+  ) {
+    await this.reportsService.generatePayoutRegister(insuranceId, res);
+  }
+
+  @Get('reports/rejection-analysis')
+  @Roles(UserRole.INSURANCE, UserRole.ADMIN)
+  @ApiOperation({ summary: 'Export Rejection Analysis Report (PDF)' })
+  @ApiQuery({ name: 'insuranceId', required: true })
+  async exportRejectionAnalysis(
+    @Query('insuranceId') insuranceId: string,
+    @Res() res: Response
+  ) {
+    // Placeholder, using the same method for now
+    await this.reportsService.generateMonthlySummary(insuranceId, res);
+  }
+
+  @Get('reports/coverage-audit')
+  @Roles(UserRole.INSURANCE, UserRole.ADMIN)
+  @ApiOperation({ summary: 'Export Insured Patient Coverage Audit (CSV)' })
+  @ApiQuery({ name: 'insuranceId', required: true })
+  async exportCoverageAudit(
+    @Query('insuranceId') insuranceId: string,
+    @Res() res: Response
+  ) {
+    // Placeholder, using the same method for now
+    await this.reportsService.generatePayoutRegister(insuranceId, res);
   }
 }
