@@ -74,6 +74,16 @@ export class PharmaciesController {
     return this.pharmaciesService.findOne(id);
   }
 
+  @Get(':id/employees')
+  @UseGuards(JwtAuthGuard)
+  @Roles(UserRole.PHARMACY_OWNER)
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Get employees for an owned pharmacy' })
+  @ApiParam({ name: 'id', type: 'string', description: 'Pharmacy UUID' })
+  findEmployees(@Param('id') id: string, @Req() req: any) {
+    return this.pharmaciesService.findEmployees(id, req.user.id);
+  }
+
   @Patch(':id')
   @UseGuards(JwtAuthGuard)
   @Roles(UserRole.PHARMACY_OWNER)
