@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../common/prisma/prisma.service';
-import * as PDFDocument from 'pdfkit';
+import PDFDocument = require('pdfkit');
 import * as xlsx from 'xlsx';
 import { Response } from 'express';
 

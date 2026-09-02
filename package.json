@@ -32,6 +32,7 @@
     "@nestjs/throttler": "^6.5.0",
     "@prisma/adapter-pg": "^7.9.0",
     "@prisma/client": "^7.9.1",
+    "@swc/helpers": "^0.5.23",
     "bcrypt": "^6.0.0",
     "class-transformer": "^0.5.1",
     "class-validator": "^0.15.1",
