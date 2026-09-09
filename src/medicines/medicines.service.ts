@@ -13,10 +13,14 @@ import {
   sanitizeDeep,
   validateGeoCoordinate,
 } from '../common/security/security.util';
+import { ApiCacheService } from '../common/cache/api-cache.service';
 
 @Injectable()
 export class MedicinesService {
-  constructor(private prismaService: PrismaService) {}
+  constructor(
+    private prismaService: PrismaService,
+    private apiCache: ApiCacheService,
+  ) {}
 
   async create(createMedicineDto: CreateMedicineDto) {
     const prisma = this.prismaService.prisma;
@@ -65,6 +69,8 @@ export class MedicinesService {
         },
         include: { category: true, manufacturer: true, batches: true },
       });
+      this.apiCache.invalidate('medicine:');
+      this.apiCache.invalidate('search:');
       return updatedMedicine;
     }
 
@@ -116,6 +122,8 @@ export class MedicinesService {
       },
       include: { category: true, manufacturer: true, batches: true },
     });
+    this.apiCache.invalidate('medicine:');
+    this.apiCache.invalidate('search:');
     return medicine;
   }
 
@@ -151,7 +159,8 @@ export class MedicinesService {
     const safeSearch = search?.trim();
     const safeCategory = category?.trim();
 
-    return prisma.medicine.findMany({
+    const cacheKey = `medicine:list:${safePage}:${safeLimit}:${includeArchived}:${safeSearch ?? ''}:${safeCategory ?? ''}`;
+    return this.apiCache.getOrSet(cacheKey, () => prisma.medicine.findMany({
       skip,
       take: safeLimit,
       where: {
@@ -181,7 +190,7 @@ export class MedicinesService {
           },
         },
       },
-    });
+    }), 30_000);
   }
 
   findOne(id: string) {
@@ -211,7 +220,10 @@ export class MedicinesService {
       where: { id: safeId },
     });
     if (!medicine) throw new NotFoundException('Medicine not found');
-    return prisma.medicine.update({ where: { id: safeId }, data: safeDto });
+    const result = await prisma.medicine.update({ where: { id: safeId }, data: safeDto });
+    this.apiCache.invalidate('medicine:');
+    this.apiCache.invalidate('search:');
+    return result;
   }
 
   async remove(id: string) {
@@ -221,7 +233,10 @@ export class MedicinesService {
       where: { id: safeId },
     });
     if (!medicine) throw new NotFoundException('Medicine not found');
-    return prisma.medicine.delete({ where: { id: safeId } });
+    const result = await prisma.medicine.delete({ where: { id: safeId } });
+    this.apiCache.invalidate('medicine:');
+    this.apiCache.invalidate('search:');
+    return result;
   }
 
   async getAvailability(
@@ -242,6 +257,9 @@ export class MedicinesService {
       longitude !== undefined
         ? validateGeoCoordinate(longitude, 'longitude', [-180, 180])
         : undefined;
+
+    const cacheKey = `medicine:availability:${safeId}:${safeLat ?? ''}:${safeLon ?? ''}:${safeRadius}:${insuranceId ?? ''}`;
+    return this.apiCache.getOrSet(cacheKey, async () => {
 
     const inventories = await prisma.inventory.findMany({
       where: {
@@ -333,6 +351,7 @@ export class MedicinesService {
         usedFallback,
       },
     };
+    }, 15_000);
   }
 
   private calculateDistance(

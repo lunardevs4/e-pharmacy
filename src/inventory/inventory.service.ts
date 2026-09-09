@@ -18,6 +18,7 @@ import csv from 'csv-parser';
 import * as xlsx from 'xlsx';
 import { Readable } from 'stream';
 import { EmailService } from '../common/email/email.service';
+import { ApiCacheService } from '../common/cache/api-cache.service';
 
 interface AuthenticatedUser {
   id: string;
@@ -29,6 +30,7 @@ export class InventoryService {
   constructor(
     private prismaService: PrismaService,
     private emailService: EmailService,
+    private apiCache: ApiCacheService,
   ) {}
 
   private async ensureViewAccess(pharmacyId: string, user: AuthenticatedUser) {
@@ -152,6 +154,8 @@ export class InventoryService {
       },
     });
 
+    this.apiCache.invalidate('medicine:availability:');
+    this.apiCache.invalidate('search:');
     return inventory;
   }
 
@@ -272,6 +276,8 @@ export class InventoryService {
       }
     }
 
+    this.apiCache.invalidate('medicine:availability:');
+    this.apiCache.invalidate('search:');
     return updated;
   }
 
@@ -282,10 +288,13 @@ export class InventoryService {
 
     await this.ensureWriteAccess(safePharmacyId, user);
 
-    return prisma.inventory.update({
+    const result = await prisma.inventory.update({
       where: { id: safeId },
       data: { deletedAt: new Date() },
     });
+    this.apiCache.invalidate('medicine:availability:');
+    this.apiCache.invalidate('search:');
+    return result;
   }
 
   async importInventory(
@@ -539,6 +548,8 @@ export class InventoryService {
       }
     }
 
+    this.apiCache.invalidate('medicine:availability:');
+    this.apiCache.invalidate('search:');
     return results;
   }
 

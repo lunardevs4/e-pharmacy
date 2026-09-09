@@ -315,6 +315,8 @@ model Inventory {
   @@unique([pharmacyId, medicineId])
   @@index([pharmacyId])
   @@index([medicineId])
+  @@index([pharmacyId, deletedAt])
+  @@index([medicineId, deletedAt])
   @@index([expiryDate])
 }
 
@@ -643,6 +645,7 @@ model InsuranceClaim {
   @@index([insuranceId])
   @@index([pharmacyId])
   @@index([status])
+  @@index([insuranceId, status, claimedAt])
   @@index([claimedAt])
 }
 

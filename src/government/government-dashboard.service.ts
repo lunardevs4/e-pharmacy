@@ -98,23 +98,24 @@ export class GovernmentDashboardService {
       where: { deletedAt: null },
     });
 
-    return Promise.all(
-      result.map(async (item) => {
-        const medicine = await prisma.medicine.findUnique({
-          where: { id: item.medicineId },
+    const medicineIds = result.map((item) => item.medicineId);
+    const medicines = medicineIds.length
+      ? await prisma.medicine.findMany({
+          where: { id: { in: medicineIds } },
           select: {
             id: true,
             tradeName: true,
             genericName: true,
             category: { select: { name: true } },
           },
-        });
-        return {
-          medicine,
-          totalStock: item._sum.quantity,
-        };
-      }),
-    );
+        })
+      : [];
+    const medicineById = new Map(medicines.map((medicine) => [medicine.id, medicine]));
+
+    return result.map((item) => ({
+      medicine: medicineById.get(item.medicineId) ?? null,
+      totalStock: item._sum.quantity,
+    }));
   }
 
   async getLowStockMedicines(threshold: number = 10) {
