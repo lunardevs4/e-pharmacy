@@ -1,9 +1,9 @@
-import { Controller, Post, Body, UseGuards, Req, Param, Get, Patch, Query } from '@nestjs/common';
+import { Controller, Post, Body, UseGuards, Req, Param, Get, Patch, Query, Res } from '@nestjs/common';
+import { Response } from 'express';
 import { ApiTags, ApiOperation, ApiBearerAuth, ApiBody } from '@nestjs/swagger';
 import { AuthService } from './auth.service';
 import { RegisterDto } from './dto/register.dto';
 import { LoginDto } from './dto/login.dto';
-import { RefreshTokenDto } from './dto/refresh-token.dto';
 import { RegisterPharmacyDto } from './dto/register-pharmacy.dto';
 import { RegisterInsuranceDto } from './dto/register-insurance.dto';
 import { CreateStaffDto } from './dto/create-staff.dto';
@@ -15,6 +15,7 @@ import { Public } from '../common/guards/public.decorator';
 import { Roles } from '../common/guards/roles.decorator';
 import { Permissions } from '../common/guards/permissions.decorator';
 import { PermissionsGuard } from '../common/guards/permissions.guard';
+import { clearAuthCookies, readCookie, REFRESH_TOKEN_COOKIE, setAuthCookies } from '../common/auth-cookies';
 
 @ApiTags('Auth')
 @Controller('api/v1/auth')
@@ -25,8 +26,15 @@ export class AuthController {
   @Post('register')
   @ApiOperation({ summary: 'Register a new patient account' })
   @ApiBody({ type: RegisterDto })
-  async register(@Body() registerDto: RegisterDto) {
-    return this.authService.register(registerDto);
+  async register(@Body() registerDto: RegisterDto, @Res({ passthrough: true }) response: Response) {
+    const result = await this.authService.register(registerDto);
+    if ('accessToken' in result && 'refreshToken' in result) {
+      const authenticatedResult = result as { accessToken: string; refreshToken: string; [key: string]: unknown };
+      setAuthCookies(response, authenticatedResult.accessToken, authenticatedResult.refreshToken);
+      const { accessToken: _accessToken, refreshToken: _refreshToken, ...safeResult } = authenticatedResult;
+      return safeResult;
+    }
+    return result;
   }
 
   @Public()
@@ -59,8 +67,11 @@ export class AuthController {
       },
     },
   })
-  async login(@Body() loginDto: LoginDto) {
-    return this.authService.login(loginDto);
+  async login(@Body() loginDto: LoginDto, @Res({ passthrough: true }) response: Response) {
+    const result = await this.authService.login(loginDto);
+    setAuthCookies(response, result.accessToken, result.refreshToken);
+    const { accessToken: _accessToken, refreshToken: _refreshToken, ...safeResult } = result;
+    return safeResult;
   }
 
   @Public()
@@ -92,18 +103,13 @@ export class AuthController {
   @Public()
   @Post('refresh')
   @ApiOperation({ summary: 'Refresh access token' })
-  @ApiBody({
-    type: RefreshTokenDto,
-    examples: {
-      default: {
-        value: {
-          refreshToken: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...',
-        },
-      },
-    },
-  })
-  async refreshTokens(@Body() refreshTokenDto: RefreshTokenDto) {
-    return this.authService.refreshTokens(refreshTokenDto);
+  async refreshTokens(@Req() request: any, @Res({ passthrough: true }) response: Response) {
+    const refreshToken = readCookie(request, REFRESH_TOKEN_COOKIE);
+    if (!refreshToken) return this.authService.refreshTokens({ refreshToken: '' });
+    const result = await this.authService.refreshTokens({ refreshToken });
+    setAuthCookies(response, result.accessToken, result.refreshToken);
+    const { accessToken: _accessToken, refreshToken: _refreshToken, ...safeResult } = result;
+    return safeResult;
   }
 
   @UseGuards(JwtAuthGuard)
@@ -151,21 +157,13 @@ export class AuthController {
     return this.authService.approvePharmacy(pharmacyId, approved);
   }
 
+  @Public()
   @Post('logout')
-  @UseGuards(JwtAuthGuard)
-  @ApiBearerAuth()
   @ApiOperation({ summary: 'Logout user' })
-  @ApiBody({
-    type: RefreshTokenDto,
-    examples: {
-      default: {
-        value: {
-          refreshToken: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...',
-        },
-      },
-    },
-  })
-  async logout(@Body('refreshToken') refreshToken: string) {
-    return this.authService.logout(refreshToken);
+  async logout(@Req() request: any, @Res({ passthrough: true }) response: Response) {
+    const refreshToken = readCookie(request, REFRESH_TOKEN_COOKIE);
+    const result = await this.authService.logout(refreshToken);
+    clearAuthCookies(response);
+    return result;
   }
 }

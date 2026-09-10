@@ -87,6 +87,34 @@ export class PharmaciesService {
     return pharmacy;
   }
 
+  async findEmployees(id: string, ownerId: string) {
+    const prisma = this.prismaService.prisma;
+    const safeId = validateUuid(id, 'id');
+    const pharmacy = await prisma.pharmacy.findUnique({ where: { id: safeId } });
+
+    if (!pharmacy) throw new NotFoundException('Pharmacy not found');
+    if (pharmacy.ownerId !== ownerId) {
+      throw new ForbiddenException('You do not own this pharmacy');
+    }
+
+    return prisma.pharmacyEmployee.findMany({
+      where: { pharmacyId: safeId },
+      include: {
+        user: {
+          select: {
+            firstName: true,
+            lastName: true,
+            email: true,
+            phone: true,
+            role: true,
+            isActive: true,
+            updatedAt: true,
+          },
+        },
+      },
+    });
+  }
+
   async update(id: string, ownerId: string, updatePharmacyDto: UpdatePharmacyDto) {
     const prisma = this.prismaService.prisma;
     const safeId = validateUuid(id, 'id');

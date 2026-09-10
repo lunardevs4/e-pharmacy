@@ -480,10 +480,12 @@ export class AuthService {
     };
   }
 
-  async logout(refreshToken: string) {
+  async logout(refreshToken?: string) {
     const prisma = this.prismaService.prisma;
+    if (!refreshToken) return { message: 'Logged out successfully' };
     const safeToken = validateSafeString(refreshToken, 'refreshToken', 500);
     await prisma.refreshToken.deleteMany({ where: { token: safeToken } });
+    return { message: 'Logged out successfully' };
   }
 
   async changePassword(userId: string, changePasswordDto: ChangePasswordDto) {

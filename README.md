@@ -76,9 +76,9 @@ Every endpoint is protected with:
 ## 🔐 Authentication Workflow
 
 1. **Register** → `POST /api/v1/auth/register` → creates user + patient/pharmacy-ready profile
-2. **Login** → `POST /api/v1/auth/login` → returns `accessToken` (short-lived, 1h) + `refreshToken` (7d)
-3. **Refresh** → `POST /api/v1/auth/refresh` → token rotation (old refresh token invalidated)
-4. **Logout** → `POST /api/v1/auth/logout` → deletes the refresh token server-side
+2. **Login** → `POST /api/v1/auth/login` → sets short-lived access and rotated refresh `HttpOnly` cookies
+3. **Refresh** → `POST /api/v1/auth/refresh` → rotates the cookies (old refresh token invalidated)
+4. **Logout** → `POST /api/v1/auth/logout` → clears cookies and deletes the refresh token server-side
 
 Passwords are hashed with **bcrypt (10 rounds)** before storage.
 
@@ -165,7 +165,7 @@ Includes:
 
 - Every endpoint with `@ApiOperation()` + summary
 - Full Request/Response schemas
-- `Bearer Auth` enabled globally (click "Authorize" to paste JWT)
+- Browser authentication uses `HttpOnly` cookies; Bearer authentication remains available for compatible API clients.
 - Examples + Validation rules
 
 ---
