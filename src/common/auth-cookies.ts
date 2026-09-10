@@ -16,11 +16,15 @@ function durationToMs(value: string | undefined, fallbackMs: number): number {
 }
 
 export function authCookieOptions(maxAge: number) {
-  const isProduction = process.env.NODE_ENV === 'production';
-  const sameSite = (process.env.COOKIE_SAME_SITE || (isProduction ? 'none' : 'lax')) as 'lax' | 'strict' | 'none';
+  // A hosted frontend and API are commonly on different sites. In that case
+  // the auth cookie must be Secure + SameSite=None to be sent with XHR/fetch.
+  // The HTTPS frontend URL also covers deployments that do not set NODE_ENV.
+  const isSecureDeployment =
+    process.env.NODE_ENV === 'production' || process.env.FRONTEND_URL?.startsWith('https://');
+  const sameSite = (process.env.COOKIE_SAME_SITE || (isSecureDeployment ? 'none' : 'lax')) as 'lax' | 'strict' | 'none';
   return {
     httpOnly: true,
-    secure: isProduction,
+    secure: isSecureDeployment,
     sameSite,
     path: '/',
     maxAge,
