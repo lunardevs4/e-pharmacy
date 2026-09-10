@@ -9,14 +9,21 @@ import {
 
 const SAFE_METHODS = new Set(['GET', 'HEAD', 'OPTIONS']);
 
-function tokensMatch(expected: string | undefined, supplied: string | undefined) {
+function tokensMatch(
+  expected: string | undefined,
+  supplied: string | undefined,
+) {
   if (!expected || !supplied) return false;
   const expectedHash = createHash('sha256').update(expected).digest();
   const suppliedHash = createHash('sha256').update(supplied).digest();
   return timingSafeEqual(expectedHash, suppliedHash);
 }
 
-export function csrfMiddleware(request: Request, response: Response, next: NextFunction) {
+export function csrfMiddleware(
+  request: Request,
+  response: Response,
+  next: NextFunction,
+) {
   let csrfToken = readCookie(request, CSRF_TOKEN_COOKIE);
   if (!csrfToken) {
     csrfToken = issueCsrfToken(response);

@@ -1,6 +1,13 @@
-import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  BadRequestException,
+} from '@nestjs/common';
 import { PrismaService } from '../common/prisma/prisma.service';
-import { SetMedicineTariffDto, BatchUpdateTariffDto } from './dto/insurance.dto';
+import {
+  SetMedicineTariffDto,
+  BatchUpdateTariffDto,
+} from './dto/insurance.dto';
 
 @Injectable()
 export class InsuranceTariffsService {
@@ -39,12 +46,16 @@ export class InsuranceTariffsService {
         where: { id: existingTariff.id },
         data: {
           coveredPrice: dto.coveredPrice,
-          coveragePercentage: dto.coveragePercentage ?? insurance.defaultCoveragePercentage,
-          copayPercentage: dto.copayPercentage ?? insurance.defaultCopayPercentage,
+          coveragePercentage:
+            dto.coveragePercentage ?? insurance.defaultCoveragePercentage,
+          copayPercentage:
+            dto.copayPercentage ?? insurance.defaultCopayPercentage,
           fixedCopayAmount: dto.fixedCopayAmount,
           isCovered: dto.isCovered ?? true,
           requiresPreAuth: dto.requiresPreAuth ?? false,
-          effectiveDate: dto.effectiveDate ? new Date(dto.effectiveDate) : new Date(),
+          effectiveDate: dto.effectiveDate
+            ? new Date(dto.effectiveDate)
+            : new Date(),
           status: 'ACTIVE',
         },
         include: {
@@ -73,12 +84,16 @@ export class InsuranceTariffsService {
         insuranceId: dto.insuranceId,
         medicineId: dto.medicineId,
         coveredPrice: dto.coveredPrice,
-        coveragePercentage: dto.coveragePercentage ?? insurance.defaultCoveragePercentage,
-        copayPercentage: dto.copayPercentage ?? insurance.defaultCopayPercentage,
+        coveragePercentage:
+          dto.coveragePercentage ?? insurance.defaultCoveragePercentage,
+        copayPercentage:
+          dto.copayPercentage ?? insurance.defaultCopayPercentage,
         fixedCopayAmount: dto.fixedCopayAmount,
         isCovered: dto.isCovered ?? true,
         requiresPreAuth: dto.requiresPreAuth ?? false,
-        effectiveDate: dto.effectiveDate ? new Date(dto.effectiveDate) : new Date(),
+        effectiveDate: dto.effectiveDate
+          ? new Date(dto.effectiveDate)
+          : new Date(),
         status: 'ACTIVE',
       },
       include: {
@@ -113,14 +128,18 @@ export class InsuranceTariffsService {
         });
         results.push({ success: true, tariff });
       } catch (error: any) {
-        results.push({ success: false, error: error.message, medicineId: tariffDto.medicineId });
+        results.push({
+          success: false,
+          error: error.message,
+          medicineId: tariffDto.medicineId,
+        });
       }
     }
 
     return {
       total: dto.tariffs.length,
-      successful: results.filter(r => r.success).length,
-      failed: results.filter(r => !r.success).length,
+      successful: results.filter((r) => r.success).length,
+      failed: results.filter((r) => !r.success).length,
       results,
     };
   }
@@ -207,7 +226,10 @@ export class InsuranceTariffsService {
     return tariff;
   }
 
-  async updateTariff(tariffId: string, dto: Partial<SetMedicineTariffDto> & { status?: string }) {
+  async updateTariff(
+    tariffId: string,
+    dto: Partial<SetMedicineTariffDto> & { status?: string },
+  ) {
     const prisma = this.prismaService.prisma;
 
     const tariff = await prisma.insuranceMedicineTariff.findUnique({
@@ -227,7 +249,9 @@ export class InsuranceTariffsService {
         fixedCopayAmount: dto.fixedCopayAmount,
         isCovered: dto.isCovered,
         requiresPreAuth: dto.requiresPreAuth,
-        effectiveDate: dto.effectiveDate ? new Date(dto.effectiveDate) : undefined,
+        effectiveDate: dto.effectiveDate
+          ? new Date(dto.effectiveDate)
+          : undefined,
         status: dto.status,
       },
       include: {
@@ -269,7 +293,11 @@ export class InsuranceTariffsService {
     return { message: 'Tariff deleted successfully' };
   }
 
-  async calculateCopay(insuranceId: string, medicineId: string, retailPrice: number) {
+  async calculateCopay(
+    insuranceId: string,
+    medicineId: string,
+    retailPrice: number,
+  ) {
     const prisma = this.prismaService.prisma;
 
     const tariff = await prisma.insuranceMedicineTariff.findUnique({
@@ -298,7 +326,10 @@ export class InsuranceTariffsService {
     let patientPays: number;
 
     if (tariff.fixedCopayAmount) {
-      insurancePays = Math.min(retailPrice, retailPrice - Number(tariff.fixedCopayAmount));
+      insurancePays = Math.min(
+        retailPrice,
+        retailPrice - Number(tariff.fixedCopayAmount),
+      );
       patientPays = Number(tariff.fixedCopayAmount);
     } else {
       const coverageRate = Number(tariff.coveragePercentage) / 100;

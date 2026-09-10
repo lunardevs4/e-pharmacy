@@ -100,7 +100,9 @@ export class AuditInterceptor implements NestInterceptor {
 
     const sanitized: Record<string, any> = {};
     for (const [key, value] of Object.entries(body)) {
-      sanitized[key] = SENSITIVE_KEYS.has(key.toLowerCase()) ? '[REDACTED]' : value;
+      sanitized[key] = SENSITIVE_KEYS.has(key.toLowerCase())
+        ? '[REDACTED]'
+        : value;
     }
     return sanitized;
   }

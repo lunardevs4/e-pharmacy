@@ -1,7 +1,26 @@
-import { Controller, Get, Post, Body, Patch, Delete, Param, UseGuards, Req } from '@nestjs/common';
-import { ApiTags, ApiBearerAuth, ApiOperation, ApiBody, ApiParam } from '@nestjs/swagger';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Delete,
+  Param,
+  UseGuards,
+  Req,
+} from '@nestjs/common';
+import {
+  ApiTags,
+  ApiBearerAuth,
+  ApiOperation,
+  ApiBody,
+  ApiParam,
+} from '@nestjs/swagger';
 import { RemindersService } from './reminders.service';
-import { CreateReminderScheduleDto, UpdateReminderScheduleDto } from './dto/reminders.dto';
+import {
+  CreateReminderScheduleDto,
+  UpdateReminderScheduleDto,
+} from './dto/reminders.dto';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { Roles } from '../common/guards/roles.decorator';
 import { UserRole } from '@generated/prisma';
@@ -60,10 +79,16 @@ export class RemindersController {
   }
 
   @Get('schedules')
-  @Roles(UserRole.PATIENT, UserRole.PHARMACY_OWNER, UserRole.PHARMACIST, UserRole.GOVERNMENT)
+  @Roles(
+    UserRole.PATIENT,
+    UserRole.PHARMACY_OWNER,
+    UserRole.PHARMACIST,
+    UserRole.GOVERNMENT,
+  )
   @ApiOperation({
     summary: 'Get reminder schedules',
-    description: 'Endpoint: GET /api/v1/reminders/schedules\n\nPatient → own schedules. Pharmacist/Owner → pharmacy scoped. Government → aggregated analytics view.',
+    description:
+      'Endpoint: GET /api/v1/reminders/schedules\n\nPatient → own schedules. Pharmacist/Owner → pharmacy scoped. Government → aggregated analytics view.',
   })
   getSchedules(@Req() req: any) {
     return this.remindersService.getSchedules(req.user);
@@ -71,7 +96,11 @@ export class RemindersController {
 
   @Patch('schedules/:id')
   @Roles(UserRole.PATIENT)
-  updateSchedule(@Param('id') id: string, @Req() req: any, @Body() dto: UpdateReminderScheduleDto) {
+  updateSchedule(
+    @Param('id') id: string,
+    @Req() req: any,
+    @Body() dto: UpdateReminderScheduleDto,
+  ) {
     return this.remindersService.updateSchedule(req.user, id, dto);
   }
 
@@ -85,18 +114,37 @@ export class RemindersController {
   @Roles(UserRole.PATIENT)
   @ApiOperation({
     summary: 'Mark medication intake as completed (patient only)',
-    description: 'Endpoint: PATCH /api/v1/reminders/logs/:logId/complete\n\nURL Parameters:\n- logId (UUID): The unique identifier of the reminder log to mark as completed',
+    description:
+      'Endpoint: PATCH /api/v1/reminders/logs/:logId/complete\n\nURL Parameters:\n- logId (UUID): The unique identifier of the reminder log to mark as completed',
   })
-  @ApiParam({ name: 'logId', type: 'string', description: 'Reminder log UUID', example: '550e8400-e29b-41d4-a716-446655440000' })
+  @ApiParam({
+    name: 'logId',
+    type: 'string',
+    description: 'Reminder log UUID',
+    example: '550e8400-e29b-41d4-a716-446655440000',
+  })
   markIntake(@Param('logId') logId: string, @Req() req: any) {
     return this.remindersService.markIntake(req.user, logId);
+  }
+
+  @Get('history')
+  @Roles(UserRole.PATIENT)
+  getReminderHistory(@Req() req: any) {
+    return this.remindersService.getLogs(req.user);
+  }
+
+  @Get('adherence/summary')
+  @Roles(UserRole.PATIENT)
+  getAdherenceSummary(@Req() req: any) {
+    return this.remindersService.getAdherenceSummary(req.user, 'month');
   }
 
   @Get('logs')
   @Roles(UserRole.PATIENT)
   @ApiOperation({
     summary: 'Get my reminder logs (patient only)',
-    description: 'Endpoint: GET /api/v1/reminders/logs\n\nReturns all medication reminder logs (intake history) for the currently authenticated patient.',
+    description:
+      'Endpoint: GET /api/v1/reminders/logs\n\nReturns all medication reminder logs (intake history) for the currently authenticated patient.',
   })
   getLogs(@Req() req: any) {
     return this.remindersService.getLogs(req.user);

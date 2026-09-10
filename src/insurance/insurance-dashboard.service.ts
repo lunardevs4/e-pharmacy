@@ -1,4 +1,9 @@
-import { Injectable, NotFoundException, BadRequestException, ForbiddenException } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  BadRequestException,
+  ForbiddenException,
+} from '@nestjs/common';
 import { PrismaService } from '../common/prisma/prisma.service';
 
 @Injectable()
@@ -9,7 +14,11 @@ export class InsuranceDashboardService {
     const prisma = this.prismaService.prisma;
     const now = new Date();
     const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
-    const startOfPreviousMonth = new Date(now.getFullYear(), now.getMonth() - 1, 1);
+    const startOfPreviousMonth = new Date(
+      now.getFullYear(),
+      now.getMonth() - 1,
+      1,
+    );
     const endOfPreviousMonth = new Date(now.getFullYear(), now.getMonth(), 0);
 
     const whereClause = insuranceId ? { insuranceId } : {};
@@ -36,7 +45,9 @@ export class InsuranceDashboardService {
       },
     });
 
-    const totalClaimsAmountThisMonth = Number(claimsThisMonth._sum.totalAmount || 0);
+    const totalClaimsAmountThisMonth = Number(
+      claimsThisMonth._sum.totalAmount || 0,
+    );
 
     const claimsPreviousMonth = await prisma.insuranceClaim.aggregate({
       where: {
@@ -51,10 +62,14 @@ export class InsuranceDashboardService {
       },
     });
 
-    const totalClaimsAmountPreviousMonth = Number(claimsPreviousMonth._sum.totalAmount || 0);
+    const totalClaimsAmountPreviousMonth = Number(
+      claimsPreviousMonth._sum.totalAmount || 0,
+    );
     const claimsGrowthPercentage =
       totalClaimsAmountPreviousMonth > 0
-        ? ((totalClaimsAmountThisMonth - totalClaimsAmountPreviousMonth) / totalClaimsAmountPreviousMonth) * 100
+        ? ((totalClaimsAmountThisMonth - totalClaimsAmountPreviousMonth) /
+            totalClaimsAmountPreviousMonth) *
+          100
         : 0;
 
     const totalClaimsCount = await prisma.insuranceClaim.count({
@@ -81,7 +96,9 @@ export class InsuranceDashboardService {
       where: { ...whereClause, status: 'APPROVED' },
       _sum: { insuranceAmount: true, totalAmount: true },
     });
-    const approvedClaimsAmount = Number(approvedClaimsAgg._sum.insuranceAmount || 0);
+    const approvedClaimsAmount = Number(
+      approvedClaimsAgg._sum.insuranceAmount || 0,
+    );
 
     const pendingClaimsAgg = await prisma.insuranceClaim.aggregate({
       where: { ...whereClause, status: 'PENDING' },
@@ -93,7 +110,9 @@ export class InsuranceDashboardService {
       where: { ...whereClause, status: 'REJECTED' },
       _sum: { totalAmount: true },
     });
-    const rejectedClaimsAmount = Number(rejectedClaimsAgg._sum.totalAmount || 0);
+    const rejectedClaimsAmount = Number(
+      rejectedClaimsAgg._sum.totalAmount || 0,
+    );
 
     const paidClaimsAgg = await prisma.insuranceClaim.aggregate({
       where: { ...whereClause, status: 'PAID' },
@@ -101,9 +120,11 @@ export class InsuranceDashboardService {
     });
     const paidClaimsAmount = Number(paidClaimsAgg._sum.insuranceAmount || 0);
 
-    const totalActiveAgreements = await prisma.pharmacyInsuranceAgreement.count({
-      where: { ...whereClause, status: 'ACTIVE' },
-    });
+    const totalActiveAgreements = await prisma.pharmacyInsuranceAgreement.count(
+      {
+        where: { ...whereClause, status: 'ACTIVE' },
+      },
+    );
 
     const totalCoveredTariffs = await prisma.insuranceMedicineTariff.count({
       where: { ...whereClause, isCovered: true, status: 'ACTIVE' },
@@ -152,7 +173,10 @@ export class InsuranceDashboardService {
       });
 
       monthlyTrend.push({
-        month: monthStart.toLocaleString('default', { month: 'short', year: 'numeric' }),
+        month: monthStart.toLocaleString('default', {
+          month: 'short',
+          year: 'numeric',
+        }),
         volume: monthData._count,
         value: Number(monthData._sum.totalAmount || 0),
       });
@@ -224,10 +248,14 @@ export class InsuranceDashboardService {
     const formattedRecentClaims = recentClaims.map((claim) => ({
       id: claim.id,
       claimNumber: claim.claimNumber,
-      patientName: claim.insuredPatient?.fullName ||
-        [claim.patient?.user?.firstName, claim.patient?.user?.lastName].filter(Boolean).join(' ') ||
+      patientName:
+        claim.insuredPatient?.fullName ||
+        [claim.patient?.user?.firstName, claim.patient?.user?.lastName]
+          .filter(Boolean)
+          .join(' ') ||
         'Unknown',
-      medicineName: claim.medicine?.tradeName || claim.medicine?.genericName || 'Unknown',
+      medicineName:
+        claim.medicine?.tradeName || claim.medicine?.genericName || 'Unknown',
       pharmacyName: claim.pharmacy?.name || 'Unknown',
       insuranceName: claim.insurance?.name || 'Unknown',
       pharmacy: {
@@ -313,17 +341,21 @@ export class InsuranceDashboardService {
     return provider;
   }
 
-  async updateProvider(providerId: string, data: {
-    name?: string;
-    logoUrl?: string;
-    email?: string;
-    phone?: string;
-    address?: string;
-    defaultCoveragePercentage?: number;
-    defaultCopayPercentage?: number;
-    status?: string;
-    isActive?: boolean;
-  }, user?: any) {
+  async updateProvider(
+    providerId: string,
+    data: {
+      name?: string;
+      logoUrl?: string;
+      email?: string;
+      phone?: string;
+      address?: string;
+      defaultCoveragePercentage?: number;
+      defaultCopayPercentage?: number;
+      status?: string;
+      isActive?: boolean;
+    },
+    user?: any,
+  ) {
     const prisma = this.prismaService.prisma;
 
     const provider = await prisma.insuranceProvider.findUnique({
@@ -336,26 +368,44 @@ export class InsuranceDashboardService {
 
     if (user && user.role !== 'ADMIN') {
       if (provider.userId !== user.id) {
-        throw new ForbiddenException('You do not have permission to update this insurance provider');
+        throw new ForbiddenException(
+          'You do not have permission to update this insurance provider',
+        );
       }
     }
 
     if (data.defaultCoveragePercentage !== undefined) {
-      if (data.defaultCoveragePercentage < 0 || data.defaultCoveragePercentage > 100) {
-        throw new BadRequestException('Coverage percentage must be between 0 and 100');
+      if (
+        data.defaultCoveragePercentage < 0 ||
+        data.defaultCoveragePercentage > 100
+      ) {
+        throw new BadRequestException(
+          'Coverage percentage must be between 0 and 100',
+        );
       }
     }
 
     if (data.defaultCopayPercentage !== undefined) {
-      if (data.defaultCopayPercentage < 0 || data.defaultCopayPercentage > 100) {
-        throw new BadRequestException('Copay percentage must be between 0 and 100');
+      if (
+        data.defaultCopayPercentage < 0 ||
+        data.defaultCopayPercentage > 100
+      ) {
+        throw new BadRequestException(
+          'Copay percentage must be between 0 and 100',
+        );
       }
     }
 
-    if (data.defaultCoveragePercentage !== undefined && data.defaultCopayPercentage !== undefined) {
-      const total = data.defaultCoveragePercentage + data.defaultCopayPercentage;
+    if (
+      data.defaultCoveragePercentage !== undefined &&
+      data.defaultCopayPercentage !== undefined
+    ) {
+      const total =
+        data.defaultCoveragePercentage + data.defaultCopayPercentage;
       if (Math.abs(total - 100) > 0.01) {
-        throw new BadRequestException('Coverage percentage and copay percentage must sum to 100');
+        throw new BadRequestException(
+          'Coverage percentage and copay percentage must sum to 100',
+        );
       }
     }
 

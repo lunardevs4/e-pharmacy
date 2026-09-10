@@ -15,8 +15,11 @@ describe('AppController', () => {
   });
 
   describe('root', () => {
-    it('should return "Hello Rwanda-Epharmacy!"', () => {
-      expect(appController.getHello()).toBe('Hello Rwanda-Epharmacy!');
+    it('should return the API metadata payload', () => {
+      const response = appController.getHello();
+      expect(response.success).toBe(true);
+      expect(response.message).toContain('Rwanda E-Pharmacy');
+      expect(response.docs).toBe('/api/docs');
     });
   });
 });

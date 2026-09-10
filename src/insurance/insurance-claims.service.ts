@@ -1,6 +1,15 @@
-import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  BadRequestException,
+} from '@nestjs/common';
 import { PrismaService } from '../common/prisma/prisma.service';
-import { CreateInsuranceClaimDto, UpdateClaimStatusDto, BatchPayClaimsDto, ClaimStatus } from './dto/insurance.dto';
+import {
+  CreateInsuranceClaimDto,
+  UpdateClaimStatusDto,
+  BatchPayClaimsDto,
+  ClaimStatus,
+} from './dto/insurance.dto';
 import { InsuranceCalculationService } from './insurance-calculation.service';
 
 @Injectable()
@@ -40,11 +49,13 @@ export class InsuranceClaimsService {
     const calculation = await this.calculationService.calculatePayments({
       pharmacyId: dto.pharmacyId,
       insuranceId: dto.insuranceId,
-      medicines: [{
-        medicineId: dto.medicineId,
-        quantity: dto.quantity,
-        unitPrice: dto.unitPrice,
-      }],
+      medicines: [
+        {
+          medicineId: dto.medicineId,
+          quantity: dto.quantity,
+          unitPrice: dto.unitPrice,
+        },
+      ],
       patientId: dto.patientId,
       insuredPatientId: dto.insuredPatientId,
     });
@@ -355,8 +366,8 @@ export class InsuranceClaimsService {
 
     return {
       total: dto.claimIds.length,
-      successful: results.filter(r => r.success).length,
-      failed: results.filter(r => !r.success).length,
+      successful: results.filter((r) => r.success).length,
+      failed: results.filter((r) => !r.success).length,
       results,
     };
   }

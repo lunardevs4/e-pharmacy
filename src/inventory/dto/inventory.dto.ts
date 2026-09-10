@@ -1,5 +1,13 @@
 import { PartialType } from '@nestjs/swagger';
-import { IsInt, IsNumber, IsOptional, IsUUID, IsDateString, IsString, Min } from 'class-validator';
+import {
+  IsInt,
+  IsNumber,
+  IsOptional,
+  IsUUID,
+  IsDateString,
+  IsString,
+  Min,
+} from 'class-validator';
 import { TransformToISODateTimeOptional } from '../../common/transformers/date.transformer';
 
 export class CreateInventoryDto {

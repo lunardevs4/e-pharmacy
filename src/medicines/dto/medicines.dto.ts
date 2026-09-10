@@ -1,6 +1,17 @@
 import { PartialType } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
-import { IsString, IsOptional, IsUUID, IsBoolean, IsDateString, IsInt, IsNumber, Min, ValidateNested, ValidateIf } from 'class-validator';
+import {
+  IsString,
+  IsOptional,
+  IsUUID,
+  IsBoolean,
+  IsDateString,
+  IsInt,
+  IsNumber,
+  Min,
+  ValidateNested,
+  ValidateIf,
+} from 'class-validator';
 
 export class CreateMedicineBatchDto {
   @IsString()

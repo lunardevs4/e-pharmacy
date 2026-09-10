@@ -18,7 +18,11 @@ function isPlainObject(v: unknown): v is Record<string, unknown> {
   );
 }
 
-function deriveSafeKey(key: string, replaceWith: string, allowDots: boolean): string {
+function deriveSafeKey(
+  key: string,
+  replaceWith: string,
+  allowDots: boolean,
+): string {
   let safe = key;
   if (safe.startsWith(UNSAFE_KEY_PREFIX)) safe = replaceWith + safe.slice(1);
   if (!allowDots) safe = safe.split(DOT_CHAR).join(replaceWith);
@@ -56,7 +60,7 @@ function sanitizeNode(
     if (unsafePrefix || unsafeDot) {
       delete node[key];
       const safeKey = deriveSafeKey(key, opts.replaceWith, opts.allowDots);
-      (node as Record<string, unknown>)[safeKey] = value;
+      node[safeKey] = value;
       if (opts.onSanitize) opts.onSanitize({ key, req: opts.req });
     }
   }
@@ -72,14 +76,22 @@ export function noSqlSanitize(options: NoSqlSanitizeOptions = {}) {
     _res: Response,
     next: NextFunction,
   ): void {
-    const targets: Array<'body' | 'query' | 'params'> = ['body', 'query', 'params'];
+    const targets: Array<'body' | 'query' | 'params'> = [
+      'body',
+      'query',
+      'params',
+    ];
     for (const key of targets) {
       const container = (req as unknown as Record<string, unknown>)[key];
       if (isPlainObject(container) || Array.isArray(container)) {
         try {
-          sanitizeNode(container as any, { replaceWith, allowDots, onSanitize, req });
-        } catch {
-        }
+          sanitizeNode(container as any, {
+            replaceWith,
+            allowDots,
+            onSanitize,
+            req,
+          });
+        } catch {}
       }
     }
     next();

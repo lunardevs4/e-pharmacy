@@ -1,7 +1,18 @@
-import { Injectable, NotFoundException, ForbiddenException, BadRequestException } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  ForbiddenException,
+  BadRequestException,
+} from '@nestjs/common';
 import { PrismaService } from '../common/prisma/prisma.service';
 import { CreateInventoryDto, UpdateInventoryDto } from './dto/inventory.dto';
-import { validateUuid, sanitizeDeep, validateDate, validateSafeString, validatePositiveInt } from '../common/security/security.util';
+import {
+  validateUuid,
+  sanitizeDeep,
+  validateDate,
+  validateSafeString,
+  validatePositiveInt,
+} from '../common/security/security.util';
 import { UserRole } from '@generated/prisma';
 import csv from 'csv-parser';
 import * as xlsx from 'xlsx';
@@ -15,14 +26,23 @@ interface AuthenticatedUser {
 
 @Injectable()
 export class InventoryService {
-  constructor(private prismaService: PrismaService, private emailService: EmailService) { }
+  constructor(
+    private prismaService: PrismaService,
+    private emailService: EmailService,
+  ) {}
 
   private async ensureViewAccess(pharmacyId: string, user: AuthenticatedUser) {
     const prisma = this.prismaService.prisma;
-    const pharmacy = await prisma.pharmacy.findUnique({ where: { id: pharmacyId } });
+    const pharmacy = await prisma.pharmacy.findUnique({
+      where: { id: pharmacyId },
+    });
     if (!pharmacy) throw new NotFoundException('Pharmacy not found');
 
-    if (user.role === UserRole.ADMIN || user.role === UserRole.GOVERNMENT || user.role === UserRole.PATIENT) {
+    if (
+      user.role === UserRole.ADMIN ||
+      user.role === UserRole.GOVERNMENT ||
+      user.role === UserRole.PATIENT
+    ) {
       return pharmacy;
     }
 
@@ -42,22 +62,31 @@ export class InventoryService {
         },
       });
       if (!employee) {
-        throw new ForbiddenException('You are not employed as a pharmacist at this pharmacy');
+        throw new ForbiddenException(
+          'You are not employed as a pharmacist at this pharmacy',
+        );
       }
       return pharmacy;
     }
 
-    throw new ForbiddenException('Insufficient permissions to view this inventory');
+    throw new ForbiddenException(
+      'Insufficient permissions to view this inventory',
+    );
   }
 
   private async ensureWriteAccess(pharmacyId: string, user: AuthenticatedUser) {
     const prisma = this.prismaService.prisma;
-    const pharmacy = await prisma.pharmacy.findUnique({ where: { id: pharmacyId } });
+    const pharmacy = await prisma.pharmacy.findUnique({
+      where: { id: pharmacyId },
+    });
     if (!pharmacy) throw new NotFoundException('Pharmacy not found');
 
     if (user.role === UserRole.ADMIN) return pharmacy;
 
-    if (user.role === UserRole.PHARMACY_OWNER || (user.role as string) === 'PHARMACY') {
+    if (
+      user.role === UserRole.PHARMACY_OWNER ||
+      (user.role as string) === 'PHARMACY'
+    ) {
       if (pharmacy.ownerId !== user.id) {
         throw new ForbiddenException('You do not own this pharmacy');
       }
@@ -74,10 +103,16 @@ export class InventoryService {
       return pharmacy;
     }
 
-    throw new ForbiddenException('Insufficient permissions to modify this inventory');
+    throw new ForbiddenException(
+      'Insufficient permissions to modify this inventory',
+    );
   }
 
-  async create(pharmacyId: string, user: AuthenticatedUser, createInventoryDto: CreateInventoryDto) {
+  async create(
+    pharmacyId: string,
+    user: AuthenticatedUser,
+    createInventoryDto: CreateInventoryDto,
+  ) {
     const prisma = this.prismaService.prisma;
     const safePharmacyId = validateUuid(pharmacyId, 'pharmacyId');
     const safeUserId = validateUuid(user.id, 'userId');
@@ -157,7 +192,12 @@ export class InventoryService {
     return inventory;
   }
 
-  async update(id: string, pharmacyId: string, user: AuthenticatedUser, updateInventoryDto: UpdateInventoryDto) {
+  async update(
+    id: string,
+    pharmacyId: string,
+    user: AuthenticatedUser,
+    updateInventoryDto: UpdateInventoryDto,
+  ) {
     const prisma = this.prismaService.prisma;
     const safeId = validateUuid(id, 'id');
     const safePharmacyId = validateUuid(pharmacyId, 'pharmacyId');
@@ -166,12 +206,15 @@ export class InventoryService {
 
     await this.ensureWriteAccess(safePharmacyId, user);
 
-    const inventory = await prisma.inventory.findUnique({ where: { id: safeId } });
+    const inventory = await prisma.inventory.findUnique({
+      where: { id: safeId },
+    });
     if (!inventory) throw new NotFoundException('Inventory not found');
 
-    const expiryDate = (safeDto as any).expiryDate !== undefined
-      ? validateDate((safeDto as any).expiryDate, 'expiryDate')
-      : undefined;
+    const expiryDate =
+      (safeDto as any).expiryDate !== undefined
+        ? validateDate((safeDto as any).expiryDate, 'expiryDate')
+        : undefined;
     const { expiryDate: _stripExpiry, ...restDto } = safeDto as any;
 
     const updated = await prisma.inventory.update({
@@ -203,14 +246,28 @@ export class InventoryService {
       });
       const owner = details?.pharmacy.owner;
       if (owner) {
-        const setting = await prisma.systemSetting.findUnique({ where: { key: `email_notifications:${owner.id}` } });
-        const emailEnabled = setting ? JSON.parse(setting.value).lowStock !== false : true;
+        const setting = await prisma.systemSetting.findUnique({
+          where: { key: `email_notifications:${owner.id}` },
+        });
+        const emailEnabled = setting
+          ? JSON.parse(setting.value).lowStock !== false
+          : true;
         const message = `${details.medicine.tradeName} at ${details.pharmacy.name} is low on stock (${newQuantity} units remaining).`;
         await prisma.notification.create({
-          data: { userId: owner.id, type: 'IN_APP', title: 'Low Stock Alert', message },
+          data: {
+            userId: owner.id,
+            type: 'IN_APP',
+            title: 'Low Stock Alert',
+            message,
+          },
         });
         if (emailEnabled) {
-          await this.emailService.sendNotificationEmail(owner.email, `${owner.firstName} ${owner.lastName}`.trim(), 'Low Stock Alert', message);
+          await this.emailService.sendNotificationEmail(
+            owner.email,
+            `${owner.firstName} ${owner.lastName}`.trim(),
+            'Low Stock Alert',
+            message,
+          );
         }
       }
     }
@@ -225,7 +282,10 @@ export class InventoryService {
 
     await this.ensureWriteAccess(safePharmacyId, user);
 
-    return prisma.inventory.update({ where: { id: safeId }, data: { deletedAt: new Date() } });
+    return prisma.inventory.update({
+      where: { id: safeId },
+      data: { deletedAt: new Date() },
+    });
   }
 
   async importInventory(
@@ -244,10 +304,15 @@ export class InventoryService {
 
     if (mimeType === 'text/csv' || mimeType === 'application/vnd.ms-excel') {
       rows = await this.parseCSV(fileBuffer);
-    } else if (mimeType === 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet') {
+    } else if (
+      mimeType ===
+      'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+    ) {
       rows = await this.parseExcel(fileBuffer);
     } else {
-      throw new BadRequestException('Unsupported file format. Please upload CSV or Excel file.');
+      throw new BadRequestException(
+        'Unsupported file format. Please upload CSV or Excel file.',
+      );
     }
 
     const results = {
@@ -263,16 +328,34 @@ export class InventoryService {
 
       try {
         if (!row.tradeName || !row.quantity || !row.price) {
-          throw new Error('Missing required fields: tradeName, quantity, or price');
+          throw new Error(
+            'Missing required fields: tradeName, quantity, or price',
+          );
         }
 
-        const safeTradeName = validateSafeString(row.tradeName, 'tradeName', 255);
-        const safeGenericName = row.genericName ? validateSafeString(row.genericName, 'genericName', 255) : null;
-        const safeQuantity = validatePositiveInt(Number(row.quantity), 'quantity', 1);
+        const safeTradeName = validateSafeString(
+          row.tradeName,
+          'tradeName',
+          255,
+        );
+        const safeGenericName = row.genericName
+          ? validateSafeString(row.genericName, 'genericName', 255)
+          : null;
+        const safeQuantity = validatePositiveInt(
+          Number(row.quantity),
+          'quantity',
+          1,
+        );
         const safePrice = validatePositiveInt(Number(row.price), 'price', 0);
-        const safeBatchNumber = row.batchNumber ? validateSafeString(row.batchNumber, 'batchNumber', 100) : null;
-        const safeLotNumber = row.lotNumber ? validateSafeString(row.lotNumber, 'lotNumber', 100) : null;
-        const safeUnitCost = row.unitCost ? validatePositiveInt(Number(row.unitCost), 'unitCost', 0) : null;
+        const safeBatchNumber = row.batchNumber
+          ? validateSafeString(row.batchNumber, 'batchNumber', 100)
+          : null;
+        const safeLotNumber = row.lotNumber
+          ? validateSafeString(row.lotNumber, 'lotNumber', 100)
+          : null;
+        const safeUnitCost = row.unitCost
+          ? validatePositiveInt(Number(row.unitCost), 'unitCost', 0)
+          : null;
 
         let expiryDate: Date | undefined;
         if (row.expiryDate) {
@@ -281,7 +364,11 @@ export class InventoryService {
 
         let categoryId: string | undefined;
         if (row.category) {
-          const safeCategory = validateSafeString(row.category, 'category', 100);
+          const safeCategory = validateSafeString(
+            row.category,
+            'category',
+            100,
+          );
           const category = await prisma.category.findFirst({
             where: { name: { equals: safeCategory, mode: 'insensitive' } },
           });
@@ -297,7 +384,11 @@ export class InventoryService {
 
         let manufacturerId: string | undefined;
         if (row.manufacturer) {
-          const safeManufacturer = validateSafeString(row.manufacturer, 'manufacturer', 255);
+          const safeManufacturer = validateSafeString(
+            row.manufacturer,
+            'manufacturer',
+            255,
+          );
           const manufacturer = await prisma.manufacturer.findFirst({
             where: { name: { equals: safeManufacturer, mode: 'insensitive' } },
           });

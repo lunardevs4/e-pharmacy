@@ -1,5 +1,13 @@
 import { PartialType } from '@nestjs/swagger';
-import { IsOptional, IsString, IsUUID, IsArray, ValidateNested, IsEnum, IsInt } from 'class-validator';
+import {
+  IsOptional,
+  IsString,
+  IsUUID,
+  IsArray,
+  ValidateNested,
+  IsEnum,
+  IsInt,
+} from 'class-validator';
 import { Type } from 'class-transformer';
 import { PrescriptionStatus } from '@generated/prisma';
 

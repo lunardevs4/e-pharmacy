@@ -4,7 +4,7 @@ import { Public } from './common/guards/public.decorator';
 
 @Controller()
 export class AppController {
-  constructor(private readonly appService: AppService) { }
+  constructor(private readonly appService: AppService) {}
 
   @Public()
   @Get()
@@ -14,7 +14,7 @@ export class AppController {
       message: 'Welcome to the Rwanda E-Pharmacy API',
       version: '1.0.0',
       timestamp: new Date().toISOString(),
-      docs: '/api/docs'
+      docs: '/api/docs',
     };
   }
 }

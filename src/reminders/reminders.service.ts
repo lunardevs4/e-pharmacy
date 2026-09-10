@@ -1,8 +1,20 @@
-import { Injectable, NotFoundException, ForbiddenException, BadRequestException } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  ForbiddenException,
+  BadRequestException,
+} from '@nestjs/common';
 import { PrismaService } from '../common/prisma/prisma.service';
-import { CreateReminderScheduleDto, UpdateReminderScheduleDto } from './dto/reminders.dto';
+import {
+  CreateReminderScheduleDto,
+  UpdateReminderScheduleDto,
+} from './dto/reminders.dto';
 import { UserRole, ReminderStatus } from '@generated/prisma';
-import { validateUuid, sanitizeDeep, validateDate } from '../common/security/security.util';
+import {
+  validateUuid,
+  sanitizeDeep,
+  validateDate,
+} from '../common/security/security.util';
 
 interface AuthenticatedUser {
   id: string;
@@ -13,24 +25,81 @@ interface AuthenticatedUser {
 export class RemindersService {
   constructor(private prismaService: PrismaService) { }
 
-  async createSchedule(user: AuthenticatedUser, dto: CreateReminderScheduleDto) {
+  private async getPatientFromUser(prisma: any, userId: string) {
+    const patient = await prisma.patient.findFirst({ where: { userId } });
+    if (!patient) throw new NotFoundException('Patient profile not found');
+    return patient;
+  }
+
+  private computeAdherence(logs: any[]) {
+    const totalEligible = logs.filter(
+      (log) => ![ReminderStatus.CANCELLED].includes(log.status),
+    ).length;
+    const completed = logs.filter(
+      (log) => log.status === ReminderStatus.COMPLETED,
+    ).length;
+    const missed = logs.filter(
+      (log) => log.status === ReminderStatus.MISSED,
+    ).length;
+    const skipped = logs.filter(
+      (log) => log.status === ReminderStatus.SKIPPED,
+    ).length;
+    const adherencePercentage =
+      totalEligible > 0
+        ? Number(((completed / totalEligible) * 100).toFixed(2))
+        : 0;
+    return {
+      scheduledDoses: totalEligible,
+      completedDoses: completed,
+      missedDoses: missed,
+      skippedDoses: skipped,
+      adherencePercentage,
+    };
+  }
+
+  async createSchedule(
+    user: AuthenticatedUser,
+    dto: CreateReminderScheduleDto,
+  ) {
     const prisma = this.prismaService.prisma;
     const safeDto = sanitizeDeep(dto);
 
     const startDate = validateDate((safeDto as any).startDate, 'startDate');
     const endDate = validateDate((safeDto as any).endDate, 'endDate');
-    const { startDate: _s, endDate: _e, patientId, medicineId, medicineName, times, timeOfDay, frequency, dosage, notes, pharmacistInstructions, ...restDto } = safeDto as any;
+    const {
+      startDate: _s,
+      endDate: _e,
+      patientId,
+      medicineId,
+      medicineName,
+      times,
+      timeOfDay,
+      frequency,
+      dosage,
+      notes,
+      pharmacistInstructions,
+      ...restDto
+    } = safeDto as any;
 
-    let safePatientId = patientId ? validateUuid(patientId, 'patientId') : undefined;
+    let safePatientId = patientId
+      ? validateUuid(patientId, 'patientId')
+      : undefined;
     if (user.role === UserRole.PATIENT) {
-      const currentPatient = await prisma.patient.findFirst({ where: { userId: user.id } });
-      if (!currentPatient) throw new NotFoundException('Patient profile not found');
+      const currentPatient = await prisma.patient.findFirst({
+        where: { userId: user.id },
+      });
+      if (!currentPatient)
+        throw new NotFoundException('Patient profile not found');
       safePatientId = currentPatient.id;
     } else if (user.role !== UserRole.PHARMACIST) {
-      throw new ForbiddenException('Only patients and pharmacists can create medication reminders');
+      throw new ForbiddenException(
+        'Only patients and pharmacists can create medication reminders',
+      );
     }
 
-    let safeMedicineId = medicineId ? validateUuid(medicineId, 'medicineId') : undefined;
+    let safeMedicineId = medicineId
+      ? validateUuid(medicineId, 'medicineId')
+      : undefined;
     if (!safeMedicineId && medicineName) {
       const medicine = await prisma.medicine.findFirst({
         where: {
@@ -42,18 +111,27 @@ export class RemindersService {
           ],
         },
       });
-      if (!medicine) throw new NotFoundException(`Medicine not found: ${medicineName}`);
+      if (!medicine)
+        throw new NotFoundException(`Medicine not found: ${medicineName}`);
       safeMedicineId = medicine.id;
     }
-    if (!safePatientId) throw new BadRequestException('patientId must be provided');
-    if (!safeMedicineId) throw new BadRequestException('medicineId or medicineName must be provided');
+    if (!safePatientId)
+      throw new BadRequestException('patientId must be provided');
+    if (!safeMedicineId)
+      throw new BadRequestException(
+        'medicineId or medicineName must be provided',
+      );
     if (!startDate) throw new BadRequestException('startDate must be provided');
 
     const scheduleTimes = timeOfDay || times;
-    if (!scheduleTimes?.length) throw new BadRequestException('timeOfDay or times must be provided');
-    const scheduleEndDate = endDate || new Date(startDate.getTime() + 365 * 24 * 60 * 60 * 1000);
+    if (!scheduleTimes?.length)
+      throw new BadRequestException('timeOfDay or times must be provided');
+    const scheduleEndDate =
+      endDate || new Date(startDate.getTime() + 365 * 24 * 60 * 60 * 1000);
 
-    const patient = await prisma.patient.findUnique({ where: { id: safePatientId } });
+    const patient = await prisma.patient.findUnique({
+      where: { id: safePatientId },
+    });
     if (!patient) throw new NotFoundException('Patient profile not found');
 
     return prisma.reminderSchedule.create({
@@ -74,8 +152,7 @@ export class RemindersService {
     const prisma = this.prismaService.prisma;
 
     if (user.role === UserRole.PATIENT) {
-      const patient = await prisma.patient.findFirst({ where: { userId: user.id } });
-      if (!patient) throw new NotFoundException('Patient profile not found');
+      const patient = await this.getPatientFromUser(prisma, user.id);
       return prisma.reminderSchedule.findMany({
         where: { patientId: patient.id },
         include: { medicine: true, prescription: true },
@@ -96,7 +173,11 @@ export class RemindersService {
       const medicineIds = [...new Set(inventoryItems.map((i) => i.medicineId))];
       return prisma.reminderSchedule.findMany({
         where: { medicineId: { in: medicineIds } },
-        include: { medicine: true, prescription: true, patient: { include: { user: true } } },
+        include: {
+          medicine: true,
+          prescription: true,
+          patient: { include: { user: true } },
+        },
         orderBy: { createdAt: 'desc' },
       });
     }
@@ -114,7 +195,11 @@ export class RemindersService {
       const medicineIds = [...new Set(inventoryItems.map((i) => i.medicineId))];
       return prisma.reminderSchedule.findMany({
         where: { medicineId: { in: medicineIds } },
-        include: { medicine: true, prescription: true, patient: { include: { user: true } } },
+        include: {
+          medicine: true,
+          prescription: true,
+          patient: { include: { user: true } },
+        },
         orderBy: { createdAt: 'desc' },
       });
     }
@@ -125,8 +210,11 @@ export class RemindersService {
         where: { endDate: { gt: new Date() } },
       });
       const totalLogs = await prisma.reminderLog.count();
-      const completedLogs = await prisma.reminderLog.count({ where: { status: ReminderStatus.COMPLETED } });
-      const adherenceRate = totalLogs > 0 ? Math.round((completedLogs / totalLogs) * 100) : 0;
+      const completedLogs = await prisma.reminderLog.count({
+        where: { status: ReminderStatus.COMPLETED },
+      });
+      const adherenceRate =
+        totalLogs > 0 ? Math.round((completedLogs / totalLogs) * 100) : 0;
       return {
         aggregatedAnalytics: true,
         totalSchedules,
@@ -137,14 +225,15 @@ export class RemindersService {
       };
     }
 
-    throw new ForbiddenException('Insufficient permissions to access schedules');
+    throw new ForbiddenException(
+      'Insufficient permissions to access schedules',
+    );
   }
 
   async getMySchedules(userId: string) {
     const prisma = this.prismaService.prisma;
     const safeUserId = validateUuid(userId, 'userId');
-    const patient = await prisma.patient.findFirst({ where: { userId: safeUserId } });
-    if (!patient) throw new NotFoundException('Patient profile not found');
+    const patient = await this.getPatientFromUser(prisma, safeUserId);
     return prisma.reminderSchedule.findMany({
       where: { patientId: patient.id },
       include: { medicine: true, prescription: true },
@@ -152,36 +241,59 @@ export class RemindersService {
     });
   }
 
-  async updateSchedule(user: AuthenticatedUser, id: string, dto: UpdateReminderScheduleDto) {
+  async updateSchedule(
+    user: AuthenticatedUser,
+    id: string,
+    dto: UpdateReminderScheduleDto,
+  ) {
     const prisma = this.prismaService.prisma;
-    if (user.role !== UserRole.PATIENT) throw new ForbiddenException('Only patients can update reminders');
-    const patient = await prisma.patient.findFirst({ where: { userId: validateUuid(user.id, 'userId') } });
-    if (!patient) throw new NotFoundException('Patient profile not found');
+    if (user.role !== UserRole.PATIENT)
+      throw new ForbiddenException('Only patients can update reminders');
+    const patient = await this.getPatientFromUser(
+      prisma,
+      validateUuid(user.id, 'userId'),
+    );
     const safeId = validateUuid(id, 'id');
-    const schedule = await prisma.reminderSchedule.findUnique({ where: { id: safeId } });
-    if (!schedule || schedule.patientId !== patient.id) throw new NotFoundException('Reminder not found');
+    const schedule = await prisma.reminderSchedule.findUnique({
+      where: { id: safeId },
+    });
+    if (!schedule || schedule.patientId !== patient.id)
+      throw new NotFoundException('Reminder not found');
     const safeDto = sanitizeDeep(dto) as any;
     const data: any = {};
     if (safeDto.times !== undefined) data.timeOfDay = safeDto.times;
-    if (safeDto.startDate !== undefined) data.startDate = validateDate(safeDto.startDate, 'startDate');
-    if (safeDto.endDate !== undefined) data.endDate = validateDate(safeDto.endDate, 'endDate');
+    if (safeDto.startDate !== undefined)
+      data.startDate = validateDate(safeDto.startDate, 'startDate');
+    if (safeDto.endDate !== undefined)
+      data.endDate = validateDate(safeDto.endDate, 'endDate');
     if (safeDto.isActive === false) data.endDate = new Date();
-    if (safeDto.isActive === true && safeDto.endDate === undefined) data.endDate = new Date('2099-12-31T23:59:59.999Z');
+    if (safeDto.isActive === true && safeDto.endDate === undefined)
+      data.endDate = new Date('2099-12-31T23:59:59.999Z');
     return prisma.reminderSchedule.update({ where: { id: safeId }, data });
   }
 
   async deleteSchedule(user: AuthenticatedUser, id: string) {
     const prisma = this.prismaService.prisma;
-    if (user.role !== UserRole.PATIENT) throw new ForbiddenException('Only patients can delete reminders');
-    const patient = await prisma.patient.findFirst({ where: { userId: validateUuid(user.id, 'userId') } });
-    if (!patient) throw new NotFoundException('Patient profile not found');
+    if (user.role !== UserRole.PATIENT)
+      throw new ForbiddenException('Only patients can delete reminders');
+    const patient = await this.getPatientFromUser(
+      prisma,
+      validateUuid(user.id, 'userId'),
+    );
     const safeId = validateUuid(id, 'id');
-    const schedule = await prisma.reminderSchedule.findUnique({ where: { id: safeId } });
-    if (!schedule || schedule.patientId !== patient.id) throw new NotFoundException('Reminder not found');
+    const schedule = await prisma.reminderSchedule.findUnique({
+      where: { id: safeId },
+    });
+    if (!schedule || schedule.patientId !== patient.id)
+      throw new NotFoundException('Reminder not found');
     return prisma.reminderSchedule.delete({ where: { id: safeId } });
   }
 
-  async markIntake(user: AuthenticatedUser, logId: string) {
+  async markIntake(
+    user: AuthenticatedUser,
+    logId: string,
+    confirmationSource: 'APP' | 'SMS' | 'VOICE' | 'IVR' | 'SYSTEM' = 'APP',
+  ) {
     const prisma = this.prismaService.prisma;
     const safeUserId = validateUuid(user.id, 'userId');
     const safeLogId = validateUuid(logId, 'logId');
@@ -190,9 +302,7 @@ export class RemindersService {
       throw new ForbiddenException('Only patients can mark medication intake');
     }
 
-    const patient = await prisma.patient.findFirst({ where: { userId: safeUserId } });
-    if (!patient) throw new NotFoundException('Patient profile not found');
-
+    const patient = await this.getPatientFromUser(prisma, safeUserId);
     const log = await prisma.reminderLog.findUnique({
       where: { id: safeLogId },
       include: { schedule: true },
@@ -201,23 +311,101 @@ export class RemindersService {
     if (log.schedule.patientId !== patient.id) {
       throw new ForbiddenException('This reminder log does not belong to you');
     }
+    if (
+      log.status === ReminderStatus.COMPLETED ||
+      log.status === ReminderStatus.MISSED ||
+      log.status === ReminderStatus.SKIPPED ||
+      log.status === ReminderStatus.CANCELLED
+    ) {
+      throw new BadRequestException(
+        'This reminder dose can no longer be updated',
+      );
+    }
 
     return prisma.reminderLog.update({
       where: { id: safeLogId },
-      data: { status: ReminderStatus.COMPLETED, sentAt: new Date() },
+      data: {
+        status: ReminderStatus.COMPLETED,
+        sentAt: log.sentAt ?? new Date(),
+        confirmationSource,
+        confirmationTime: new Date(),
+      },
     });
   }
 
-  async getLogs(user: AuthenticatedUser) {
+  async getLogs(user: AuthenticatedUser, page = 1, limit = 20) {
     const prisma = this.prismaService.prisma;
     const safeUserId = validateUuid(user.id, 'userId');
-    const patient = await prisma.patient.findFirst({ where: { userId: safeUserId } });
-    if (!patient) throw new NotFoundException('Patient profile not found');
+    const patient = await this.getPatientFromUser(prisma, safeUserId);
+    const safePage = Number(page) > 0 ? Number(page) : 1;
+    const safeLimit = Math.min(Number(limit) > 0 ? Number(limit) : 20, 100);
+    const [data, total] = await Promise.all([
+      prisma.reminderLog.findMany({
+        where: { schedule: { patientId: patient.id } },
+        include: { schedule: { include: { medicine: true } } },
+        orderBy: { createdAt: 'desc' },
+        skip: (safePage - 1) * safeLimit,
+        take: safeLimit,
+      }),
+      prisma.reminderLog.count({
+        where: { schedule: { patientId: patient.id } },
+      }),
+    ]);
 
-    return prisma.reminderLog.findMany({
-      where: { schedule: { patientId: patient.id } },
-      include: { schedule: { include: { medicine: true } } },
+    return {
+      data,
+      meta: {
+        page: safePage,
+        limit: safeLimit,
+        total,
+        totalPages: Math.ceil(total / safeLimit) || 1,
+      },
+    };
+  }
+
+  async getAdherenceSummary(
+    user: AuthenticatedUser,
+    period: 'day' | 'week' | 'month' = 'month',
+    startDate?: string,
+    endDate?: string,
+  ) {
+    const prisma = this.prismaService.prisma;
+    if (user.role !== UserRole.PATIENT) {
+      throw new ForbiddenException(
+        'Only patients can access their adherence summary',
+      );
+    }
+
+    const patient = await this.getPatientFromUser(
+      prisma,
+      validateUuid(user.id, 'userId'),
+    );
+    const lowerBound = startDate
+      ? validateDate(startDate, 'startDate')
+      : undefined;
+    const upperBound = endDate ? validateDate(endDate, 'endDate') : undefined;
+    const where: any = { schedule: { patientId: patient.id } };
+    if (lowerBound || upperBound) {
+      where.createdAt = {};
+      if (lowerBound) where.createdAt.gte = lowerBound;
+      if (upperBound) where.createdAt.lte = upperBound;
+    }
+
+    const logs = await prisma.reminderLog.findMany({
+      where,
+      include: {
+        schedule: {
+          select: {
+            id: true,
+            dosage: true,
+            medicine: { select: { tradeName: true } },
+          },
+        },
+      },
       orderBy: { createdAt: 'desc' },
     });
+
+    const summary = this.computeAdherence(logs);
+    return { period, ...summary, generatedAt: new Date().toISOString() };
   }
 }

@@ -1,5 +1,17 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
-import { IsString, IsOptional, IsNumber, IsBoolean, IsEnum, IsDateString, IsArray, IsUUID, Min, Max, IsInt } from 'class-validator';
+import {
+  IsString,
+  IsOptional,
+  IsNumber,
+  IsBoolean,
+  IsEnum,
+  IsDateString,
+  IsArray,
+  IsUUID,
+  Min,
+  Max,
+  IsInt,
+} from 'class-validator';
 import { Type } from 'class-transformer';
 
 export enum InsuranceStatus {
@@ -50,21 +62,24 @@ export class CreateInsuranceProviderDto {
   @IsString()
   address?: string;
 
-  @ApiPropertyOptional({ example: 85.00 })
+  @ApiPropertyOptional({ example: 85.0 })
   @IsOptional()
   @IsNumber()
   @Min(0)
   @Max(100)
   defaultCoveragePercentage?: number;
 
-  @ApiPropertyOptional({ example: 15.00 })
+  @ApiPropertyOptional({ example: 15.0 })
   @IsOptional()
   @IsNumber()
   @Min(0)
   @Max(100)
   defaultCopayPercentage?: number;
 
-  @ApiPropertyOptional({ enum: InsuranceStatus, default: InsuranceStatus.ACTIVE })
+  @ApiPropertyOptional({
+    enum: InsuranceStatus,
+    default: InsuranceStatus.ACTIVE,
+  })
   @IsOptional()
   @IsEnum(InsuranceStatus)
   status?: InsuranceStatus;
@@ -96,14 +111,14 @@ export class UpdateInsuranceProviderDto {
   @IsString()
   address?: string;
 
-  @ApiPropertyOptional({ example: 85.00 })
+  @ApiPropertyOptional({ example: 85.0 })
   @IsOptional()
   @IsNumber()
   @Min(0)
   @Max(100)
   defaultCoveragePercentage?: number;
 
-  @ApiPropertyOptional({ example: 15.00 })
+  @ApiPropertyOptional({ example: 15.0 })
   @IsOptional()
   @IsNumber()
   @Min(0)
@@ -135,14 +150,14 @@ export class CreatePharmacyAgreementDto {
   @IsString()
   contractNumber?: string;
 
-  @ApiPropertyOptional({ example: 5.00 })
+  @ApiPropertyOptional({ example: 5.0 })
   @IsOptional()
   @IsNumber()
   @Min(0)
   @Max(100)
   discountRate?: number;
 
-  @ApiPropertyOptional({ example: 90.00 })
+  @ApiPropertyOptional({ example: 90.0 })
   @IsOptional()
   @IsNumber()
   @Min(0)
@@ -159,7 +174,10 @@ export class CreatePharmacyAgreementDto {
   @IsDateString()
   endDate?: string;
 
-  @ApiPropertyOptional({ enum: AgreementStatus, default: AgreementStatus.ACTIVE })
+  @ApiPropertyOptional({
+    enum: AgreementStatus,
+    default: AgreementStatus.ACTIVE,
+  })
   @IsOptional()
   @IsEnum(AgreementStatus)
   status?: AgreementStatus;
@@ -171,14 +189,14 @@ export class UpdatePharmacyAgreementDto {
   @IsString()
   contractNumber?: string;
 
-  @ApiPropertyOptional({ example: 5.00 })
+  @ApiPropertyOptional({ example: 5.0 })
   @IsOptional()
   @IsNumber()
   @Min(0)
   @Max(100)
   discountRate?: number;
 
-  @ApiPropertyOptional({ example: 90.00 })
+  @ApiPropertyOptional({ example: 90.0 })
   @IsOptional()
   @IsNumber()
   @Min(0)
@@ -205,26 +223,26 @@ export class SetMedicineTariffDto {
   @IsUUID()
   medicineId: string;
 
-  @ApiProperty({ example: 5000.00 })
+  @ApiProperty({ example: 5000.0 })
   @IsNumber()
   @Min(0)
   coveredPrice: number;
 
-  @ApiPropertyOptional({ example: 85.00 })
+  @ApiPropertyOptional({ example: 85.0 })
   @IsOptional()
   @IsNumber()
   @Min(0)
   @Max(100)
   coveragePercentage?: number;
 
-  @ApiPropertyOptional({ example: 15.00 })
+  @ApiPropertyOptional({ example: 15.0 })
   @IsOptional()
   @IsNumber()
   @Min(0)
   @Max(100)
   copayPercentage?: number;
 
-  @ApiPropertyOptional({ example: 500.00 })
+  @ApiPropertyOptional({ example: 500.0 })
   @IsOptional()
   @IsNumber()
   @Min(0)
@@ -295,24 +313,24 @@ export class CreateInsuranceClaimDto {
   @Min(1)
   quantity: number;
 
-  @ApiProperty({ example: 5000.00 })
+  @ApiProperty({ example: 5000.0 })
   @IsNumber()
   @Min(0)
   unitPrice: number;
 
-  @ApiPropertyOptional({ example: 10000.00 })
+  @ApiPropertyOptional({ example: 10000.0 })
   @IsOptional()
   @IsNumber()
   @Min(0)
   totalAmount?: number;
 
-  @ApiPropertyOptional({ example: 8500.00 })
+  @ApiPropertyOptional({ example: 8500.0 })
   @IsOptional()
   @IsNumber()
   @Min(0)
   insuranceAmount?: number;
 
-  @ApiPropertyOptional({ example: 1500.00 })
+  @ApiPropertyOptional({ example: 1500.0 })
   @IsOptional()
   @IsNumber()
   @Min(0)
@@ -380,7 +398,7 @@ export class RegisterInsuredPatientDto {
   @IsString()
   phone?: string;
 
-  @ApiPropertyOptional({ example: 85.00 })
+  @ApiPropertyOptional({ example: 85.0 })
   @IsOptional()
   @IsNumber()
   @Min(0)
@@ -456,7 +474,7 @@ export class MedicineCalculationDto {
   @Min(1)
   quantity: number;
 
-  @ApiProperty({ example: 5000.00 })
+  @ApiProperty({ example: 5000.0 })
   @IsNumber()
   @Min(0)
   unitPrice: number;

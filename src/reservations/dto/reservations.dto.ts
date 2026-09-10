@@ -1,4 +1,11 @@
-import { IsUUID, IsInt, Min, IsEnum, IsDateString, IsOptional } from 'class-validator';
+import {
+  IsUUID,
+  IsInt,
+  Min,
+  IsEnum,
+  IsDateString,
+  IsOptional,
+} from 'class-validator';
 import { ReservationStatus } from '@generated/prisma';
 import { TransformToISODateTime } from '../../common/transformers/date.transformer';
 

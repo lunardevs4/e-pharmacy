@@ -1,6 +1,13 @@
-import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  BadRequestException,
+} from '@nestjs/common';
 import { PrismaService } from '../common/prisma/prisma.service';
-import { RegisterInsuredPatientDto, VerifyPolicyDto } from './dto/insurance.dto';
+import {
+  RegisterInsuredPatientDto,
+  VerifyPolicyDto,
+} from './dto/insurance.dto';
 
 @Injectable()
 export class InsuredPatientsService {
@@ -44,7 +51,9 @@ export class InsuredPatientsService {
       });
 
       if (existingNationalId) {
-        throw new BadRequestException('National ID already registered with this insurance');
+        throw new BadRequestException(
+          'National ID already registered with this insurance',
+        );
       }
     }
 
@@ -302,7 +311,9 @@ export class InsuredPatientsService {
         fullName: patient.fullName,
         policyNumber: patient.policyNumber,
         nationalId: patient.nationalId,
-        coveragePercentage: patient.coveragePercentage || patient.insurance.defaultCoveragePercentage,
+        coveragePercentage:
+          patient.coveragePercentage ||
+          patient.insurance.defaultCoveragePercentage,
         startDate: patient.startDate,
         endDate: patient.endDate,
         insurance: {
@@ -314,7 +325,10 @@ export class InsuredPatientsService {
     };
   }
 
-  async updatePatient(patientId: string, dto: Partial<RegisterInsuredPatientDto> & { status?: string }) {
+  async updatePatient(
+    patientId: string,
+    dto: Partial<RegisterInsuredPatientDto> & { status?: string },
+  ) {
     const prisma = this.prismaService.prisma;
 
     const patient = await prisma.insuredPatient.findUnique({

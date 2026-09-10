@@ -1,4 +1,8 @@
-import { Injectable, NotFoundException, ForbiddenException } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  ForbiddenException,
+} from '@nestjs/common';
 import { PrismaService } from '../common/prisma/prisma.service';
 import { UserRole } from '@generated/prisma';
 import { validateUuid } from '../common/security/security.util';
@@ -10,7 +14,7 @@ interface AuthenticatedUser {
 
 @Injectable()
 export class NotificationsService {
-  constructor(private prismaService: PrismaService) { }
+  constructor(private prismaService: PrismaService) {}
 
   async getEmailPreferences(userId: string) {
     const prisma = this.prismaService.prisma;
@@ -28,14 +32,28 @@ export class NotificationsService {
     };
   }
 
-  async updateEmailPreferences(userId: string, preferences: Record<string, unknown>) {
+  async updateEmailPreferences(
+    userId: string,
+    preferences: Record<string, unknown>,
+  ) {
     const prisma = this.prismaService.prisma;
     const safeUserId = validateUuid(userId, 'userId');
-    const allowed = ['reminders', 'lowStock', 'reservations', 'billing', 'system'];
-    const value = Object.fromEntries(allowed.map((key) => [key, preferences[key] === true]));
+    const allowed = [
+      'reminders',
+      'lowStock',
+      'reservations',
+      'billing',
+      'system',
+    ];
+    const value = Object.fromEntries(
+      allowed.map((key) => [key, preferences[key] === true]),
+    );
     await prisma.systemSetting.upsert({
       where: { key: `email_notifications:${safeUserId}` },
-      create: { key: `email_notifications:${safeUserId}`, value: JSON.stringify(value) },
+      create: {
+        key: `email_notifications:${safeUserId}`,
+        value: JSON.stringify(value),
+      },
       update: { value: JSON.stringify(value) },
     });
     return value;
@@ -61,14 +79,22 @@ export class NotificationsService {
         where: {
           OR: [
             { id: safeUserId },
-            { pharmacyEmployees: { some: { pharmacyId: { in: pharmacyIds } } } },
+            {
+              pharmacyEmployees: { some: { pharmacyId: { in: pharmacyIds } } },
+            },
             { pharmacies: { some: { id: { in: pharmacyIds } } } },
-            { patient: { reservations: { some: { pharmacyId: { in: pharmacyIds } } } } },
+            {
+              patient: {
+                reservations: { some: { pharmacyId: { in: pharmacyIds } } },
+              },
+            },
           ],
         },
         select: { id: true },
       });
-      const userIds = [...new Set([safeUserId, ...relatedUsers.map((u) => u.id)])];
+      const userIds = [
+        ...new Set([safeUserId, ...relatedUsers.map((u) => u.id)]),
+      ];
       return prisma.notification.findMany({
         where: { userId: { in: userIds } },
         orderBy: { createdAt: 'desc' },
@@ -85,28 +111,42 @@ export class NotificationsService {
         where: {
           OR: [
             { id: safeUserId },
-            { pharmacyEmployees: { some: { pharmacyId: { in: pharmacyIds } } } },
+            {
+              pharmacyEmployees: { some: { pharmacyId: { in: pharmacyIds } } },
+            },
             { pharmacies: { some: { id: { in: pharmacyIds } } } },
-            { patient: { reservations: { some: { pharmacyId: { in: pharmacyIds } } } } },
+            {
+              patient: {
+                reservations: { some: { pharmacyId: { in: pharmacyIds } } },
+              },
+            },
           ],
         },
         select: { id: true },
       });
-      const userIds = [...new Set([safeUserId, ...relatedUsers.map((u) => u.id)])];
+      const userIds = [
+        ...new Set([safeUserId, ...relatedUsers.map((u) => u.id)]),
+      ];
       return prisma.notification.findMany({
         where: { userId: { in: userIds } },
         orderBy: { createdAt: 'desc' },
       });
     }
 
-    if (user.role === UserRole.PATIENT || user.role === UserRole.GOVERNMENT || user.role === UserRole.INSURANCE) {
+    if (
+      user.role === UserRole.PATIENT ||
+      user.role === UserRole.GOVERNMENT ||
+      user.role === UserRole.INSURANCE
+    ) {
       return prisma.notification.findMany({
         where: { userId: safeUserId },
         orderBy: { createdAt: 'desc' },
       });
     }
 
-    throw new ForbiddenException('Insufficient permissions to access notifications');
+    throw new ForbiddenException(
+      'Insufficient permissions to access notifications',
+    );
   }
 
   async markAsRead(user: AuthenticatedUser, id: string) {
@@ -114,15 +154,23 @@ export class NotificationsService {
     const safeUserId = validateUuid(user.id, 'userId');
     const safeId = validateUuid(id, 'id');
 
-    const notification = await prisma.notification.findUnique({ where: { id: safeId } });
+    const notification = await prisma.notification.findUnique({
+      where: { id: safeId },
+    });
     if (!notification) throw new NotFoundException('Notification not found');
 
     if (notification.userId === safeUserId) {
-      return prisma.notification.update({ where: { id: safeId }, data: { isRead: true } });
+      return prisma.notification.update({
+        where: { id: safeId },
+        data: { isRead: true },
+      });
     }
 
     if (user.role === UserRole.ADMIN || user.role === UserRole.INSURANCE) {
-      return prisma.notification.update({ where: { id: safeId }, data: { isRead: true } });
+      return prisma.notification.update({
+        where: { id: safeId },
+        data: { isRead: true },
+      });
     }
 
     if (user.role === UserRole.PHARMACY_OWNER) {
@@ -134,16 +182,25 @@ export class NotificationsService {
       const relatedUsers = await prisma.user.findMany({
         where: {
           OR: [
-            { pharmacyEmployees: { some: { pharmacyId: { in: pharmacyIds } } } },
+            {
+              pharmacyEmployees: { some: { pharmacyId: { in: pharmacyIds } } },
+            },
             { pharmacies: { some: { id: { in: pharmacyIds } } } },
-            { patient: { reservations: { some: { pharmacyId: { in: pharmacyIds } } } } },
+            {
+              patient: {
+                reservations: { some: { pharmacyId: { in: pharmacyIds } } },
+              },
+            },
           ],
         },
         select: { id: true },
       });
       const userIds = [safeUserId, ...relatedUsers.map((u) => u.id)];
       if (userIds.includes(notification.userId)) {
-        return prisma.notification.update({ where: { id: safeId }, data: { isRead: true } });
+        return prisma.notification.update({
+          where: { id: safeId },
+          data: { isRead: true },
+        });
       }
     }
 
@@ -156,20 +213,31 @@ export class NotificationsService {
       const relatedUsers = await prisma.user.findMany({
         where: {
           OR: [
-            { pharmacyEmployees: { some: { pharmacyId: { in: pharmacyIds } } } },
+            {
+              pharmacyEmployees: { some: { pharmacyId: { in: pharmacyIds } } },
+            },
             { pharmacies: { some: { id: { in: pharmacyIds } } } },
-            { patient: { reservations: { some: { pharmacyId: { in: pharmacyIds } } } } },
+            {
+              patient: {
+                reservations: { some: { pharmacyId: { in: pharmacyIds } } },
+              },
+            },
           ],
         },
         select: { id: true },
       });
       const userIds = [safeUserId, ...relatedUsers.map((u) => u.id)];
       if (userIds.includes(notification.userId)) {
-        return prisma.notification.update({ where: { id: safeId }, data: { isRead: true } });
+        return prisma.notification.update({
+          where: { id: safeId },
+          data: { isRead: true },
+        });
       }
     }
 
-    throw new ForbiddenException('This notification does not belong to you or your pharmacy scope');
+    throw new ForbiddenException(
+      'This notification does not belong to you or your pharmacy scope',
+    );
   }
 
   async markAllAsRead(user: AuthenticatedUser) {
@@ -193,9 +261,15 @@ export class NotificationsService {
         where: {
           OR: [
             { id: safeUserId },
-            { pharmacyEmployees: { some: { pharmacyId: { in: pharmacyIds } } } },
+            {
+              pharmacyEmployees: { some: { pharmacyId: { in: pharmacyIds } } },
+            },
             { pharmacies: { some: { id: { in: pharmacyIds } } } },
-            { patient: { reservations: { some: { pharmacyId: { in: pharmacyIds } } } } },
+            {
+              patient: {
+                reservations: { some: { pharmacyId: { in: pharmacyIds } } },
+              },
+            },
           ],
         },
         select: { id: true },
@@ -217,9 +291,15 @@ export class NotificationsService {
         where: {
           OR: [
             { id: safeUserId },
-            { pharmacyEmployees: { some: { pharmacyId: { in: pharmacyIds } } } },
+            {
+              pharmacyEmployees: { some: { pharmacyId: { in: pharmacyIds } } },
+            },
             { pharmacies: { some: { id: { in: pharmacyIds } } } },
-            { patient: { reservations: { some: { pharmacyId: { in: pharmacyIds } } } } },
+            {
+              patient: {
+                reservations: { some: { pharmacyId: { in: pharmacyIds } } },
+              },
+            },
           ],
         },
         select: { id: true },
@@ -231,7 +311,11 @@ export class NotificationsService {
       });
     }
 
-    if (user.role === UserRole.PATIENT || user.role === UserRole.GOVERNMENT || user.role === UserRole.INSURANCE) {
+    if (
+      user.role === UserRole.PATIENT ||
+      user.role === UserRole.GOVERNMENT ||
+      user.role === UserRole.INSURANCE
+    ) {
       return prisma.notification.updateMany({
         where: { userId: safeUserId, isRead: false },
         data: { isRead: true },

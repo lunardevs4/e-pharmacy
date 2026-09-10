@@ -32,16 +32,22 @@ enum PrescriptionStatus {
 
 enum ReminderStatus {
   PENDING
+  QUEUED
   SENT
+  DELIVERED
   FAILED
   COMPLETED
   MISSED
+  SKIPPED
+  CANCELLED
 }
 
 enum NotificationType {
   IN_APP
   SMS
   VOICE
+  EMAIL
+  TTS
 }
 
 enum PharmacyStatus {
@@ -429,14 +435,19 @@ model ReminderSchedule {
 }
 
 model ReminderLog {
-  id         String         @id @default(uuid())
-  scheduleId String
-  patientId  String
-  type       NotificationType
-  status     ReminderStatus
-  sentAt     DateTime?
-  error      String?
-  createdAt  DateTime       @default(now())
+  id                 String         @id @default(uuid())
+  scheduleId         String
+  patientId          String
+  type               NotificationType
+  status             ReminderStatus
+  sentAt             DateTime?
+  provider           String?
+  providerReference  String?
+  confirmationSource String?
+  confirmationTime   DateTime?
+  retryCount         Int            @default(0)
+  error              String?
+  createdAt          DateTime       @default(now())
 
   schedule   ReminderSchedule @relation(fields: [scheduleId], references: [id], onDelete: Cascade)
   patient    Patient           @relation(fields: [patientId], references: [id], onDelete: Cascade)
@@ -444,6 +455,7 @@ model ReminderLog {
   @@index([scheduleId])
   @@index([patientId])
   @@index([status])
+  @@index([provider])
   @@index([createdAt])
 }
 

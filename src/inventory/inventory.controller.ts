@@ -1,5 +1,24 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, Req, UseInterceptors, UploadedFile } from '@nestjs/common';
-import { ApiTags, ApiBearerAuth, ApiOperation, ApiBody, ApiParam, ApiConsumes } from '@nestjs/swagger';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+  UseGuards,
+  Req,
+  UseInterceptors,
+  UploadedFile,
+} from '@nestjs/common';
+import {
+  ApiTags,
+  ApiBearerAuth,
+  ApiOperation,
+  ApiBody,
+  ApiParam,
+  ApiConsumes,
+} from '@nestjs/swagger';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { InventoryService } from './inventory.service';
 import { CreateInventoryDto, UpdateInventoryDto } from './dto/inventory.dto';
@@ -12,15 +31,26 @@ import { UserRole } from '@generated/prisma';
 @UseGuards(JwtAuthGuard)
 @ApiBearerAuth()
 export class InventoryController {
-  constructor(private inventoryService: InventoryService) { }
+  constructor(private inventoryService: InventoryService) {}
 
   @Post()
-  @Roles(UserRole.PHARMACY_OWNER, UserRole.PHARMACY, UserRole.PHARMACIST, UserRole.ADMIN)
+  @Roles(
+    UserRole.PHARMACY_OWNER,
+    UserRole.PHARMACY,
+    UserRole.PHARMACIST,
+    UserRole.ADMIN,
+  )
   @ApiOperation({
     summary: 'Add medicine to inventory',
-    description: 'Endpoint: POST /api/v1/pharmacies/:pharmacyId/inventory\n\nURL Parameters:\n- pharmacyId (UUID): The unique identifier of the pharmacy',
+    description:
+      'Endpoint: POST /api/v1/pharmacies/:pharmacyId/inventory\n\nURL Parameters:\n- pharmacyId (UUID): The unique identifier of the pharmacy',
   })
-  @ApiParam({ name: 'pharmacyId', type: 'string', description: 'Pharmacy UUID', example: '550e8400-e29b-41d4-a716-446655440000' })
+  @ApiParam({
+    name: 'pharmacyId',
+    type: 'string',
+    description: 'Pharmacy UUID',
+    example: '550e8400-e29b-41d4-a716-446655440000',
+  })
   @ApiBody({
     type: CreateInventoryDto,
     examples: {
@@ -37,46 +67,103 @@ export class InventoryController {
         value: {
           medicineId: '550e8400-e29b-41d4-a716-446655440001',
           quantity: 50,
-          price: 9.50,
+          price: 9.5,
         },
       },
     },
   })
-  create(@Param('pharmacyId') pharmacyId: string, @Req() req: any, @Body() createInventoryDto: CreateInventoryDto) {
-    return this.inventoryService.create(pharmacyId, req.user, createInventoryDto);
+  create(
+    @Param('pharmacyId') pharmacyId: string,
+    @Req() req: any,
+    @Body() createInventoryDto: CreateInventoryDto,
+  ) {
+    return this.inventoryService.create(
+      pharmacyId,
+      req.user,
+      createInventoryDto,
+    );
   }
 
   @Get()
-  @Roles(UserRole.PATIENT, UserRole.PHARMACY_OWNER, UserRole.PHARMACIST, UserRole.GOVERNMENT, UserRole.ADMIN)
+  @Roles(
+    UserRole.PATIENT,
+    UserRole.PHARMACY_OWNER,
+    UserRole.PHARMACIST,
+    UserRole.GOVERNMENT,
+    UserRole.ADMIN,
+  )
   @ApiOperation({
     summary: 'List pharmacy inventory',
-    description: 'Endpoint: GET /api/v1/pharmacies/:pharmacyId/inventory\n\nURL Parameters:\n- pharmacyId (UUID): The unique identifier of the pharmacy',
+    description:
+      'Endpoint: GET /api/v1/pharmacies/:pharmacyId/inventory\n\nURL Parameters:\n- pharmacyId (UUID): The unique identifier of the pharmacy',
   })
-  @ApiParam({ name: 'pharmacyId', type: 'string', description: 'Pharmacy UUID', example: '550e8400-e29b-41d4-a716-446655440000' })
+  @ApiParam({
+    name: 'pharmacyId',
+    type: 'string',
+    description: 'Pharmacy UUID',
+    example: '550e8400-e29b-41d4-a716-446655440000',
+  })
   findByPharmacy(@Param('pharmacyId') pharmacyId: string, @Req() req: any) {
     return this.inventoryService.findByPharmacy(pharmacyId, req.user);
   }
 
   @Get(':id')
-  @Roles(UserRole.PATIENT, UserRole.PHARMACY_OWNER, UserRole.PHARMACIST, UserRole.GOVERNMENT, UserRole.ADMIN)
+  @Roles(
+    UserRole.PATIENT,
+    UserRole.PHARMACY_OWNER,
+    UserRole.PHARMACIST,
+    UserRole.GOVERNMENT,
+    UserRole.ADMIN,
+  )
   @ApiOperation({
     summary: 'Get inventory item details',
-    description: 'Endpoint: GET /api/v1/pharmacies/:pharmacyId/inventory/:id\n\nURL Parameters:\n- pharmacyId (UUID): The unique identifier of the pharmacy\n- id (UUID): The unique identifier of the inventory item',
+    description:
+      'Endpoint: GET /api/v1/pharmacies/:pharmacyId/inventory/:id\n\nURL Parameters:\n- pharmacyId (UUID): The unique identifier of the pharmacy\n- id (UUID): The unique identifier of the inventory item',
   })
-  @ApiParam({ name: 'pharmacyId', type: 'string', description: 'Pharmacy UUID', example: '550e8400-e29b-41d4-a716-446655440000' })
-  @ApiParam({ name: 'id', type: 'string', description: 'Inventory item UUID', example: '550e8400-e29b-41d4-a716-446655440001' })
-  findOne(@Param('id') id: string, @Param('pharmacyId') pharmacyId: string, @Req() req: any) {
+  @ApiParam({
+    name: 'pharmacyId',
+    type: 'string',
+    description: 'Pharmacy UUID',
+    example: '550e8400-e29b-41d4-a716-446655440000',
+  })
+  @ApiParam({
+    name: 'id',
+    type: 'string',
+    description: 'Inventory item UUID',
+    example: '550e8400-e29b-41d4-a716-446655440001',
+  })
+  findOne(
+    @Param('id') id: string,
+    @Param('pharmacyId') pharmacyId: string,
+    @Req() req: any,
+  ) {
     return this.inventoryService.findOne(id, pharmacyId, req.user);
   }
 
   @Patch(':id')
-  @Roles(UserRole.PHARMACY_OWNER, UserRole.PHARMACY, UserRole.PHARMACIST, UserRole.ADMIN)
+  @Roles(
+    UserRole.PHARMACY_OWNER,
+    UserRole.PHARMACY,
+    UserRole.PHARMACIST,
+    UserRole.ADMIN,
+  )
   @ApiOperation({
     summary: 'Update inventory item',
-    description: 'Endpoint: PATCH /api/v1/pharmacies/:pharmacyId/inventory/:id\n\nURL Parameters:\n- pharmacyId (UUID): The unique identifier of the pharmacy\n- id (UUID): The unique identifier of the inventory item',
+    description:
+      'Endpoint: PATCH /api/v1/pharmacies/:pharmacyId/inventory/:id\n\nURL Parameters:\n- pharmacyId (UUID): The unique identifier of the pharmacy\n- id (UUID): The unique identifier of the inventory item',
   })
-  @ApiParam({ name: 'pharmacyId', type: 'string', description: 'Pharmacy UUID', example: '550e8400-e29b-41d4-a716-446655440000' })
-  @ApiParam({ name: 'id', type: 'string', description: 'Inventory item UUID', example: '550e8400-e29b-41d4-a716-446655440001' })
+  @ApiParam({
+    name: 'pharmacyId',
+    type: 'string',
+    description: 'Pharmacy UUID',
+    example: '550e8400-e29b-41d4-a716-446655440000',
+  })
+  @ApiParam({
+    name: 'id',
+    type: 'string',
+    description: 'Inventory item UUID',
+    example: '550e8400-e29b-41d4-a716-446655440001',
+  })
   @ApiBody({
     type: UpdateInventoryDto,
     examples: {
@@ -101,31 +188,72 @@ export class InventoryController {
       },
     },
   })
-  update(@Param('id') id: string, @Param('pharmacyId') pharmacyId: string, @Req() req: any, @Body() updateInventoryDto: UpdateInventoryDto) {
-    return this.inventoryService.update(id, pharmacyId, req.user, updateInventoryDto);
+  update(
+    @Param('id') id: string,
+    @Param('pharmacyId') pharmacyId: string,
+    @Req() req: any,
+    @Body() updateInventoryDto: UpdateInventoryDto,
+  ) {
+    return this.inventoryService.update(
+      id,
+      pharmacyId,
+      req.user,
+      updateInventoryDto,
+    );
   }
 
   @Delete(':id')
-  @Roles(UserRole.PHARMACY_OWNER, UserRole.PHARMACY, UserRole.PHARMACIST, UserRole.ADMIN)
+  @Roles(
+    UserRole.PHARMACY_OWNER,
+    UserRole.PHARMACY,
+    UserRole.PHARMACIST,
+    UserRole.ADMIN,
+  )
   @ApiOperation({
     summary: 'Remove inventory item',
-    description: 'Endpoint: DELETE /api/v1/pharmacies/:pharmacyId/inventory/:id\n\nURL Parameters:\n- pharmacyId (UUID): The unique identifier of the pharmacy\n- id (UUID): The unique identifier of the inventory item to remove',
+    description:
+      'Endpoint: DELETE /api/v1/pharmacies/:pharmacyId/inventory/:id\n\nURL Parameters:\n- pharmacyId (UUID): The unique identifier of the pharmacy\n- id (UUID): The unique identifier of the inventory item to remove',
   })
-  @ApiParam({ name: 'pharmacyId', type: 'string', description: 'Pharmacy UUID', example: '550e8400-e29b-41d4-a716-446655440000' })
-  @ApiParam({ name: 'id', type: 'string', description: 'Inventory item UUID', example: '550e8400-e29b-41d4-a716-446655440001' })
-  remove(@Param('id') id: string, @Param('pharmacyId') pharmacyId: string, @Req() req: any) {
+  @ApiParam({
+    name: 'pharmacyId',
+    type: 'string',
+    description: 'Pharmacy UUID',
+    example: '550e8400-e29b-41d4-a716-446655440000',
+  })
+  @ApiParam({
+    name: 'id',
+    type: 'string',
+    description: 'Inventory item UUID',
+    example: '550e8400-e29b-41d4-a716-446655440001',
+  })
+  remove(
+    @Param('id') id: string,
+    @Param('pharmacyId') pharmacyId: string,
+    @Req() req: any,
+  ) {
     return this.inventoryService.remove(id, pharmacyId, req.user);
   }
 
   @Post('import')
-  @Roles(UserRole.PHARMACY_OWNER, UserRole.PHARMACY, UserRole.PHARMACIST, UserRole.ADMIN)
+  @Roles(
+    UserRole.PHARMACY_OWNER,
+    UserRole.PHARMACY,
+    UserRole.PHARMACIST,
+    UserRole.ADMIN,
+  )
   @UseInterceptors(FileInterceptor('file'))
   @ApiConsumes('multipart/form-data')
   @ApiOperation({
     summary: 'Import inventory from CSV or Excel file',
-    description: 'Endpoint: POST /api/v1/pharmacies/:pharmacyId/inventory/import\n\nSupported formats: CSV, Excel (.xlsx)\n\nRequired columns: tradeName, quantity, price\n\nOptional columns: genericName, category, manufacturer, batchNumber, lotNumber, expiryDate, unitCost',
+    description:
+      'Endpoint: POST /api/v1/pharmacies/:pharmacyId/inventory/import\n\nSupported formats: CSV, Excel (.xlsx)\n\nRequired columns: tradeName, quantity, price\n\nOptional columns: genericName, category, manufacturer, batchNumber, lotNumber, expiryDate, unitCost',
   })
-  @ApiParam({ name: 'pharmacyId', type: 'string', description: 'Pharmacy UUID', example: '550e8400-e29b-41d4-a716-446655440000' })
+  @ApiParam({
+    name: 'pharmacyId',
+    type: 'string',
+    description: 'Pharmacy UUID',
+    example: '550e8400-e29b-41d4-a716-446655440000',
+  })
   @ApiBody({
     schema: {
       type: 'object',
@@ -142,6 +270,11 @@ export class InventoryController {
     @Req() req: any,
     @UploadedFile() file: Express.Multer.File,
   ) {
-    return this.inventoryService.importInventory(pharmacyId, req.user, file.buffer, file.mimetype);
+    return this.inventoryService.importInventory(
+      pharmacyId,
+      req.user,
+      file.buffer,
+      file.mimetype,
+    );
   }
 }

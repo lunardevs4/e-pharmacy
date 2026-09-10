@@ -1,7 +1,25 @@
-import { Controller, Get, Post, Body, Patch, Param, UseGuards, Req } from '@nestjs/common';
-import { ApiTags, ApiBearerAuth, ApiOperation, ApiBody, ApiParam } from '@nestjs/swagger';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  UseGuards,
+  Req,
+} from '@nestjs/common';
+import {
+  ApiTags,
+  ApiBearerAuth,
+  ApiOperation,
+  ApiBody,
+  ApiParam,
+} from '@nestjs/swagger';
 import { ReservationsService } from './reservations.service';
-import { CreateReservationDto, UpdateReservationStatusDto } from './dto/reservations.dto';
+import {
+  CreateReservationDto,
+  UpdateReservationStatusDto,
+} from './dto/reservations.dto';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { Roles } from '../common/guards/roles.decorator';
 import { UserRole, ReservationStatus } from '@generated/prisma';
@@ -13,7 +31,7 @@ import { Throttle } from '@nestjs/throttler';
 @Controller('api/v1')
 @Throttle({ userSensitive: {} })
 export class ReservationsController {
-  constructor(private reservationsService: ReservationsService) { }
+  constructor(private reservationsService: ReservationsService) {}
 
   @Post('reservations')
   @Roles(UserRole.PATIENT)
@@ -50,7 +68,8 @@ export class ReservationsController {
   @Roles(UserRole.PATIENT)
   @ApiOperation({
     summary: 'View my late pickups (patient only)',
-    description: 'Endpoint: GET /api/v1/reservations/late\n\nReturns reservations whose pickup window expired without collection.',
+    description:
+      'Endpoint: GET /api/v1/reservations/late\n\nReturns reservations whose pickup window expired without collection.',
   })
   findLateForPatient(@Req() req: any) {
     return this.reservationsService.findLateForPatient(req.user);
@@ -60,7 +79,8 @@ export class ReservationsController {
   @Roles(UserRole.PATIENT)
   @ApiOperation({
     summary: 'View my reservations (patient only)',
-    description: 'Endpoint: GET /api/v1/reservations\n\nReturns all reservations for the currently authenticated patient.',
+    description:
+      'Endpoint: GET /api/v1/reservations\n\nReturns all reservations for the currently authenticated patient.',
   })
   findByPatient(@Req() req: any) {
     return this.reservationsService.findByPatient(req.user);
@@ -70,9 +90,15 @@ export class ReservationsController {
   @Roles(UserRole.PATIENT)
   @ApiOperation({
     summary: 'Cancel my reservation (patient only)',
-    description: 'Endpoint: PATCH /api/v1/reservations/:id/cancel\n\nURL Parameters:\n- id (UUID): The unique identifier of the reservation',
+    description:
+      'Endpoint: PATCH /api/v1/reservations/:id/cancel\n\nURL Parameters:\n- id (UUID): The unique identifier of the reservation',
   })
-  @ApiParam({ name: 'id', type: 'string', description: 'Reservation UUID', example: '550e8400-e29b-41d4-a716-446655440000' })
+  @ApiParam({
+    name: 'id',
+    type: 'string',
+    description: 'Reservation UUID',
+    example: '550e8400-e29b-41d4-a716-446655440000',
+  })
   cancelPatient(@Param('id') id: string, @Req() req: any) {
     return this.reservationsService.cancelPatient(req.user, id);
   }
@@ -81,9 +107,15 @@ export class ReservationsController {
   @Roles(UserRole.PHARMACY_OWNER, UserRole.PHARMACIST)
   @ApiOperation({
     summary: 'View pharmacy reservations',
-    description: 'Endpoint: GET /api/v1/pharmacies/:pharmacyId/reservations\n\nURL Parameters:\n- pharmacyId (UUID): The unique identifier of the pharmacy',
+    description:
+      'Endpoint: GET /api/v1/pharmacies/:pharmacyId/reservations\n\nURL Parameters:\n- pharmacyId (UUID): The unique identifier of the pharmacy',
   })
-  @ApiParam({ name: 'pharmacyId', type: 'string', description: 'Pharmacy UUID', example: '550e8400-e29b-41d4-a716-446655440000' })
+  @ApiParam({
+    name: 'pharmacyId',
+    type: 'string',
+    description: 'Pharmacy UUID',
+    example: '550e8400-e29b-41d4-a716-446655440000',
+  })
   findByPharmacy(@Param('pharmacyId') pharmacyId: string, @Req() req: any) {
     return this.reservationsService.findByPharmacy(pharmacyId, req.user);
   }
@@ -92,10 +124,21 @@ export class ReservationsController {
   @Roles(UserRole.PHARMACY_OWNER, UserRole.PHARMACIST)
   @ApiOperation({
     summary: 'Confirm/manage reservation status (pharmacist or owner)',
-    description: 'Endpoint: PATCH /api/v1/pharmacies/:pharmacyId/reservations/:id',
+    description:
+      'Endpoint: PATCH /api/v1/pharmacies/:pharmacyId/reservations/:id',
   })
-  @ApiParam({ name: 'pharmacyId', type: 'string', description: 'Pharmacy UUID', example: '550e8400-e29b-41d4-a716-446655440000' })
-  @ApiParam({ name: 'id', type: 'string', description: 'Reservation UUID', example: '550e8400-e29b-41d4-a716-446655440001' })
+  @ApiParam({
+    name: 'pharmacyId',
+    type: 'string',
+    description: 'Pharmacy UUID',
+    example: '550e8400-e29b-41d4-a716-446655440000',
+  })
+  @ApiParam({
+    name: 'id',
+    type: 'string',
+    description: 'Reservation UUID',
+    example: '550e8400-e29b-41d4-a716-446655440001',
+  })
   @ApiBody({
     type: UpdateReservationStatusDto,
     examples: {
@@ -127,6 +170,11 @@ export class ReservationsController {
     @Req() req: any,
     @Body() updateDto: UpdateReservationStatusDto,
   ) {
-    return this.reservationsService.updatePharmacyStatus(pharmacyId, req.user, id, updateDto);
+    return this.reservationsService.updatePharmacyStatus(
+      pharmacyId,
+      req.user,
+      id,
+      updateDto,
+    );
   }
 }

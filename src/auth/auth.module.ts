@@ -17,7 +17,10 @@ import { EmailModule } from '../common/email/email.module';
       imports: [ConfigModule],
       useFactory: (configService: ConfigService) => ({
         secret: configService.getOrThrow<string>('JWT_SECRET'),
-        signOptions: { expiresIn: (configService.get<string>('JWT_EXPIRES_IN') || '1h') as any },
+        signOptions: {
+          expiresIn: (configService.get<string>('JWT_EXPIRES_IN') ||
+            '1h') as any,
+        },
       }),
       inject: [ConfigService],
     }),
@@ -26,4 +29,4 @@ import { EmailModule } from '../common/email/email.module';
   providers: [AuthService, JwtStrategy],
   exports: [AuthService],
 })
-export class AuthModule { }
+export class AuthModule {}

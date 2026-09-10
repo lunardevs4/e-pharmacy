@@ -5,15 +5,25 @@ import * as nodemailer from 'nodemailer';
 export class EmailService {
   private readonly logger = new Logger(EmailService.name);
 
-  async sendNotificationEmail(recipientEmail: string, recipientName: string, subject: string, message: string) {
+  async sendNotificationEmail(
+    recipientEmail: string,
+    recipientName: string,
+    subject: string,
+    message: string,
+  ) {
     const gmailUser = process.env.GMAIL_USER?.trim();
     const gmailAppPassword = process.env.GMAIL_APP_PASSWORD?.trim();
     const fromAddress = process.env.GMAIL_FROM?.trim() || gmailUser;
     if (!gmailUser || !gmailAppPassword || !fromAddress) {
-      this.logger.warn(`Gmail email is not configured. Skipping notification email to ${recipientEmail}.`);
+      this.logger.warn(
+        `Gmail email is not configured. Skipping notification email to ${recipientEmail}.`,
+      );
       return false;
     }
-    const transport = nodemailer.createTransport({ service: 'gmail', auth: { user: gmailUser, pass: gmailAppPassword } });
+    const transport = nodemailer.createTransport({
+      service: 'gmail',
+      auth: { user: gmailUser, pass: gmailAppPassword },
+    });
     await transport.sendMail({
       from: `"Rwanda E-pharmacy" <${fromAddress}>`,
       to: recipientEmail,
@@ -38,14 +48,16 @@ export class EmailService {
       </p>
     </div>
   `,
-
-
     });
     this.logger.log(`Notification email sent to ${recipientEmail}`);
     return true;
   }
 
-  async sendTemporaryPasswordEmail(recipientEmail: string, recipientName: string, temporaryPassword: string) {
+  async sendTemporaryPasswordEmail(
+    recipientEmail: string,
+    recipientName: string,
+    temporaryPassword: string,
+  ) {
     const gmailUser = process.env.GMAIL_USER?.trim();
     const gmailAppPassword = process.env.GMAIL_APP_PASSWORD?.trim();
     const fromAddress = process.env.GMAIL_FROM?.trim() || gmailUser;
@@ -66,7 +78,6 @@ export class EmailService {
     });
 
     await transport.sendMail({
-
       from: `"Rwanda E-pharmacy" <${fromAddress}>`,
       to: recipientEmail,
       subject: 'Your temporary e-Pharmacy password',
@@ -108,24 +119,31 @@ export class EmailService {
       </p>
     </div>
   `,
-
     });
 
     this.logger.log(`Temporary password email sent to ${recipientEmail}`);
     return true;
   }
 
-  async sendVerificationEmail(recipientEmail: string, recipientName: string, verificationUrl: string) {
+  async sendVerificationEmail(
+    recipientEmail: string,
+    recipientName: string,
+    verificationUrl: string,
+  ) {
     const gmailUser = process.env.GMAIL_USER?.trim();
     const gmailAppPassword = process.env.GMAIL_APP_PASSWORD?.trim();
     const fromAddress = process.env.GMAIL_FROM?.trim() || gmailUser;
     if (!gmailUser || !gmailAppPassword || !fromAddress) {
-      this.logger.warn(`Gmail email is not configured. Skipping verification email to ${recipientEmail}.`);
+      this.logger.warn(
+        `Gmail email is not configured. Skipping verification email to ${recipientEmail}.`,
+      );
       return false;
     }
-    const transport = nodemailer.createTransport({ service: 'gmail', auth: { user: gmailUser, pass: gmailAppPassword } });
+    const transport = nodemailer.createTransport({
+      service: 'gmail',
+      auth: { user: gmailUser, pass: gmailAppPassword },
+    });
     await transport.sendMail({
-
       from: `"Rwanda E-pharmacy" <${fromAddress}>`,
       to: recipientEmail,
       subject: 'Verify your e-Pharmacy email',
@@ -171,18 +189,23 @@ export class EmailService {
       </p>
     </div>
   `,
-
     });
     this.logger.log(`Verification email sent to ${recipientEmail}`);
     return true;
   }
 
-  async sendPasswordResetEmail(recipientEmail: string, recipientName: string, otp: string) {
+  async sendPasswordResetEmail(
+    recipientEmail: string,
+    recipientName: string,
+    otp: string,
+  ) {
     const gmailUser = process.env.GMAIL_USER?.trim();
     const gmailAppPassword = process.env.GMAIL_APP_PASSWORD?.trim();
     const fromAddress = process.env.GMAIL_FROM?.trim() || gmailUser;
     if (!gmailUser || !gmailAppPassword || !fromAddress) {
-      this.logger.warn('Gmail email is not configured. Skipping password reset email.');
+      this.logger.warn(
+        'Gmail email is not configured. Skipping password reset email.',
+      );
       return false;
     }
 

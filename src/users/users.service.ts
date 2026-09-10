@@ -1,11 +1,15 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../common/prisma/prisma.service';
 import { UpdateUserDto } from './dto/users.dto';
-import { validatePositiveInt, validateUuid, sanitizeDeep } from '../common/security/security.util';
+import {
+  validatePositiveInt,
+  validateUuid,
+  sanitizeDeep,
+} from '../common/security/security.util';
 
 @Injectable()
 export class UsersService {
-  constructor(private prismaService: PrismaService) { }
+  constructor(private prismaService: PrismaService) {}
 
   async getProfile(userId: string) {
     const prisma = this.prismaService.prisma;
@@ -40,7 +44,13 @@ export class UsersService {
     }
     const ownedPharmacy = user.pharmacyOwner?.pharmacy ?? null;
     const employedPharmacy = user.pharmacyEmployees?.[0]?.pharmacy ?? null;
-    const { pharmacyOwner, pharmacyEmployees, insuranceProvider, patient, ...rest } = user;
+    const {
+      pharmacyOwner,
+      pharmacyEmployees,
+      insuranceProvider,
+      patient,
+      ...rest
+    } = user;
 
     return {
       ...rest,
@@ -62,35 +72,42 @@ export class UsersService {
     const prisma = this.prismaService.prisma;
     const safeUserId = validateUuid(userId, 'userId');
     const safeDto = sanitizeDeep(updateUserDto);
-    const { 
-      insuranceProvider, 
-      province, 
-      district, 
-      sector, 
-      cell, 
-      village, 
-      emergencyContact, 
-      preferredPharmacy, 
-      medicalNotes, 
+    const {
+      insuranceProvider,
+      province,
+      district,
+      sector,
+      cell,
+      village,
+      emergencyContact,
+      preferredPharmacy,
+      medicalNotes,
       profilePhoto,
-      ...userFields 
+      ...userFields
     } = safeDto;
 
     await prisma.$transaction(async (tx) => {
       await tx.user.update({ where: { id: safeUserId }, data: userFields });
-      const patient = await tx.patient.findUnique({ where: { userId: safeUserId } });
+      const patient = await tx.patient.findUnique({
+        where: { userId: safeUserId },
+      });
       if (patient) {
         await tx.patient.update({
           where: { userId: safeUserId },
           data: {
-            insuranceProvider: insuranceProvider !== undefined ? insuranceProvider || null : undefined,
+            insuranceProvider:
+              insuranceProvider !== undefined
+                ? insuranceProvider || null
+                : undefined,
             province: province !== undefined ? province : undefined,
             district: district !== undefined ? district : undefined,
             sector: sector !== undefined ? sector : undefined,
             cell: cell !== undefined ? cell : undefined,
             village: village !== undefined ? village : undefined,
-            emergencyContact: emergencyContact !== undefined ? emergencyContact : undefined,
-            preferredPharmacy: preferredPharmacy !== undefined ? preferredPharmacy : undefined,
+            emergencyContact:
+              emergencyContact !== undefined ? emergencyContact : undefined,
+            preferredPharmacy:
+              preferredPharmacy !== undefined ? preferredPharmacy : undefined,
             medicalNotes: medicalNotes !== undefined ? medicalNotes : undefined,
           },
         });
@@ -172,7 +189,12 @@ export class UsersService {
 
     return {
       data: users,
-      meta: { page: safePage, limit: safeLimit, total, totalPages: Math.ceil(total / safeLimit) },
+      meta: {
+        page: safePage,
+        limit: safeLimit,
+        total,
+        totalPages: Math.ceil(total / safeLimit),
+      },
     };
   }
 }

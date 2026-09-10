@@ -41,11 +41,20 @@ async function promptRequired(label: string, fallback?: string) {
 }
 
 async function main() {
-  const firstName = await promptRequired('First name: ', process.env.CREATE_ADMIN_FIRST_NAME);
-  const lastName = await promptRequired('Last name: ', process.env.CREATE_ADMIN_LAST_NAME);
+  const firstName = await promptRequired(
+    'First name: ',
+    process.env.CREATE_ADMIN_FIRST_NAME,
+  );
+  const lastName = await promptRequired(
+    'Last name: ',
+    process.env.CREATE_ADMIN_LAST_NAME,
+  );
   const email = await promptRequired('Email: ', process.env.CREATE_ADMIN_EMAIL);
   const phone = await promptRequired('Phone: ', process.env.CREATE_ADMIN_PHONE);
-  const password = await promptRequired('Password: ', process.env.CREATE_ADMIN_PASSWORD);
+  const password = await promptRequired(
+    'Password: ',
+    process.env.CREATE_ADMIN_PASSWORD,
+  );
 
   if (password.length < 8) {
     throw new Error('Password must be at least 8 characters long');
@@ -97,14 +106,14 @@ async function main() {
     },
   });
 
-    console.log('\nAdmin created successfully!');
-    console.log('--------------------------------');
-    console.log(`Name:  ${admin.firstName} ${admin.lastName}`);
-    console.log(`Email: ${admin.email}`);
-    console.log(`Phone: ${admin.phone}`);
-    console.log(`Role:  ${admin.role}`);
-    console.log(`ID:    ${admin.id}`);
-    console.log('--------------------------------\n');
+  console.log('\nAdmin created successfully!');
+  console.log('--------------------------------');
+  console.log(`Name:  ${admin.firstName} ${admin.lastName}`);
+  console.log(`Email: ${admin.email}`);
+  console.log(`Phone: ${admin.phone}`);
+  console.log(`Role:  ${admin.role}`);
+  console.log(`ID:    ${admin.id}`);
+  console.log('--------------------------------\n');
 }
 
 main()

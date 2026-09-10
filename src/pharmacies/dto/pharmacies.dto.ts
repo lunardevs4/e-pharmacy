@@ -1,5 +1,11 @@
 import { PartialType } from '@nestjs/swagger';
-import { IsString, IsOptional, IsNumberString, IsUUID, IsEnum } from 'class-validator';
+import {
+  IsString,
+  IsOptional,
+  IsNumberString,
+  IsUUID,
+  IsEnum,
+} from 'class-validator';
 import { PharmacyStatus, UserRole } from '@generated/prisma';
 
 export class CreatePharmacyDto {

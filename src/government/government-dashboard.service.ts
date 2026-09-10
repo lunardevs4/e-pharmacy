@@ -4,27 +4,32 @@ import { validatePositiveInt } from '../common/security/security.util';
 
 @Injectable()
 export class GovernmentDashboardService {
-  constructor(private prismaService: PrismaService) { }
+  constructor(private prismaService: PrismaService) {}
 
   async getPublicStats() {
     const prisma = this.prismaService.prisma;
-    const [registeredPharmacies, patientsRegistered, pharmacies, medicines, stockedEntries] =
-      await Promise.all([
-        prisma.pharmacy.count({ where: { deletedAt: null } }),
-        prisma.patient.count(),
-        prisma.pharmacy.findMany({
-          where: { status: 'APPROVED', isActive: true, deletedAt: null },
-          select: { province: true },
-        }),
-        prisma.medicine.count(),
-        prisma.inventory.count({
-          where: {
-            quantity: { gt: 0 },
-            deletedAt: null,
-            pharmacy: { status: 'APPROVED', isActive: true, deletedAt: null },
-          },
-        }),
-      ]);
+    const [
+      registeredPharmacies,
+      patientsRegistered,
+      pharmacies,
+      medicines,
+      stockedEntries,
+    ] = await Promise.all([
+      prisma.pharmacy.count({ where: { deletedAt: null } }),
+      prisma.patient.count(),
+      prisma.pharmacy.findMany({
+        where: { status: 'APPROVED', isActive: true, deletedAt: null },
+        select: { province: true },
+      }),
+      prisma.medicine.count(),
+      prisma.inventory.count({
+        where: {
+          quantity: { gt: 0 },
+          deletedAt: null,
+          pharmacy: { status: 'APPROVED', isActive: true, deletedAt: null },
+        },
+      }),
+    ]);
 
     const coveredProvinces = new Set(
       pharmacies.map(({ province }) => province?.trim()).filter(Boolean),
@@ -43,17 +48,17 @@ export class GovernmentDashboardService {
 
   async getSummary() {
     const prisma = this.prismaService.prisma;
-    
-    const pharmacies = await prisma.pharmacy.findMany({
-      select:{
-        id:true,
-        name:true,
-        status:true,
-        deletedAt:true,
-      },
-    })
 
-    console.log("Pharmacies seen by Prisma: ",pharmacies);
+    const pharmacies = await prisma.pharmacy.findMany({
+      select: {
+        id: true,
+        name: true,
+        status: true,
+        deletedAt: true,
+      },
+    });
+
+    console.log('Pharmacies seen by Prisma: ', pharmacies);
     const [
       totalPharmacies,
       approvedPharmacies,
@@ -64,7 +69,7 @@ export class GovernmentDashboardService {
     ] = await Promise.all([
       prisma.pharmacy.count({ where: { deletedAt: null } }),
       prisma.pharmacy.count({ where: { status: 'APPROVED', deletedAt: null } }),
-       prisma.medicine.count(),
+      prisma.medicine.count(),
       prisma.patient.count(),
       prisma.reservation.count(),
       prisma.reservation.count({ where: { status: 'PENDING' } }),
@@ -72,8 +77,8 @@ export class GovernmentDashboardService {
 
     console.log({
       totalPharmacies,
-      approvedPharmacies
-    })
+      approvedPharmacies,
+    });
 
     return {
       totalPharmacies,
@@ -97,7 +102,12 @@ export class GovernmentDashboardService {
       result.map(async (item) => {
         const medicine = await prisma.medicine.findUnique({
           where: { id: item.medicineId },
-           select: { id: true, tradeName: true, genericName: true, category: { select: { name: true } } },
+          select: {
+            id: true,
+            tradeName: true,
+            genericName: true,
+            category: { select: { name: true } },
+          },
         });
         return {
           medicine,
@@ -118,7 +128,15 @@ export class GovernmentDashboardService {
       },
       include: {
         medicine: true,
-        pharmacy: { select: { id: true, name: true, address: true, district: true, province: true } },
+        pharmacy: {
+          select: {
+            id: true,
+            name: true,
+            address: true,
+            district: true,
+            province: true,
+          },
+        },
       },
     });
   }
@@ -142,13 +160,16 @@ export class GovernmentDashboardService {
       }),
     ]);
 
-    const districts = new Map<string, {
-      district: string;
-      province: string;
-      approvedPharmacies: number;
-      stockedMedicineEntries: number;
-      reservations: number;
-    }>();
+    const districts = new Map<
+      string,
+      {
+        district: string;
+        province: string;
+        approvedPharmacies: number;
+        stockedMedicineEntries: number;
+        reservations: number;
+      }
+    >();
 
     pharmacies.forEach((pharmacy) => {
       const district = pharmacy.district || 'Unknown';
@@ -161,7 +182,9 @@ export class GovernmentDashboardService {
       };
 
       existing.approvedPharmacies += 1;
-      existing.stockedMedicineEntries += pharmacy.inventories.filter((item) => item.quantity > 0).length;
+      existing.stockedMedicineEntries += pharmacy.inventories.filter(
+        (item) => item.quantity > 0,
+      ).length;
       existing.reservations += pharmacy._count.reservations;
       districts.set(district, existing);
     });
@@ -172,9 +195,14 @@ export class GovernmentDashboardService {
       approvedPharmacies: district.approvedPharmacies,
       stockedMedicineEntries: district.stockedMedicineEntries,
       totalMedicineEntries: district.approvedPharmacies * totalMedicines,
-      coverage: totalMedicines > 0
-        ? Math.round((district.stockedMedicineEntries / (district.approvedPharmacies * totalMedicines)) * 100)
-        : 0,
+      coverage:
+        totalMedicines > 0
+          ? Math.round(
+              (district.stockedMedicineEntries /
+                (district.approvedPharmacies * totalMedicines)) *
+                100,
+            )
+          : 0,
       reservations: district.reservations,
     }));
   }
