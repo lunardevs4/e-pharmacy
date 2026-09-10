@@ -8,6 +8,7 @@ import { InsuredPatientsService } from './insured-patients.service';
 import { InsuranceCalculationService } from './insurance-calculation.service';
 import { InsuranceReportsService } from './insurance-reports.service';
 import { Roles } from '../common/guards/roles.decorator';
+import { Public } from '../common/guards/public.decorator';
 import { UserRole } from '../generated/prisma';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { RolesGuard } from '../common/guards/roles.guard';
@@ -321,6 +322,7 @@ export class InsuranceDashboardController {
   }
 
   @Get('providers')
+  @Public()
   @ApiOperation({ summary: 'Get insurance providers' })
   async getProviders() {
     return this.dashboardService.getProviders();
