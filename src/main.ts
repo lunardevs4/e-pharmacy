@@ -9,6 +9,7 @@ import { AppModule } from './app.module';
 import { HttpExceptionFilter } from './common/filters/http-exception.filter';
 import { XssSanitizationPipe } from './common/pipes/xss-sanitization.pipe';
 import { noSqlSanitize } from './common/middleware/nosql-sanitize.middleware';
+import { csrfMiddleware } from './common/middleware/csrf.middleware';
 
 async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule);
@@ -60,6 +61,8 @@ async function bootstrap() {
     next();
   });
 
+  app.use(csrfMiddleware);
+
   app.enableCors({
     origin: (origin, callback) => {
       const allowedOrigins = (process.env.CORS_ORIGINS || (process.env.NODE_ENV === 'production' ? '' : '*')).split(',').map((s) => s.trim()).filter(Boolean);
@@ -70,7 +73,7 @@ async function bootstrap() {
       }
     },
     methods: ['GET', 'HEAD', 'PUT', 'PATCH', 'POST', 'DELETE'],
-    allowedHeaders: ['Content-Type', 'Authorization', 'Accept', 'X-Requested-With'],
+    allowedHeaders: ['Content-Type', 'Authorization', 'Accept', 'X-Requested-With', 'X-CSRF-Token'],
     exposedHeaders: ['Content-Length', 'X-Request-Id'],
     credentials: true,
     maxAge: 600,

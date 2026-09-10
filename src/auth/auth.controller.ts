@@ -15,7 +15,7 @@ import { Public } from '../common/guards/public.decorator';
 import { Roles } from '../common/guards/roles.decorator';
 import { Permissions } from '../common/guards/permissions.decorator';
 import { PermissionsGuard } from '../common/guards/permissions.guard';
-import { clearAuthCookies, readCookie, REFRESH_TOKEN_COOKIE, setAuthCookies } from '../common/auth-cookies';
+import { clearAuthCookies, issueCsrfToken, readCookie, REFRESH_TOKEN_COOKIE, setAuthCookies } from '../common/auth-cookies';
 import { Throttle } from '@nestjs/throttler';
 import { PasswordResetRequestDto } from './dto/password-reset-request.dto';
 import { PasswordResetOtpDto } from './dto/password-reset-otp.dto';
@@ -25,6 +25,13 @@ import { PasswordResetDto } from './dto/password-reset.dto';
 @Controller('api/v1/auth')
 export class AuthController {
   constructor(private authService: AuthService) { }
+
+  @Public()
+  @Get('csrf-token')
+  @ApiOperation({ summary: 'Issue a CSRF token for browser clients' })
+  getCsrfToken(@Req() request: any, @Res({ passthrough: true }) response: Response) {
+    return { csrfToken: request.csrfToken || issueCsrfToken(response) };
+  }
 
   @Public()
   @Post('register')
