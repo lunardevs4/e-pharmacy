@@ -23,6 +23,7 @@ import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { Roles } from '../common/guards/roles.decorator';
 import { Public } from '../common/guards/public.decorator';
 import { UserRole } from '@generated/prisma';
+import { Throttle } from '@nestjs/throttler';
 
 @ApiTags('Medicines')
 @Controller('api/v1/medicines')
@@ -79,6 +80,7 @@ export class MedicinesController {
   }
 
   @Get()
+  @Throttle({ medicineSearch: {} })
   @Roles(UserRole.PATIENT, UserRole.PHARMACY_OWNER, UserRole.PHARMACY, UserRole.PHARMACIST, UserRole.INSURANCE, UserRole.GOVERNMENT, UserRole.ADMIN)
   @ApiOperation({
     summary: 'List all medicines',

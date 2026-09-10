@@ -275,6 +275,7 @@ export type UserWhereInput = {
   updatedAt?: Prisma.DateTimeFilter<"User"> | Date | string
   deletedAt?: Prisma.DateTimeNullableFilter<"User"> | Date | string | null
   refreshTokens?: Prisma.RefreshTokenListRelationFilter
+  passwordResetTokens?: Prisma.PasswordResetTokenListRelationFilter
   patient?: Prisma.XOR<Prisma.PatientNullableScalarRelationFilter, Prisma.PatientWhereInput> | null
   pharmacies?: Prisma.PharmacyListRelationFilter
   pharmacyOwner?: Prisma.XOR<Prisma.PharmacyOwnerNullableScalarRelationFilter, Prisma.PharmacyOwnerWhereInput> | null
@@ -304,6 +305,7 @@ export type UserOrderByWithRelationInput = {
   updatedAt?: Prisma.SortOrder
   deletedAt?: Prisma.SortOrderInput | Prisma.SortOrder
   refreshTokens?: Prisma.RefreshTokenOrderByRelationAggregateInput
+  passwordResetTokens?: Prisma.PasswordResetTokenOrderByRelationAggregateInput
   patient?: Prisma.PatientOrderByWithRelationInput
   pharmacies?: Prisma.PharmacyOrderByRelationAggregateInput
   pharmacyOwner?: Prisma.PharmacyOwnerOrderByWithRelationInput
@@ -336,6 +338,7 @@ export type UserWhereUniqueInput = Prisma.AtLeast<{
   updatedAt?: Prisma.DateTimeFilter<"User"> | Date | string
   deletedAt?: Prisma.DateTimeNullableFilter<"User"> | Date | string | null
   refreshTokens?: Prisma.RefreshTokenListRelationFilter
+  passwordResetTokens?: Prisma.PasswordResetTokenListRelationFilter
   patient?: Prisma.XOR<Prisma.PatientNullableScalarRelationFilter, Prisma.PatientWhereInput> | null
   pharmacies?: Prisma.PharmacyListRelationFilter
   pharmacyOwner?: Prisma.XOR<Prisma.PharmacyOwnerNullableScalarRelationFilter, Prisma.PharmacyOwnerWhereInput> | null
@@ -411,6 +414,7 @@ export type UserCreateInput = {
   updatedAt?: Date | string
   deletedAt?: Date | string | null
   refreshTokens?: Prisma.RefreshTokenCreateNestedManyWithoutUserInput
+  passwordResetTokens?: Prisma.PasswordResetTokenCreateNestedManyWithoutUserInput
   patient?: Prisma.PatientCreateNestedOneWithoutUserInput
   pharmacies?: Prisma.PharmacyCreateNestedManyWithoutOwnerInput
   pharmacyOwner?: Prisma.PharmacyOwnerCreateNestedOneWithoutUserInput
@@ -440,6 +444,7 @@ export type UserUncheckedCreateInput = {
   updatedAt?: Date | string
   deletedAt?: Date | string | null
   refreshTokens?: Prisma.RefreshTokenUncheckedCreateNestedManyWithoutUserInput
+  passwordResetTokens?: Prisma.PasswordResetTokenUncheckedCreateNestedManyWithoutUserInput
   patient?: Prisma.PatientUncheckedCreateNestedOneWithoutUserInput
   pharmacies?: Prisma.PharmacyUncheckedCreateNestedManyWithoutOwnerInput
   pharmacyOwner?: Prisma.PharmacyOwnerUncheckedCreateNestedOneWithoutUserInput
@@ -469,6 +474,7 @@ export type UserUpdateInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   refreshTokens?: Prisma.RefreshTokenUpdateManyWithoutUserNestedInput
+  passwordResetTokens?: Prisma.PasswordResetTokenUpdateManyWithoutUserNestedInput
   patient?: Prisma.PatientUpdateOneWithoutUserNestedInput
   pharmacies?: Prisma.PharmacyUpdateManyWithoutOwnerNestedInput
   pharmacyOwner?: Prisma.PharmacyOwnerUpdateOneWithoutUserNestedInput
@@ -498,6 +504,7 @@ export type UserUncheckedUpdateInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   refreshTokens?: Prisma.RefreshTokenUncheckedUpdateManyWithoutUserNestedInput
+  passwordResetTokens?: Prisma.PasswordResetTokenUncheckedUpdateManyWithoutUserNestedInput
   patient?: Prisma.PatientUncheckedUpdateOneWithoutUserNestedInput
   pharmacies?: Prisma.PharmacyUncheckedUpdateManyWithoutOwnerNestedInput
   pharmacyOwner?: Prisma.PharmacyOwnerUncheckedUpdateOneWithoutUserNestedInput
@@ -691,6 +698,20 @@ export type UserUpdateOneRequiredWithoutRefreshTokensNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutRefreshTokensInput, Prisma.UserUpdateWithoutRefreshTokensInput>, Prisma.UserUncheckedUpdateWithoutRefreshTokensInput>
 }
 
+export type UserCreateNestedOneWithoutPasswordResetTokensInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutPasswordResetTokensInput, Prisma.UserUncheckedCreateWithoutPasswordResetTokensInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutPasswordResetTokensInput
+  connect?: Prisma.UserWhereUniqueInput
+}
+
+export type UserUpdateOneRequiredWithoutPasswordResetTokensNestedInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutPasswordResetTokensInput, Prisma.UserUncheckedCreateWithoutPasswordResetTokensInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutPasswordResetTokensInput
+  upsert?: Prisma.UserUpsertWithoutPasswordResetTokensInput
+  connect?: Prisma.UserWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutPasswordResetTokensInput, Prisma.UserUpdateWithoutPasswordResetTokensInput>, Prisma.UserUncheckedUpdateWithoutPasswordResetTokensInput>
+}
+
 export type UserCreateNestedOneWithoutPatientInput = {
   create?: Prisma.XOR<Prisma.UserCreateWithoutPatientInput, Prisma.UserUncheckedCreateWithoutPatientInput>
   connectOrCreate?: Prisma.UserCreateOrConnectWithoutPatientInput
@@ -827,6 +848,7 @@ export type UserCreateWithoutRefreshTokensInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   deletedAt?: Date | string | null
+  passwordResetTokens?: Prisma.PasswordResetTokenCreateNestedManyWithoutUserInput
   patient?: Prisma.PatientCreateNestedOneWithoutUserInput
   pharmacies?: Prisma.PharmacyCreateNestedManyWithoutOwnerInput
   pharmacyOwner?: Prisma.PharmacyOwnerCreateNestedOneWithoutUserInput
@@ -855,6 +877,7 @@ export type UserUncheckedCreateWithoutRefreshTokensInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   deletedAt?: Date | string | null
+  passwordResetTokens?: Prisma.PasswordResetTokenUncheckedCreateNestedManyWithoutUserInput
   patient?: Prisma.PatientUncheckedCreateNestedOneWithoutUserInput
   pharmacies?: Prisma.PharmacyUncheckedCreateNestedManyWithoutOwnerInput
   pharmacyOwner?: Prisma.PharmacyOwnerUncheckedCreateNestedOneWithoutUserInput
@@ -899,6 +922,7 @@ export type UserUpdateWithoutRefreshTokensInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  passwordResetTokens?: Prisma.PasswordResetTokenUpdateManyWithoutUserNestedInput
   patient?: Prisma.PatientUpdateOneWithoutUserNestedInput
   pharmacies?: Prisma.PharmacyUpdateManyWithoutOwnerNestedInput
   pharmacyOwner?: Prisma.PharmacyOwnerUpdateOneWithoutUserNestedInput
@@ -927,6 +951,139 @@ export type UserUncheckedUpdateWithoutRefreshTokensInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  passwordResetTokens?: Prisma.PasswordResetTokenUncheckedUpdateManyWithoutUserNestedInput
+  patient?: Prisma.PatientUncheckedUpdateOneWithoutUserNestedInput
+  pharmacies?: Prisma.PharmacyUncheckedUpdateManyWithoutOwnerNestedInput
+  pharmacyOwner?: Prisma.PharmacyOwnerUncheckedUpdateOneWithoutUserNestedInput
+  pharmacyEmployees?: Prisma.PharmacyEmployeeUncheckedUpdateManyWithoutUserNestedInput
+  pharmacistPrescriptions?: Prisma.PrescriptionUncheckedUpdateManyWithoutPharmacistNestedInput
+  insuranceProvider?: Prisma.InsuranceProviderUncheckedUpdateOneWithoutUserNestedInput
+  auditLogs?: Prisma.AuditLogUncheckedUpdateManyWithoutUserNestedInput
+  notifications?: Prisma.NotificationUncheckedUpdateManyWithoutUserNestedInput
+}
+
+export type UserCreateWithoutPasswordResetTokensInput = {
+  id?: string
+  email: string
+  phone: string
+  password: string
+  firstName: string
+  lastName: string
+  role: $Enums.UserRole
+  position?: string | null
+  permissions?: Prisma.UserCreatepermissionsInput | string[]
+  firstLogin?: boolean
+  isActive?: boolean
+  emailVerified?: boolean
+  emailVerificationTokenHash?: string | null
+  emailVerificationExpiresAt?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  deletedAt?: Date | string | null
+  refreshTokens?: Prisma.RefreshTokenCreateNestedManyWithoutUserInput
+  patient?: Prisma.PatientCreateNestedOneWithoutUserInput
+  pharmacies?: Prisma.PharmacyCreateNestedManyWithoutOwnerInput
+  pharmacyOwner?: Prisma.PharmacyOwnerCreateNestedOneWithoutUserInput
+  pharmacyEmployees?: Prisma.PharmacyEmployeeCreateNestedManyWithoutUserInput
+  pharmacistPrescriptions?: Prisma.PrescriptionCreateNestedManyWithoutPharmacistInput
+  insuranceProvider?: Prisma.InsuranceProviderCreateNestedOneWithoutUserInput
+  auditLogs?: Prisma.AuditLogCreateNestedManyWithoutUserInput
+  notifications?: Prisma.NotificationCreateNestedManyWithoutUserInput
+}
+
+export type UserUncheckedCreateWithoutPasswordResetTokensInput = {
+  id?: string
+  email: string
+  phone: string
+  password: string
+  firstName: string
+  lastName: string
+  role: $Enums.UserRole
+  position?: string | null
+  permissions?: Prisma.UserCreatepermissionsInput | string[]
+  firstLogin?: boolean
+  isActive?: boolean
+  emailVerified?: boolean
+  emailVerificationTokenHash?: string | null
+  emailVerificationExpiresAt?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  deletedAt?: Date | string | null
+  refreshTokens?: Prisma.RefreshTokenUncheckedCreateNestedManyWithoutUserInput
+  patient?: Prisma.PatientUncheckedCreateNestedOneWithoutUserInput
+  pharmacies?: Prisma.PharmacyUncheckedCreateNestedManyWithoutOwnerInput
+  pharmacyOwner?: Prisma.PharmacyOwnerUncheckedCreateNestedOneWithoutUserInput
+  pharmacyEmployees?: Prisma.PharmacyEmployeeUncheckedCreateNestedManyWithoutUserInput
+  pharmacistPrescriptions?: Prisma.PrescriptionUncheckedCreateNestedManyWithoutPharmacistInput
+  insuranceProvider?: Prisma.InsuranceProviderUncheckedCreateNestedOneWithoutUserInput
+  auditLogs?: Prisma.AuditLogUncheckedCreateNestedManyWithoutUserInput
+  notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutUserInput
+}
+
+export type UserCreateOrConnectWithoutPasswordResetTokensInput = {
+  where: Prisma.UserWhereUniqueInput
+  create: Prisma.XOR<Prisma.UserCreateWithoutPasswordResetTokensInput, Prisma.UserUncheckedCreateWithoutPasswordResetTokensInput>
+}
+
+export type UserUpsertWithoutPasswordResetTokensInput = {
+  update: Prisma.XOR<Prisma.UserUpdateWithoutPasswordResetTokensInput, Prisma.UserUncheckedUpdateWithoutPasswordResetTokensInput>
+  create: Prisma.XOR<Prisma.UserCreateWithoutPasswordResetTokensInput, Prisma.UserUncheckedCreateWithoutPasswordResetTokensInput>
+  where?: Prisma.UserWhereInput
+}
+
+export type UserUpdateToOneWithWhereWithoutPasswordResetTokensInput = {
+  where?: Prisma.UserWhereInput
+  data: Prisma.XOR<Prisma.UserUpdateWithoutPasswordResetTokensInput, Prisma.UserUncheckedUpdateWithoutPasswordResetTokensInput>
+}
+
+export type UserUpdateWithoutPasswordResetTokensInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  phone?: Prisma.StringFieldUpdateOperationsInput | string
+  password?: Prisma.StringFieldUpdateOperationsInput | string
+  firstName?: Prisma.StringFieldUpdateOperationsInput | string
+  lastName?: Prisma.StringFieldUpdateOperationsInput | string
+  role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
+  position?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  permissions?: Prisma.UserUpdatepermissionsInput | string[]
+  firstLogin?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  emailVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  emailVerificationTokenHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  emailVerificationExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  refreshTokens?: Prisma.RefreshTokenUpdateManyWithoutUserNestedInput
+  patient?: Prisma.PatientUpdateOneWithoutUserNestedInput
+  pharmacies?: Prisma.PharmacyUpdateManyWithoutOwnerNestedInput
+  pharmacyOwner?: Prisma.PharmacyOwnerUpdateOneWithoutUserNestedInput
+  pharmacyEmployees?: Prisma.PharmacyEmployeeUpdateManyWithoutUserNestedInput
+  pharmacistPrescriptions?: Prisma.PrescriptionUpdateManyWithoutPharmacistNestedInput
+  insuranceProvider?: Prisma.InsuranceProviderUpdateOneWithoutUserNestedInput
+  auditLogs?: Prisma.AuditLogUpdateManyWithoutUserNestedInput
+  notifications?: Prisma.NotificationUpdateManyWithoutUserNestedInput
+}
+
+export type UserUncheckedUpdateWithoutPasswordResetTokensInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  phone?: Prisma.StringFieldUpdateOperationsInput | string
+  password?: Prisma.StringFieldUpdateOperationsInput | string
+  firstName?: Prisma.StringFieldUpdateOperationsInput | string
+  lastName?: Prisma.StringFieldUpdateOperationsInput | string
+  role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
+  position?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  permissions?: Prisma.UserUpdatepermissionsInput | string[]
+  firstLogin?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  emailVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  emailVerificationTokenHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  emailVerificationExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  refreshTokens?: Prisma.RefreshTokenUncheckedUpdateManyWithoutUserNestedInput
   patient?: Prisma.PatientUncheckedUpdateOneWithoutUserNestedInput
   pharmacies?: Prisma.PharmacyUncheckedUpdateManyWithoutOwnerNestedInput
   pharmacyOwner?: Prisma.PharmacyOwnerUncheckedUpdateOneWithoutUserNestedInput
@@ -956,6 +1113,7 @@ export type UserCreateWithoutPatientInput = {
   updatedAt?: Date | string
   deletedAt?: Date | string | null
   refreshTokens?: Prisma.RefreshTokenCreateNestedManyWithoutUserInput
+  passwordResetTokens?: Prisma.PasswordResetTokenCreateNestedManyWithoutUserInput
   pharmacies?: Prisma.PharmacyCreateNestedManyWithoutOwnerInput
   pharmacyOwner?: Prisma.PharmacyOwnerCreateNestedOneWithoutUserInput
   pharmacyEmployees?: Prisma.PharmacyEmployeeCreateNestedManyWithoutUserInput
@@ -984,6 +1142,7 @@ export type UserUncheckedCreateWithoutPatientInput = {
   updatedAt?: Date | string
   deletedAt?: Date | string | null
   refreshTokens?: Prisma.RefreshTokenUncheckedCreateNestedManyWithoutUserInput
+  passwordResetTokens?: Prisma.PasswordResetTokenUncheckedCreateNestedManyWithoutUserInput
   pharmacies?: Prisma.PharmacyUncheckedCreateNestedManyWithoutOwnerInput
   pharmacyOwner?: Prisma.PharmacyOwnerUncheckedCreateNestedOneWithoutUserInput
   pharmacyEmployees?: Prisma.PharmacyEmployeeUncheckedCreateNestedManyWithoutUserInput
@@ -1028,6 +1187,7 @@ export type UserUpdateWithoutPatientInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   refreshTokens?: Prisma.RefreshTokenUpdateManyWithoutUserNestedInput
+  passwordResetTokens?: Prisma.PasswordResetTokenUpdateManyWithoutUserNestedInput
   pharmacies?: Prisma.PharmacyUpdateManyWithoutOwnerNestedInput
   pharmacyOwner?: Prisma.PharmacyOwnerUpdateOneWithoutUserNestedInput
   pharmacyEmployees?: Prisma.PharmacyEmployeeUpdateManyWithoutUserNestedInput
@@ -1056,6 +1216,7 @@ export type UserUncheckedUpdateWithoutPatientInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   refreshTokens?: Prisma.RefreshTokenUncheckedUpdateManyWithoutUserNestedInput
+  passwordResetTokens?: Prisma.PasswordResetTokenUncheckedUpdateManyWithoutUserNestedInput
   pharmacies?: Prisma.PharmacyUncheckedUpdateManyWithoutOwnerNestedInput
   pharmacyOwner?: Prisma.PharmacyOwnerUncheckedUpdateOneWithoutUserNestedInput
   pharmacyEmployees?: Prisma.PharmacyEmployeeUncheckedUpdateManyWithoutUserNestedInput
@@ -1084,6 +1245,7 @@ export type UserCreateWithoutPharmaciesInput = {
   updatedAt?: Date | string
   deletedAt?: Date | string | null
   refreshTokens?: Prisma.RefreshTokenCreateNestedManyWithoutUserInput
+  passwordResetTokens?: Prisma.PasswordResetTokenCreateNestedManyWithoutUserInput
   patient?: Prisma.PatientCreateNestedOneWithoutUserInput
   pharmacyOwner?: Prisma.PharmacyOwnerCreateNestedOneWithoutUserInput
   pharmacyEmployees?: Prisma.PharmacyEmployeeCreateNestedManyWithoutUserInput
@@ -1112,6 +1274,7 @@ export type UserUncheckedCreateWithoutPharmaciesInput = {
   updatedAt?: Date | string
   deletedAt?: Date | string | null
   refreshTokens?: Prisma.RefreshTokenUncheckedCreateNestedManyWithoutUserInput
+  passwordResetTokens?: Prisma.PasswordResetTokenUncheckedCreateNestedManyWithoutUserInput
   patient?: Prisma.PatientUncheckedCreateNestedOneWithoutUserInput
   pharmacyOwner?: Prisma.PharmacyOwnerUncheckedCreateNestedOneWithoutUserInput
   pharmacyEmployees?: Prisma.PharmacyEmployeeUncheckedCreateNestedManyWithoutUserInput
@@ -1156,6 +1319,7 @@ export type UserUpdateWithoutPharmaciesInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   refreshTokens?: Prisma.RefreshTokenUpdateManyWithoutUserNestedInput
+  passwordResetTokens?: Prisma.PasswordResetTokenUpdateManyWithoutUserNestedInput
   patient?: Prisma.PatientUpdateOneWithoutUserNestedInput
   pharmacyOwner?: Prisma.PharmacyOwnerUpdateOneWithoutUserNestedInput
   pharmacyEmployees?: Prisma.PharmacyEmployeeUpdateManyWithoutUserNestedInput
@@ -1184,6 +1348,7 @@ export type UserUncheckedUpdateWithoutPharmaciesInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   refreshTokens?: Prisma.RefreshTokenUncheckedUpdateManyWithoutUserNestedInput
+  passwordResetTokens?: Prisma.PasswordResetTokenUncheckedUpdateManyWithoutUserNestedInput
   patient?: Prisma.PatientUncheckedUpdateOneWithoutUserNestedInput
   pharmacyOwner?: Prisma.PharmacyOwnerUncheckedUpdateOneWithoutUserNestedInput
   pharmacyEmployees?: Prisma.PharmacyEmployeeUncheckedUpdateManyWithoutUserNestedInput
@@ -1212,6 +1377,7 @@ export type UserCreateWithoutPharmacyOwnerInput = {
   updatedAt?: Date | string
   deletedAt?: Date | string | null
   refreshTokens?: Prisma.RefreshTokenCreateNestedManyWithoutUserInput
+  passwordResetTokens?: Prisma.PasswordResetTokenCreateNestedManyWithoutUserInput
   patient?: Prisma.PatientCreateNestedOneWithoutUserInput
   pharmacies?: Prisma.PharmacyCreateNestedManyWithoutOwnerInput
   pharmacyEmployees?: Prisma.PharmacyEmployeeCreateNestedManyWithoutUserInput
@@ -1240,6 +1406,7 @@ export type UserUncheckedCreateWithoutPharmacyOwnerInput = {
   updatedAt?: Date | string
   deletedAt?: Date | string | null
   refreshTokens?: Prisma.RefreshTokenUncheckedCreateNestedManyWithoutUserInput
+  passwordResetTokens?: Prisma.PasswordResetTokenUncheckedCreateNestedManyWithoutUserInput
   patient?: Prisma.PatientUncheckedCreateNestedOneWithoutUserInput
   pharmacies?: Prisma.PharmacyUncheckedCreateNestedManyWithoutOwnerInput
   pharmacyEmployees?: Prisma.PharmacyEmployeeUncheckedCreateNestedManyWithoutUserInput
@@ -1284,6 +1451,7 @@ export type UserUpdateWithoutPharmacyOwnerInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   refreshTokens?: Prisma.RefreshTokenUpdateManyWithoutUserNestedInput
+  passwordResetTokens?: Prisma.PasswordResetTokenUpdateManyWithoutUserNestedInput
   patient?: Prisma.PatientUpdateOneWithoutUserNestedInput
   pharmacies?: Prisma.PharmacyUpdateManyWithoutOwnerNestedInput
   pharmacyEmployees?: Prisma.PharmacyEmployeeUpdateManyWithoutUserNestedInput
@@ -1312,6 +1480,7 @@ export type UserUncheckedUpdateWithoutPharmacyOwnerInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   refreshTokens?: Prisma.RefreshTokenUncheckedUpdateManyWithoutUserNestedInput
+  passwordResetTokens?: Prisma.PasswordResetTokenUncheckedUpdateManyWithoutUserNestedInput
   patient?: Prisma.PatientUncheckedUpdateOneWithoutUserNestedInput
   pharmacies?: Prisma.PharmacyUncheckedUpdateManyWithoutOwnerNestedInput
   pharmacyEmployees?: Prisma.PharmacyEmployeeUncheckedUpdateManyWithoutUserNestedInput
@@ -1340,6 +1509,7 @@ export type UserCreateWithoutPharmacyEmployeesInput = {
   updatedAt?: Date | string
   deletedAt?: Date | string | null
   refreshTokens?: Prisma.RefreshTokenCreateNestedManyWithoutUserInput
+  passwordResetTokens?: Prisma.PasswordResetTokenCreateNestedManyWithoutUserInput
   patient?: Prisma.PatientCreateNestedOneWithoutUserInput
   pharmacies?: Prisma.PharmacyCreateNestedManyWithoutOwnerInput
   pharmacyOwner?: Prisma.PharmacyOwnerCreateNestedOneWithoutUserInput
@@ -1368,6 +1538,7 @@ export type UserUncheckedCreateWithoutPharmacyEmployeesInput = {
   updatedAt?: Date | string
   deletedAt?: Date | string | null
   refreshTokens?: Prisma.RefreshTokenUncheckedCreateNestedManyWithoutUserInput
+  passwordResetTokens?: Prisma.PasswordResetTokenUncheckedCreateNestedManyWithoutUserInput
   patient?: Prisma.PatientUncheckedCreateNestedOneWithoutUserInput
   pharmacies?: Prisma.PharmacyUncheckedCreateNestedManyWithoutOwnerInput
   pharmacyOwner?: Prisma.PharmacyOwnerUncheckedCreateNestedOneWithoutUserInput
@@ -1412,6 +1583,7 @@ export type UserUpdateWithoutPharmacyEmployeesInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   refreshTokens?: Prisma.RefreshTokenUpdateManyWithoutUserNestedInput
+  passwordResetTokens?: Prisma.PasswordResetTokenUpdateManyWithoutUserNestedInput
   patient?: Prisma.PatientUpdateOneWithoutUserNestedInput
   pharmacies?: Prisma.PharmacyUpdateManyWithoutOwnerNestedInput
   pharmacyOwner?: Prisma.PharmacyOwnerUpdateOneWithoutUserNestedInput
@@ -1440,6 +1612,7 @@ export type UserUncheckedUpdateWithoutPharmacyEmployeesInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   refreshTokens?: Prisma.RefreshTokenUncheckedUpdateManyWithoutUserNestedInput
+  passwordResetTokens?: Prisma.PasswordResetTokenUncheckedUpdateManyWithoutUserNestedInput
   patient?: Prisma.PatientUncheckedUpdateOneWithoutUserNestedInput
   pharmacies?: Prisma.PharmacyUncheckedUpdateManyWithoutOwnerNestedInput
   pharmacyOwner?: Prisma.PharmacyOwnerUncheckedUpdateOneWithoutUserNestedInput
@@ -1468,6 +1641,7 @@ export type UserCreateWithoutPharmacistPrescriptionsInput = {
   updatedAt?: Date | string
   deletedAt?: Date | string | null
   refreshTokens?: Prisma.RefreshTokenCreateNestedManyWithoutUserInput
+  passwordResetTokens?: Prisma.PasswordResetTokenCreateNestedManyWithoutUserInput
   patient?: Prisma.PatientCreateNestedOneWithoutUserInput
   pharmacies?: Prisma.PharmacyCreateNestedManyWithoutOwnerInput
   pharmacyOwner?: Prisma.PharmacyOwnerCreateNestedOneWithoutUserInput
@@ -1496,6 +1670,7 @@ export type UserUncheckedCreateWithoutPharmacistPrescriptionsInput = {
   updatedAt?: Date | string
   deletedAt?: Date | string | null
   refreshTokens?: Prisma.RefreshTokenUncheckedCreateNestedManyWithoutUserInput
+  passwordResetTokens?: Prisma.PasswordResetTokenUncheckedCreateNestedManyWithoutUserInput
   patient?: Prisma.PatientUncheckedCreateNestedOneWithoutUserInput
   pharmacies?: Prisma.PharmacyUncheckedCreateNestedManyWithoutOwnerInput
   pharmacyOwner?: Prisma.PharmacyOwnerUncheckedCreateNestedOneWithoutUserInput
@@ -1540,6 +1715,7 @@ export type UserUpdateWithoutPharmacistPrescriptionsInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   refreshTokens?: Prisma.RefreshTokenUpdateManyWithoutUserNestedInput
+  passwordResetTokens?: Prisma.PasswordResetTokenUpdateManyWithoutUserNestedInput
   patient?: Prisma.PatientUpdateOneWithoutUserNestedInput
   pharmacies?: Prisma.PharmacyUpdateManyWithoutOwnerNestedInput
   pharmacyOwner?: Prisma.PharmacyOwnerUpdateOneWithoutUserNestedInput
@@ -1568,6 +1744,7 @@ export type UserUncheckedUpdateWithoutPharmacistPrescriptionsInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   refreshTokens?: Prisma.RefreshTokenUncheckedUpdateManyWithoutUserNestedInput
+  passwordResetTokens?: Prisma.PasswordResetTokenUncheckedUpdateManyWithoutUserNestedInput
   patient?: Prisma.PatientUncheckedUpdateOneWithoutUserNestedInput
   pharmacies?: Prisma.PharmacyUncheckedUpdateManyWithoutOwnerNestedInput
   pharmacyOwner?: Prisma.PharmacyOwnerUncheckedUpdateOneWithoutUserNestedInput
@@ -1596,6 +1773,7 @@ export type UserCreateWithoutNotificationsInput = {
   updatedAt?: Date | string
   deletedAt?: Date | string | null
   refreshTokens?: Prisma.RefreshTokenCreateNestedManyWithoutUserInput
+  passwordResetTokens?: Prisma.PasswordResetTokenCreateNestedManyWithoutUserInput
   patient?: Prisma.PatientCreateNestedOneWithoutUserInput
   pharmacies?: Prisma.PharmacyCreateNestedManyWithoutOwnerInput
   pharmacyOwner?: Prisma.PharmacyOwnerCreateNestedOneWithoutUserInput
@@ -1624,6 +1802,7 @@ export type UserUncheckedCreateWithoutNotificationsInput = {
   updatedAt?: Date | string
   deletedAt?: Date | string | null
   refreshTokens?: Prisma.RefreshTokenUncheckedCreateNestedManyWithoutUserInput
+  passwordResetTokens?: Prisma.PasswordResetTokenUncheckedCreateNestedManyWithoutUserInput
   patient?: Prisma.PatientUncheckedCreateNestedOneWithoutUserInput
   pharmacies?: Prisma.PharmacyUncheckedCreateNestedManyWithoutOwnerInput
   pharmacyOwner?: Prisma.PharmacyOwnerUncheckedCreateNestedOneWithoutUserInput
@@ -1668,6 +1847,7 @@ export type UserUpdateWithoutNotificationsInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   refreshTokens?: Prisma.RefreshTokenUpdateManyWithoutUserNestedInput
+  passwordResetTokens?: Prisma.PasswordResetTokenUpdateManyWithoutUserNestedInput
   patient?: Prisma.PatientUpdateOneWithoutUserNestedInput
   pharmacies?: Prisma.PharmacyUpdateManyWithoutOwnerNestedInput
   pharmacyOwner?: Prisma.PharmacyOwnerUpdateOneWithoutUserNestedInput
@@ -1696,6 +1876,7 @@ export type UserUncheckedUpdateWithoutNotificationsInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   refreshTokens?: Prisma.RefreshTokenUncheckedUpdateManyWithoutUserNestedInput
+  passwordResetTokens?: Prisma.PasswordResetTokenUncheckedUpdateManyWithoutUserNestedInput
   patient?: Prisma.PatientUncheckedUpdateOneWithoutUserNestedInput
   pharmacies?: Prisma.PharmacyUncheckedUpdateManyWithoutOwnerNestedInput
   pharmacyOwner?: Prisma.PharmacyOwnerUncheckedUpdateOneWithoutUserNestedInput
@@ -1724,6 +1905,7 @@ export type UserCreateWithoutAuditLogsInput = {
   updatedAt?: Date | string
   deletedAt?: Date | string | null
   refreshTokens?: Prisma.RefreshTokenCreateNestedManyWithoutUserInput
+  passwordResetTokens?: Prisma.PasswordResetTokenCreateNestedManyWithoutUserInput
   patient?: Prisma.PatientCreateNestedOneWithoutUserInput
   pharmacies?: Prisma.PharmacyCreateNestedManyWithoutOwnerInput
   pharmacyOwner?: Prisma.PharmacyOwnerCreateNestedOneWithoutUserInput
@@ -1752,6 +1934,7 @@ export type UserUncheckedCreateWithoutAuditLogsInput = {
   updatedAt?: Date | string
   deletedAt?: Date | string | null
   refreshTokens?: Prisma.RefreshTokenUncheckedCreateNestedManyWithoutUserInput
+  passwordResetTokens?: Prisma.PasswordResetTokenUncheckedCreateNestedManyWithoutUserInput
   patient?: Prisma.PatientUncheckedCreateNestedOneWithoutUserInput
   pharmacies?: Prisma.PharmacyUncheckedCreateNestedManyWithoutOwnerInput
   pharmacyOwner?: Prisma.PharmacyOwnerUncheckedCreateNestedOneWithoutUserInput
@@ -1796,6 +1979,7 @@ export type UserUpdateWithoutAuditLogsInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   refreshTokens?: Prisma.RefreshTokenUpdateManyWithoutUserNestedInput
+  passwordResetTokens?: Prisma.PasswordResetTokenUpdateManyWithoutUserNestedInput
   patient?: Prisma.PatientUpdateOneWithoutUserNestedInput
   pharmacies?: Prisma.PharmacyUpdateManyWithoutOwnerNestedInput
   pharmacyOwner?: Prisma.PharmacyOwnerUpdateOneWithoutUserNestedInput
@@ -1824,6 +2008,7 @@ export type UserUncheckedUpdateWithoutAuditLogsInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   refreshTokens?: Prisma.RefreshTokenUncheckedUpdateManyWithoutUserNestedInput
+  passwordResetTokens?: Prisma.PasswordResetTokenUncheckedUpdateManyWithoutUserNestedInput
   patient?: Prisma.PatientUncheckedUpdateOneWithoutUserNestedInput
   pharmacies?: Prisma.PharmacyUncheckedUpdateManyWithoutOwnerNestedInput
   pharmacyOwner?: Prisma.PharmacyOwnerUncheckedUpdateOneWithoutUserNestedInput
@@ -1852,6 +2037,7 @@ export type UserCreateWithoutInsuranceProviderInput = {
   updatedAt?: Date | string
   deletedAt?: Date | string | null
   refreshTokens?: Prisma.RefreshTokenCreateNestedManyWithoutUserInput
+  passwordResetTokens?: Prisma.PasswordResetTokenCreateNestedManyWithoutUserInput
   patient?: Prisma.PatientCreateNestedOneWithoutUserInput
   pharmacies?: Prisma.PharmacyCreateNestedManyWithoutOwnerInput
   pharmacyOwner?: Prisma.PharmacyOwnerCreateNestedOneWithoutUserInput
@@ -1880,6 +2066,7 @@ export type UserUncheckedCreateWithoutInsuranceProviderInput = {
   updatedAt?: Date | string
   deletedAt?: Date | string | null
   refreshTokens?: Prisma.RefreshTokenUncheckedCreateNestedManyWithoutUserInput
+  passwordResetTokens?: Prisma.PasswordResetTokenUncheckedCreateNestedManyWithoutUserInput
   patient?: Prisma.PatientUncheckedCreateNestedOneWithoutUserInput
   pharmacies?: Prisma.PharmacyUncheckedCreateNestedManyWithoutOwnerInput
   pharmacyOwner?: Prisma.PharmacyOwnerUncheckedCreateNestedOneWithoutUserInput
@@ -1924,6 +2111,7 @@ export type UserUpdateWithoutInsuranceProviderInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   refreshTokens?: Prisma.RefreshTokenUpdateManyWithoutUserNestedInput
+  passwordResetTokens?: Prisma.PasswordResetTokenUpdateManyWithoutUserNestedInput
   patient?: Prisma.PatientUpdateOneWithoutUserNestedInput
   pharmacies?: Prisma.PharmacyUpdateManyWithoutOwnerNestedInput
   pharmacyOwner?: Prisma.PharmacyOwnerUpdateOneWithoutUserNestedInput
@@ -1952,6 +2140,7 @@ export type UserUncheckedUpdateWithoutInsuranceProviderInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   refreshTokens?: Prisma.RefreshTokenUncheckedUpdateManyWithoutUserNestedInput
+  passwordResetTokens?: Prisma.PasswordResetTokenUncheckedUpdateManyWithoutUserNestedInput
   patient?: Prisma.PatientUncheckedUpdateOneWithoutUserNestedInput
   pharmacies?: Prisma.PharmacyUncheckedUpdateManyWithoutOwnerNestedInput
   pharmacyOwner?: Prisma.PharmacyOwnerUncheckedUpdateOneWithoutUserNestedInput
@@ -1968,6 +2157,7 @@ export type UserUncheckedUpdateWithoutInsuranceProviderInput = {
 
 export type UserCountOutputType = {
   refreshTokens: number
+  passwordResetTokens: number
   pharmacies: number
   pharmacyEmployees: number
   pharmacistPrescriptions: number
@@ -1977,6 +2167,7 @@ export type UserCountOutputType = {
 
 export type UserCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   refreshTokens?: boolean | UserCountOutputTypeCountRefreshTokensArgs
+  passwordResetTokens?: boolean | UserCountOutputTypeCountPasswordResetTokensArgs
   pharmacies?: boolean | UserCountOutputTypeCountPharmaciesArgs
   pharmacyEmployees?: boolean | UserCountOutputTypeCountPharmacyEmployeesArgs
   pharmacistPrescriptions?: boolean | UserCountOutputTypeCountPharmacistPrescriptionsArgs
@@ -1999,6 +2190,13 @@ export type UserCountOutputTypeDefaultArgs<ExtArgs extends runtime.Types.Extensi
  */
 export type UserCountOutputTypeCountRefreshTokensArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   where?: Prisma.RefreshTokenWhereInput
+}
+
+/**
+ * UserCountOutputType without action
+ */
+export type UserCountOutputTypeCountPasswordResetTokensArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.PasswordResetTokenWhereInput
 }
 
 /**
@@ -2056,6 +2254,7 @@ export type UserSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = r
   updatedAt?: boolean
   deletedAt?: boolean
   refreshTokens?: boolean | Prisma.User$refreshTokensArgs<ExtArgs>
+  passwordResetTokens?: boolean | Prisma.User$passwordResetTokensArgs<ExtArgs>
   patient?: boolean | Prisma.User$patientArgs<ExtArgs>
   pharmacies?: boolean | Prisma.User$pharmaciesArgs<ExtArgs>
   pharmacyOwner?: boolean | Prisma.User$pharmacyOwnerArgs<ExtArgs>
@@ -2130,6 +2329,7 @@ export type UserSelectScalar = {
 export type UserOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "email" | "phone" | "password" | "firstName" | "lastName" | "role" | "position" | "permissions" | "firstLogin" | "isActive" | "emailVerified" | "emailVerificationTokenHash" | "emailVerificationExpiresAt" | "createdAt" | "updatedAt" | "deletedAt", ExtArgs["result"]["user"]>
 export type UserInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   refreshTokens?: boolean | Prisma.User$refreshTokensArgs<ExtArgs>
+  passwordResetTokens?: boolean | Prisma.User$passwordResetTokensArgs<ExtArgs>
   patient?: boolean | Prisma.User$patientArgs<ExtArgs>
   pharmacies?: boolean | Prisma.User$pharmaciesArgs<ExtArgs>
   pharmacyOwner?: boolean | Prisma.User$pharmacyOwnerArgs<ExtArgs>
@@ -2147,6 +2347,7 @@ export type $UserPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs =
   name: "User"
   objects: {
     refreshTokens: Prisma.$RefreshTokenPayload<ExtArgs>[]
+    passwordResetTokens: Prisma.$PasswordResetTokenPayload<ExtArgs>[]
     patient: Prisma.$PatientPayload<ExtArgs> | null
     pharmacies: Prisma.$PharmacyPayload<ExtArgs>[]
     pharmacyOwner: Prisma.$PharmacyOwnerPayload<ExtArgs> | null
@@ -2569,6 +2770,7 @@ readonly fields: UserFieldRefs;
 export interface Prisma__UserClient<T, Null = never, ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
   readonly [Symbol.toStringTag]: "PrismaPromise"
   refreshTokens<T extends Prisma.User$refreshTokensArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$refreshTokensArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$RefreshTokenPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  passwordResetTokens<T extends Prisma.User$passwordResetTokensArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$passwordResetTokensArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$PasswordResetTokenPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   patient<T extends Prisma.User$patientArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$patientArgs<ExtArgs>>): Prisma.Prisma__PatientClient<runtime.Types.Result.GetResult<Prisma.$PatientPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   pharmacies<T extends Prisma.User$pharmaciesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$pharmaciesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$PharmacyPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   pharmacyOwner<T extends Prisma.User$pharmacyOwnerArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$pharmacyOwnerArgs<ExtArgs>>): Prisma.Prisma__PharmacyOwnerClient<runtime.Types.Result.GetResult<Prisma.$PharmacyOwnerPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
@@ -3037,6 +3239,30 @@ export type User$refreshTokensArgs<ExtArgs extends runtime.Types.Extensions.Inte
   take?: number
   skip?: number
   distinct?: Prisma.RefreshTokenScalarFieldEnum | Prisma.RefreshTokenScalarFieldEnum[]
+}
+
+/**
+ * User.passwordResetTokens
+ */
+export type User$passwordResetTokensArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the PasswordResetToken
+   */
+  select?: Prisma.PasswordResetTokenSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the PasswordResetToken
+   */
+  omit?: Prisma.PasswordResetTokenOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.PasswordResetTokenInclude<ExtArgs> | null
+  where?: Prisma.PasswordResetTokenWhereInput
+  orderBy?: Prisma.PasswordResetTokenOrderByWithRelationInput | Prisma.PasswordResetTokenOrderByWithRelationInput[]
+  cursor?: Prisma.PasswordResetTokenWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.PasswordResetTokenScalarFieldEnum | Prisma.PasswordResetTokenScalarFieldEnum[]
 }
 
 /**

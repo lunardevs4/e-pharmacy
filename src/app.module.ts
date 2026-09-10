@@ -1,10 +1,11 @@
 import { Module } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
-import { ConfigModule } from '@nestjs/config';
+import { ConfigModule, ConfigService } from '@nestjs/config';
 import { ScheduleModule } from '@nestjs/schedule';
 import { APP_GUARD, APP_INTERCEPTOR, APP_FILTER } from '@nestjs/core';
 import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
+import { getNumberConfig, userTracker } from './common/throttling';
 import { PrismaModule } from './common/prisma/prisma.module';
 import { AuthModule } from './auth/auth.module';
 import { TransformInterceptor } from './common/interceptors/transform.interceptor';
@@ -52,10 +53,45 @@ import { CommunicationModule } from './common/communication/communication.module
       },
     }),
     ScheduleModule.forRoot(),
-    ThrottlerModule.forRoot([{
-      ttl: 60,
-      limit: 1000,
-    }]),
+    ThrottlerModule.forRootAsync({
+      imports: [ConfigModule],
+      inject: [ConfigService],
+      useFactory: (config: ConfigService) => ({
+        throttlers: [
+          {
+            name: 'default',
+            ttl: getNumberConfig(config, 'THROTTLE_GLOBAL_TTL_MS', 60_000),
+            limit: getNumberConfig(config, 'THROTTLE_GLOBAL_LIMIT', 100),
+          },
+          {
+            name: 'login',
+            ttl: getNumberConfig(config, 'THROTTLE_LOGIN_TTL_MS', 60_000),
+            limit: getNumberConfig(config, 'THROTTLE_LOGIN_LIMIT', 5),
+          },
+          {
+            name: 'registration',
+            ttl: getNumberConfig(config, 'THROTTLE_REGISTRATION_TTL_MS', 60_000),
+            limit: getNumberConfig(config, 'THROTTLE_REGISTRATION_LIMIT', 3),
+          },
+          {
+            name: 'password',
+            ttl: getNumberConfig(config, 'THROTTLE_PASSWORD_TTL_MS', 900_000),
+            limit: getNumberConfig(config, 'THROTTLE_PASSWORD_LIMIT', 3),
+          },
+          {
+            name: 'medicineSearch',
+            ttl: getNumberConfig(config, 'THROTTLE_MEDICINE_SEARCH_TTL_MS', 60_000),
+            limit: getNumberConfig(config, 'THROTTLE_MEDICINE_SEARCH_LIMIT', 60),
+          },
+          {
+            name: 'userSensitive',
+            ttl: getNumberConfig(config, 'THROTTLE_USER_SENSITIVE_TTL_MS', 60_000),
+            limit: getNumberConfig(config, 'THROTTLE_USER_SENSITIVE_LIMIT', 10),
+            getTracker: userTracker,
+          },
+        ],
+      }),
+    }),
     PrismaModule,
     AuthModule,
     UsersModule,
@@ -83,8 +119,8 @@ import { CommunicationModule } from './common/communication/communication.module
     { provide: APP_INTERCEPTOR, useClass: TransformInterceptor },
     { provide: APP_INTERCEPTOR, useClass: AuditInterceptor },
     { provide: APP_FILTER, useClass: HttpExceptionFilter },
-    { provide: APP_GUARD, useClass: ThrottlerGuard },
     { provide: APP_GUARD, useClass: JwtAuthGuard },
+    { provide: APP_GUARD, useClass: ThrottlerGuard },
     { provide: APP_GUARD, useClass: RolesGuard },
     { provide: APP_GUARD, useClass: PermissionsGuard },
     { provide: APP_GUARD, useClass: FirstLoginGuard },

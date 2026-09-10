@@ -176,4 +176,42 @@ export class EmailService {
     this.logger.log(`Verification email sent to ${recipientEmail}`);
     return true;
   }
+
+  async sendPasswordResetEmail(recipientEmail: string, recipientName: string, otp: string) {
+    const gmailUser = process.env.GMAIL_USER?.trim();
+    const gmailAppPassword = process.env.GMAIL_APP_PASSWORD?.trim();
+    const fromAddress = process.env.GMAIL_FROM?.trim() || gmailUser;
+    if (!gmailUser || !gmailAppPassword || !fromAddress) {
+      this.logger.warn('Gmail email is not configured. Skipping password reset email.');
+      return false;
+    }
+
+    const transport = nodemailer.createTransport({ service: 'gmail', auth: { user: gmailUser, pass: gmailAppPassword } });
+    await transport.sendMail({
+      from: `"Rwanda E-pharmacy" <${fromAddress}>`,
+      to: recipientEmail,
+      subject: 'Your e-Pharmacy password reset code',
+      text: [
+        `Hello ${recipientName},`,
+        '',
+        `Your password reset code is: ${otp}`,
+        '',
+        'This code expires in 15 minutes and can only be used once.',
+        'If you did not request a password reset, you can safely ignore this email.',
+        '',
+        'Best regards,',
+        'The e-Pharmacy Team',
+      ].join('\n'),
+      html: `<div style="font-family:Arial,sans-serif;line-height:1.6;color:#111827;max-width:600px;margin:0 auto">
+        <p>Hello ${recipientName},</p>
+        <p>Your password reset code is:</p>
+        <p><strong style="font-size:24px;letter-spacing:4px">${otp}</strong></p>
+        <p>This code expires in 15 minutes and can only be used once.</p>
+        <p>If you did not request a password reset, you can safely ignore this email.</p>
+        <p>Best regards,<br>The e-Pharmacy Team</p>
+      </div>`,
+    });
+    this.logger.log(`Password reset email sent to ${recipientEmail}`);
+    return true;
+  }
 }

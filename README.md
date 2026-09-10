@@ -178,9 +178,9 @@ Includes:
 | Refresh Token Rotation | Old refresh tokens are deleted on refresh                    |
 | Password Hashing       | bcrypt (10 salt rounds)                                      |
 | RBAC                   | Custom `@Roles()` decorator + `RolesGuard`                   |
-| CORS                   | Enabled for all origins (adjust in `main.ts` for production) |
+| CORS                   | Explicit allowlist from `CORS_ORIGINS`, credentials enabled |
 | Helmet                 | Enabled (HTTP security headers)                              |
-| Rate Limiting          | 10 requests / minute globally (ThrottlerModule)              |
+| Rate Limiting          | 100/min baseline with stricter named route policies           |
 | Input Sanitization     | Class-validator whitelist, forbidNonWhitelisted              |
 | Exception Handling     | Global `HttpExceptionFilter` for consistent errors           |
 

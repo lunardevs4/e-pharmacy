@@ -9,7 +9,7 @@ import {
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
 import * as bcrypt from 'bcrypt';
-import { createHash, randomBytes } from 'crypto';
+import { createHash, randomBytes, randomInt } from 'crypto';
 import { PrismaService } from '../common/prisma/prisma.service';
 import { EmailService } from '../common/email/email.service';
 import { RegisterDto } from './dto/register.dto';
@@ -27,6 +27,9 @@ import {
 import { AUTH_PERMISSIONS, STAFF_ROLE_PERMISSIONS } from './auth.constants';
 import { UserRole } from '@generated/prisma';
 import { Cron } from '@nestjs/schedule';
+import { PasswordResetRequestDto } from './dto/password-reset-request.dto';
+import { PasswordResetOtpDto } from './dto/password-reset-otp.dto';
+import { PasswordResetDto } from './dto/password-reset.dto';
 
 @Injectable()
 export class AuthService {
@@ -386,6 +389,63 @@ export class AuthService {
       }
     }
     return { message: 'If an unverified account exists for that email, a verification email has been sent.' };
+  }
+
+  async requestPasswordReset(dto: PasswordResetRequestDto) {
+    const email = validateSafeString(dto.email.trim().toLowerCase(), 'email', 255);
+    const prisma = this.prismaService.prisma;
+    const user = await prisma.user.findUnique({ where: { email } });
+
+    if (user) {
+      const otp = randomInt(0, 1_000_000).toString().padStart(6, '0');
+      const tokenHash = createHash('sha256').update(otp).digest('hex');
+      const expiresAt = new Date(Date.now() + 15 * 60 * 1000);
+      await prisma.passwordResetToken.deleteMany({ where: { userId: user.id } });
+      await prisma.passwordResetToken.create({ data: { userId: user.id, tokenHash, expiresAt } });
+
+      try {
+        await this.emailService.sendPasswordResetEmail(email, `${user.firstName} ${user.lastName}`.trim(), otp);
+      } catch (error) {
+        await prisma.passwordResetToken.deleteMany({ where: { tokenHash } });
+        console.warn(`Password reset email failed for ${email}: ${(error as Error).message}`);
+      }
+    }
+
+    return { message: 'If an account exists for that email, a password reset code has been sent.' };
+  }
+
+  async verifyPasswordReset(dto: PasswordResetOtpDto) {
+    const email = validateSafeString(dto.email.trim().toLowerCase(), 'email', 255);
+    const tokenHash = createHash('sha256').update(dto.otp).digest('hex');
+    const token = await this.prismaService.prisma.passwordResetToken.findFirst({
+      where: { tokenHash, expiresAt: { gt: new Date() }, usedAt: null, user: { email } },
+    });
+    if (!token) throw new BadRequestException('Invalid or expired password reset code');
+    await this.prismaService.prisma.passwordResetToken.update({ where: { id: token.id }, data: { verifiedAt: new Date() } });
+    return { message: 'Password reset code verified' };
+  }
+
+  async completePasswordReset(dto: PasswordResetDto) {
+    const email = validateSafeString(dto.email.trim().toLowerCase(), 'email', 255);
+    const tokenHash = createHash('sha256').update(dto.otp).digest('hex');
+    const token = await this.prismaService.prisma.passwordResetToken.findFirst({
+      where: { tokenHash, expiresAt: { gt: new Date() }, usedAt: null, verifiedAt: { not: null }, user: { email } },
+      select: { id: true, userId: true },
+    });
+    if (!token) throw new BadRequestException('Invalid or expired password reset code');
+
+    const hashedPassword = await bcrypt.hash(dto.newPassword, 10);
+    await this.prismaService.prisma.$transaction(async (tx) => {
+      const consumed = await tx.passwordResetToken.updateMany({
+        where: { id: token.id, usedAt: null, expiresAt: { gt: new Date() } },
+        data: { usedAt: new Date() },
+      });
+      if (consumed.count !== 1) throw new BadRequestException('Invalid or expired password reset code');
+      await tx.user.update({ where: { id: token.userId }, data: { password: hashedPassword, firstLogin: false } });
+      await tx.refreshToken.deleteMany({ where: { userId: token.userId } });
+      await tx.passwordResetToken.deleteMany({ where: { userId: token.userId, id: { not: token.id } } });
+    });
+    return { message: 'Password reset successfully. You can now sign in.' };
   }
 
   @Cron('* * * * *')
