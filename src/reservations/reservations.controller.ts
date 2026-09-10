@@ -5,11 +5,13 @@ import { CreateReservationDto, UpdateReservationStatusDto } from './dto/reservat
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { Roles } from '../common/guards/roles.decorator';
 import { UserRole, ReservationStatus } from '@generated/prisma';
+import { Throttle } from '@nestjs/throttler';
 
 @ApiTags('Reservations')
 @UseGuards(JwtAuthGuard)
 @ApiBearerAuth()
 @Controller('api/v1')
+@Throttle({ userSensitive: {} })
 export class ReservationsController {
   constructor(private reservationsService: ReservationsService) { }
 

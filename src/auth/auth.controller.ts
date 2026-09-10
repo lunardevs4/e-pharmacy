@@ -15,7 +15,11 @@ import { Public } from '../common/guards/public.decorator';
 import { Roles } from '../common/guards/roles.decorator';
 import { Permissions } from '../common/guards/permissions.decorator';
 import { PermissionsGuard } from '../common/guards/permissions.guard';
-import { clearAuthCookies, readCookie, REFRESH_TOKEN_COOKIE, setAuthCookies } from '../common/auth-cookies';
+import { clearAuthCookies, issueCsrfToken, readCookie, REFRESH_TOKEN_COOKIE, setAuthCookies } from '../common/auth-cookies';
+import { Throttle } from '@nestjs/throttler';
+import { PasswordResetRequestDto } from './dto/password-reset-request.dto';
+import { PasswordResetOtpDto } from './dto/password-reset-otp.dto';
+import { PasswordResetDto } from './dto/password-reset.dto';
 
 @ApiTags('Auth')
 @Controller('api/v1/auth')
@@ -23,7 +27,15 @@ export class AuthController {
   constructor(private authService: AuthService) { }
 
   @Public()
+  @Get('csrf-token')
+  @ApiOperation({ summary: 'Issue a CSRF token for browser clients' })
+  getCsrfToken(@Req() request: any, @Res({ passthrough: true }) response: Response) {
+    return { csrfToken: request.csrfToken || issueCsrfToken(response) };
+  }
+
+  @Public()
   @Post('register')
+  @Throttle({ registration: {} })
   @ApiOperation({ summary: 'Register a new patient account' })
   @ApiBody({ type: RegisterDto })
   async register(@Body() registerDto: RegisterDto, @Res({ passthrough: true }) response: Response) {
@@ -39,6 +51,7 @@ export class AuthController {
 
   @Public()
   @Post('register-pharmacy')
+  @Throttle({ registration: {} })
   @ApiOperation({ summary: 'Submit a new pharmacy registration request' })
   @ApiBody({ type: RegisterPharmacyDto })
   async registerPharmacy(@Body() registerPharmacyDto: RegisterPharmacyDto) {
@@ -47,6 +60,7 @@ export class AuthController {
 
   @Public()
   @Post('register-insurance')
+  @Throttle({ registration: {} })
   @ApiOperation({ summary: 'Register a new insurance provider account' })
   @ApiBody({ type: RegisterInsuranceDto })
   async registerInsurance(@Body() registerInsuranceDto: RegisterInsuranceDto) {
@@ -55,6 +69,7 @@ export class AuthController {
 
   @Public()
   @Post('login')
+  @Throttle({ login: {} })
   @ApiOperation({ summary: 'Login user' })
   @ApiBody({
     type: LoginDto,
@@ -80,7 +95,35 @@ export class AuthController {
 
   @Public()
   @Post('resend-verification')
+  @Throttle({ password: {} })
   async resendVerification(@Body('email') email: string) { return this.authService.resendVerificationEmail(email); }
+
+  @Public()
+  @Post('password-reset/request')
+  @Throttle({ password: {} })
+  @ApiOperation({ summary: 'Request a password reset code' })
+  @ApiBody({ type: PasswordResetRequestDto })
+  async requestPasswordReset(@Body() dto: PasswordResetRequestDto) {
+    return this.authService.requestPasswordReset(dto);
+  }
+
+  @Public()
+  @Post('password-reset/verify')
+  @Throttle({ password: {} })
+  @ApiOperation({ summary: 'Verify a password reset code' })
+  @ApiBody({ type: PasswordResetOtpDto })
+  async verifyPasswordReset(@Body() dto: PasswordResetOtpDto) {
+    return this.authService.verifyPasswordReset(dto);
+  }
+
+  @Public()
+  @Post('password-reset/complete')
+  @Throttle({ password: {} })
+  @ApiOperation({ summary: 'Complete a password reset' })
+  @ApiBody({ type: PasswordResetDto })
+  async completePasswordReset(@Body() dto: PasswordResetDto) {
+    return this.authService.completePasswordReset(dto);
+  }
 
   @UseGuards(JwtAuthGuard, PermissionsGuard)
   @Permissions('MANAGE_STAFF')
@@ -94,6 +137,7 @@ export class AuthController {
 
   @UseGuards(JwtAuthGuard)
   @Post('change-password')
+  @Throttle({ password: {} })
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Change the current user password' })
   async changePassword(@Req() req: any, @Body() changePasswordDto: ChangePasswordDto) {

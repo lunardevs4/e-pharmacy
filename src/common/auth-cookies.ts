@@ -1,7 +1,10 @@
 import { Request, Response } from 'express';
+import { randomBytes } from 'crypto';
 
 export const ACCESS_TOKEN_COOKIE = 'epharmacy_access';
 export const REFRESH_TOKEN_COOKIE = 'epharmacy_refresh';
+export const CSRF_TOKEN_COOKIE = 'epharmacy_csrf';
+export const CSRF_TOKEN_HEADER = 'x-csrf-token';
 
 const DAY_MS = 24 * 60 * 60 * 1000;
 
@@ -42,6 +45,15 @@ export function setAuthCookies(response: Response, accessToken: string, refreshT
     refreshToken,
     authCookieOptions(durationToMs(process.env.REFRESH_TOKEN_EXPIRES_IN, 7 * DAY_MS)),
   );
+}
+
+export function csrfCookieOptions() {
+  return { ...authCookieOptions(0), httpOnly: false, maxAge: undefined } as const;
+}
+
+export function issueCsrfToken(response: Response, token = randomBytes(32).toString('hex')) {
+  response.cookie(CSRF_TOKEN_COOKIE, token, csrfCookieOptions());
+  return token;
 }
 
 export function clearAuthCookies(response: Response) {

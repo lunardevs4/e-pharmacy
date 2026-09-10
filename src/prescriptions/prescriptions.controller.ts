@@ -5,11 +5,13 @@ import { CreatePrescriptionDto, UpdatePrescriptionStatusDto } from './dto/prescr
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { Roles } from '../common/guards/roles.decorator';
 import { UserRole, PrescriptionStatus } from '@generated/prisma';
+import { Throttle } from '@nestjs/throttler';
 
 @ApiTags('Prescriptions')
 @UseGuards(JwtAuthGuard)
 @ApiBearerAuth()
 @Controller('api/v1')
+@Throttle({ userSensitive: {} })
 export class PrescriptionsController {
   constructor(private prescriptionsService: PrescriptionsService) { }
 

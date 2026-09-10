@@ -4,38 +4,46 @@ import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { NestExpressApplication } from '@nestjs/platform-express';
 import { join } from 'path';
 import helmet from 'helmet';
-import rateLimit from 'express-rate-limit';
 import * as hpp from 'hpp';
 import { AppModule } from './app.module';
 import { HttpExceptionFilter } from './common/filters/http-exception.filter';
 import { XssSanitizationPipe } from './common/pipes/xss-sanitization.pipe';
 import { noSqlSanitize } from './common/middleware/nosql-sanitize.middleware';
+import { csrfMiddleware } from './common/middleware/csrf.middleware';
 
 async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule);
 
   app.set('trust proxy', 1);
 
+  const isProduction = process.env.NODE_ENV === 'production';
+  const configuredOrigins = (process.env.CORS_ORIGINS || '').split(',').map((s) => s.trim()).filter(Boolean);
+  const frontendOrigin = process.env.FRONTEND_URL?.trim();
+  const isHttpsDeployment = isProduction || frontendOrigin?.startsWith('https://');
+  const connectSources = ["'self'", ...configuredOrigins, ...(frontendOrigin ? [frontendOrigin] : [])];
+
   app.use(
     helmet({
       contentSecurityPolicy: {
-        useDefaults: true,
+        useDefaults: false,
         directives: {
           defaultSrc: ["'self'"],
-          styleSrc: ["'self'", "'unsafe-inline'"],
-          scriptSrc: ["'self'"],
-          imgSrc: ["'self'", 'data:', 'https:'],
-          connectSrc: ["'self'"],
-          frameSrc: ["'none'"],
+          baseUri: ["'self'"],
           objectSrc: ["'none'"],
-          upgradeInsecureRequests: [],
+          frameAncestors: ["'none'"],
+          styleSrc: ["'self'", "'unsafe-inline'"],
+          // Swagger UI uses inline bootstrap code/styles; no unsafe-eval or
+          // third-party script/style sources are allowed.
+          scriptSrc: ["'self'", "'unsafe-inline'"],
+          imgSrc: ["'self'", 'data:'],
+          fontSrc: ["'self'", 'data:'],
+          connectSrc: connectSources,
+          mediaSrc: ["'self'"],
+          frameSrc: ["'none'"],
+          ...(isHttpsDeployment ? { upgradeInsecureRequests: [] } : {}),
         },
       },
-      hsts: {
-        maxAge: 31536000,
-        includeSubDomains: true,
-        preload: true,
-      },
+      hsts: isHttpsDeployment ? { maxAge: 31536000, includeSubDomains: true, preload: true } : false,
       frameguard: { action: 'deny' },
       xssFilter: true,
       noSniff: true,
@@ -44,6 +52,16 @@ async function bootstrap() {
       hidePoweredBy: true,
     }),
   );
+
+  app.use((_request, response, next) => {
+    response.setHeader(
+      'Permissions-Policy',
+      'camera=(), microphone=(), geolocation=(), payment=(), usb=(), browsing-topics=()',
+    );
+    next();
+  });
+
+  app.use(csrfMiddleware);
 
   app.enableCors({
     origin: (origin, callback) => {
@@ -55,39 +73,11 @@ async function bootstrap() {
       }
     },
     methods: ['GET', 'HEAD', 'PUT', 'PATCH', 'POST', 'DELETE'],
-    allowedHeaders: ['Content-Type', 'Authorization', 'Accept', 'X-Requested-With'],
+    allowedHeaders: ['Content-Type', 'Authorization', 'Accept', 'X-Requested-With', 'X-CSRF-Token'],
     exposedHeaders: ['Content-Length', 'X-Request-Id'],
     credentials: true,
     maxAge: 600,
   });
-
-  const apiLimiter = rateLimit({
-    windowMs: parseInt(process.env.RATE_LIMIT_WINDOW_MS || '900000', 10),
-    max: parseInt(process.env.RATE_LIMIT_MAX || '1000', 10),
-    standardHeaders: true,
-    legacyHeaders: false,
-    message: {
-      success: false,
-      statusCode: 429,
-      error: 'Too Many Requests',
-      message: 'Too many requests from this IP, please try again later.',
-    },
-  });
-  app.use('/api/', apiLimiter);
-
-  const strictLimiter = rateLimit({
-    windowMs: 15 * 60 * 1000,
-    max: parseInt(process.env.AUTH_RATE_LIMIT_MAX || '20', 10),
-    standardHeaders: true,
-    legacyHeaders: false,
-    message: {
-      success: false,
-      statusCode: 429,
-      error: 'Too Many Requests',
-      message: 'Too many auth attempts, please try again later.',
-    },
-  });
-  app.use('/api/v1/auth/', strictLimiter);
 
   app.use(hpp());
 

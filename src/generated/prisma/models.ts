@@ -10,6 +10,7 @@
  */
 export type * from './models/User'
 export type * from './models/RefreshToken'
+export type * from './models/PasswordResetToken'
 export type * from './models/Patient'
 export type * from './models/Pharmacy'
 export type * from './models/PharmacyOwner'
