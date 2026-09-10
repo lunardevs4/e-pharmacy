@@ -35,7 +35,22 @@ import { CommunicationModule } from './common/communication/communication.module
 
 @Module({
   imports: [
-    ConfigModule.forRoot({ isGlobal: true }),
+    ConfigModule.forRoot({
+      isGlobal: true,
+      validate: (config) => {
+        const required = ['DATABASE_URL', 'JWT_SECRET'];
+        const missing = required.filter((name) => !config[name]?.trim());
+        if (config.NODE_ENV === 'production' && !config.FRONTEND_URL?.trim()) missing.push('FRONTEND_URL');
+        if (config.NODE_ENV === 'production' && !config.CORS_ORIGINS?.trim()) missing.push('CORS_ORIGINS');
+        if (missing.length) {
+          throw new Error(`Missing required environment variable(s): ${missing.join(', ')}`);
+        }
+        if (config.JWT_SECRET.trim().length < 32) {
+          throw new Error('JWT_SECRET must be at least 32 characters long');
+        }
+        return config;
+      },
+    }),
     ScheduleModule.forRoot(),
     ThrottlerModule.forRoot([{
       ttl: 60,
