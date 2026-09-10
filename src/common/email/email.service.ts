@@ -186,7 +186,13 @@ export class EmailService {
       return false;
     }
 
-    const transport = nodemailer.createTransport({ service: 'gmail', auth: { user: gmailUser, pass: gmailAppPassword } });
+    const transport = nodemailer.createTransport({
+      service: 'gmail',
+      auth: { user: gmailUser, pass: gmailAppPassword },
+      connectionTimeout: 10000,
+      greetingTimeout: 10000,
+      socketTimeout: 15000,
+    });
     await transport.sendMail({
       from: `"Rwanda E-pharmacy" <${fromAddress}>`,
       to: recipientEmail,
