@@ -428,4 +428,22 @@ export class PharmaciesController {
       agreementId,
     );
   }
+
+  @Get(':id/patients')
+  @UseGuards(JwtAuthGuard)
+  @Roles(UserRole.PHARMACY_OWNER, UserRole.PHARMACY, UserRole.PHARMACIST)
+  @ApiBearerAuth()
+  @ApiOperation({
+    summary: 'Get patients of a pharmacy',
+    description: 'Endpoint: GET /api/v1/pharmacies/:id/patients',
+  })
+  @ApiParam({
+    name: 'id',
+    type: 'string',
+    description: 'Pharmacy UUID',
+    example: '550e8400-e29b-41d4-a716-446655440000',
+  })
+  getPatients(@Param('id') id: string, @Req() req: any) {
+    return this.pharmaciesService.getPatients(id, req.user);
+  }
 }

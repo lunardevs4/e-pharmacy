@@ -497,4 +497,56 @@ export class PharmaciesService {
 
     return { message: 'Insurance provider removed successfully' };
   }
+
+  async getPatients(pharmacyId: string, user: any) {
+    const prisma = this.prismaService.prisma;
+    const safePharmacyId = validateUuid(pharmacyId, 'pharmacyId');
+
+    const pharmacy = await prisma.pharmacy.findUnique({
+      where: { id: safePharmacyId },
+    });
+
+    if (!pharmacy) {
+      throw new NotFoundException('Pharmacy not found');
+    }
+
+    // Optionally add authorization check here
+    // if (pharmacy.ownerId !== user.id && user.role !== 'ADMIN') {
+    //   throw new ForbiddenException('You are not authorized to view this pharmacy\\'s patients');
+    // }
+
+    const patients = await prisma.patient.findMany({
+      where: {
+        OR: [
+          { reservations: { some: { pharmacyId: safePharmacyId } } },
+          { prescriptions: { some: { pharmacyId: safePharmacyId } } },
+        ]
+      },
+      include: {
+        user: {
+          select: {
+            firstName: true,
+            lastName: true,
+            email: true,
+          }
+        },
+        prescriptions: {
+          where: { pharmacyId: safePharmacyId },
+          include: {
+            medicines: true,
+          }
+        }
+      }
+    });
+
+    return patients.map(p => {
+      const totalMedicines = p.prescriptions.reduce((acc, rx) => acc + rx.medicines.length, 0);
+      return {
+        id: p.id,
+        user: p.user,
+        activeMedicines: totalMedicines,
+        updatedAt: p.updatedAt,
+      };
+    });
+  }
 }
