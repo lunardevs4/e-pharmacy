@@ -1,4 +1,8 @@
-import { Injectable, ForbiddenException, NotFoundException } from '@nestjs/common';
+import {
+  Injectable,
+  ForbiddenException,
+  NotFoundException,
+} from '@nestjs/common';
 import { PrismaService } from '../common/prisma/prisma.service';
 import { UserRole } from '@generated/prisma';
 import { validateUuid, validateDate } from '../common/security/security.util';
@@ -10,12 +14,17 @@ interface AuthenticatedUser {
 
 @Injectable()
 export class ReportsService {
-  constructor(private prismaService: PrismaService) { }
+  constructor(private prismaService: PrismaService) {}
 
-  private async ensurePharmacyReportAccess(pharmacyId: string, user: AuthenticatedUser) {
+  private async ensurePharmacyReportAccess(
+    pharmacyId: string,
+    user: AuthenticatedUser,
+  ) {
     const prisma = this.prismaService.prisma;
     const safePharmacyId = validateUuid(pharmacyId, 'pharmacyId');
-    const pharmacy = await prisma.pharmacy.findUnique({ where: { id: safePharmacyId } });
+    const pharmacy = await prisma.pharmacy.findUnique({
+      where: { id: safePharmacyId },
+    });
     if (!pharmacy) throw new NotFoundException('Pharmacy not found');
 
     if (user.role === UserRole.ADMIN) return { pharmacy, safePharmacyId };
@@ -29,21 +38,39 @@ export class ReportsService {
 
     if (user.role === UserRole.PHARMACIST) {
       const employee = await prisma.pharmacyEmployee.findFirst({
-        where: { pharmacyId: safePharmacyId, userId: user.id, role: UserRole.PHARMACIST },
+        where: {
+          pharmacyId: safePharmacyId,
+          userId: user.id,
+          role: UserRole.PHARMACIST,
+        },
       });
       if (!employee) {
-        throw new ForbiddenException('You are not employed as a pharmacist at this pharmacy');
+        throw new ForbiddenException(
+          'You are not employed as a pharmacist at this pharmacy',
+        );
       }
       return { pharmacy, safePharmacyId };
     }
 
-    throw new ForbiddenException('Insufficient permissions to access this pharmacy report');
+    throw new ForbiddenException(
+      'Insufficient permissions to access this pharmacy report',
+    );
   }
 
-  async pharmacyReport(pharmacyId: string, user: AuthenticatedUser, startDate?: string, endDate?: string) {
+  async pharmacyReport(
+    pharmacyId: string,
+    user: AuthenticatedUser,
+    startDate?: string,
+    endDate?: string,
+  ) {
     const prisma = this.prismaService.prisma;
-    const { safePharmacyId } = await this.ensurePharmacyReportAccess(pharmacyId, user);
-    const safeStartDate = startDate ? validateDate(startDate, 'startDate') : undefined;
+    const { safePharmacyId } = await this.ensurePharmacyReportAccess(
+      pharmacyId,
+      user,
+    );
+    const safeStartDate = startDate
+      ? validateDate(startDate, 'startDate')
+      : undefined;
     const safeEndDate = endDate ? validateDate(endDate, 'endDate') : undefined;
 
     const dateFilter: any = {};
@@ -55,7 +82,9 @@ export class ReportsService {
       prisma.reservation.findMany({
         where: {
           pharmacyId: safePharmacyId,
-          ...(Object.keys(dateFilter).length > 0 ? { createdAt: dateFilter } : {}),
+          ...(Object.keys(dateFilter).length > 0
+            ? { createdAt: dateFilter }
+            : {}),
         },
         include: {
           medicine: true,
@@ -79,11 +108,18 @@ export class ReportsService {
     };
   }
 
-  async medicineReport(user: AuthenticatedUser, startDate?: string, endDate?: string) {
+  async medicineReport(
+    user: AuthenticatedUser,
+    startDate?: string,
+    endDate?: string,
+  ) {
     const prisma = this.prismaService.prisma;
-    const safeStartDate = startDate ? validateDate(startDate, 'startDate') : undefined;
+    const safeStartDate = startDate
+      ? validateDate(startDate, 'startDate')
+      : undefined;
     const safeEndDate = endDate ? validateDate(endDate, 'endDate') : undefined;
-    void safeStartDate; void safeEndDate;
+    void safeStartDate;
+    void safeEndDate;
 
     if (user.role === UserRole.ADMIN) {
       return prisma.medicine.findMany({
@@ -152,13 +188,21 @@ export class ReportsService {
       });
     }
 
-    throw new ForbiddenException('Insufficient permissions to access medicines report');
+    throw new ForbiddenException(
+      'Insufficient permissions to access medicines report',
+    );
   }
 
-  async patientReport(user: AuthenticatedUser, startDate?: string, endDate?: string) {
+  async patientReport(
+    user: AuthenticatedUser,
+    startDate?: string,
+    endDate?: string,
+  ) {
     const prisma = this.prismaService.prisma;
     const safeUserId = validateUuid(user.id, 'userId');
-    const safeStartDate = startDate ? validateDate(startDate, 'startDate') : undefined;
+    const safeStartDate = startDate
+      ? validateDate(startDate, 'startDate')
+      : undefined;
     const safeEndDate = endDate ? validateDate(endDate, 'endDate') : undefined;
 
     const patient = await prisma.patient.upsert({
@@ -175,7 +219,9 @@ export class ReportsService {
       prisma.reservation.findMany({
         where: {
           patientId: patient.id,
-          ...(Object.keys(dateFilter).length > 0 ? { createdAt: dateFilter } : {}),
+          ...(Object.keys(dateFilter).length > 0
+            ? { createdAt: dateFilter }
+            : {}),
         },
         include: { medicine: true, pharmacy: true },
         orderBy: { createdAt: 'desc' },
@@ -183,7 +229,9 @@ export class ReportsService {
       prisma.prescription.findMany({
         where: {
           patientId: patient.id,
-          ...(Object.keys(dateFilter).length > 0 ? { createdAt: dateFilter } : {}),
+          ...(Object.keys(dateFilter).length > 0
+            ? { createdAt: dateFilter }
+            : {}),
         },
         include: { medicines: { include: { medicine: true } }, pharmacy: true },
         orderBy: { createdAt: 'desc' },
@@ -192,8 +240,12 @@ export class ReportsService {
 
     const inventoryPrices = await prisma.inventory.findMany({
       where: {
-        pharmacyId: { in: reservationRows.map((reservation) => reservation.pharmacyId) },
-        medicineId: { in: reservationRows.map((reservation) => reservation.medicineId) },
+        pharmacyId: {
+          in: reservationRows.map((reservation) => reservation.pharmacyId),
+        },
+        medicineId: {
+          in: reservationRows.map((reservation) => reservation.medicineId),
+        },
         deletedAt: null,
       },
       select: { pharmacyId: true, medicineId: true, price: true },
@@ -201,7 +253,9 @@ export class ReportsService {
 
     const reservations = reservationRows.map((reservation) => {
       const inventory = inventoryPrices.find(
-        (item) => item.pharmacyId === reservation.pharmacyId && item.medicineId === reservation.medicineId,
+        (item) =>
+          item.pharmacyId === reservation.pharmacyId &&
+          item.medicineId === reservation.medicineId,
       );
       const unitPrice = inventory ? Number(inventory.price) : 0;
 
@@ -232,7 +286,9 @@ export class ReportsService {
     const prisma = this.prismaService.prisma;
 
     if (user.role !== UserRole.INSURANCE && user.role !== UserRole.ADMIN) {
-      throw new ForbiddenException('Only INSURANCE or ADMIN can access insurance reports');
+      throw new ForbiddenException(
+        'Only INSURANCE or ADMIN can access insurance reports',
+      );
     }
 
     const [claims, reservations] = await Promise.all([
@@ -246,9 +302,13 @@ export class ReportsService {
 
     return {
       totalClaims: claims.length,
-      approvedClaims: claims.filter((item) => item.status === 'CONFIRMED').length,
+      approvedClaims: claims.filter((item) => item.status === 'CONFIRMED')
+        .length,
       pendingClaims: claims.filter((item) => item.status === 'PENDING').length,
-      totalCost: claims.reduce((sum, item) => sum + Number(item.quantity || 0), 0),
+      totalCost: claims.reduce(
+        (sum, item) => sum + Number(item.quantity || 0),
+        0,
+      ),
       claims: claims.map((item) => ({
         id: item.id,
         pharmacy: item.pharmacy ? { name: item.pharmacy.name } : null,
@@ -263,19 +323,28 @@ export class ReportsService {
     };
   }
 
-  async governmentReport(user: AuthenticatedUser, startDate?: string, endDate?: string) {
+  async governmentReport(
+    user: AuthenticatedUser,
+    startDate?: string,
+    endDate?: string,
+  ) {
     const prisma = this.prismaService.prisma;
-    const safeStartDate = startDate ? validateDate(startDate, 'startDate') : undefined;
+    const safeStartDate = startDate
+      ? validateDate(startDate, 'startDate')
+      : undefined;
     const safeEndDate = endDate ? validateDate(endDate, 'endDate') : undefined;
 
     if (user.role !== UserRole.GOVERNMENT && user.role !== UserRole.ADMIN) {
-      throw new ForbiddenException('Only GOVERNMENT or ADMIN can access national reports');
+      throw new ForbiddenException(
+        'Only GOVERNMENT or ADMIN can access national reports',
+      );
     }
 
     const dateFilter: any = {};
     if (safeStartDate) dateFilter.gte = new Date(safeStartDate);
     if (safeEndDate) dateFilter.lte = new Date(safeEndDate);
-    const whereCreated = Object.keys(dateFilter).length > 0 ? { createdAt: dateFilter } : {};
+    const whereCreated =
+      Object.keys(dateFilter).length > 0 ? { createdAt: dateFilter } : {};
 
     const [
       totalPharmacies,
@@ -310,13 +379,16 @@ export class ReportsService {
 
   async platformReport(startDate?: string, endDate?: string) {
     const prisma = this.prismaService.prisma;
-    const safeStartDate = startDate ? validateDate(startDate, 'startDate') : undefined;
+    const safeStartDate = startDate
+      ? validateDate(startDate, 'startDate')
+      : undefined;
     const safeEndDate = endDate ? validateDate(endDate, 'endDate') : undefined;
 
     const dateFilter: any = {};
     if (safeStartDate) dateFilter.gte = new Date(safeStartDate);
     if (safeEndDate) dateFilter.lte = new Date(safeEndDate);
-    const whereCreated = Object.keys(dateFilter).length > 0 ? { createdAt: dateFilter } : {};
+    const whereCreated =
+      Object.keys(dateFilter).length > 0 ? { createdAt: dateFilter } : {};
 
     const [
       totalUsers,
@@ -334,12 +406,23 @@ export class ReportsService {
       prisma.user.count(),
       prisma.user.groupBy({ by: ['role'], _count: { id: true } }),
       prisma.pharmacy.count({ where: { deletedAt: null } }),
-      prisma.pharmacy.groupBy({ by: ['status'], _count: { id: true }, where: { deletedAt: null } }),
-       prisma.medicine.count(),
+      prisma.pharmacy.groupBy({
+        by: ['status'],
+        _count: { id: true },
+        where: { deletedAt: null },
+      }),
+      prisma.medicine.count(),
       prisma.patient.count(),
       prisma.reservation.count({ where: whereCreated }),
-      prisma.reservation.groupBy({ by: ['status'], _count: { id: true }, where: whereCreated }),
-      prisma.inventory.aggregate({ where: { deletedAt: null }, _sum: { quantity: true } }),
+      prisma.reservation.groupBy({
+        by: ['status'],
+        _count: { id: true },
+        where: whereCreated,
+      }),
+      prisma.inventory.aggregate({
+        where: { deletedAt: null },
+        _sum: { quantity: true },
+      }),
       prisma.prescription.count({ where: whereCreated }),
       prisma.auditLog.count({ where: whereCreated }),
     ]);
@@ -348,17 +431,26 @@ export class ReportsService {
       reportType: 'PLATFORM',
       users: {
         total: totalUsers,
-        byRole: usersByRole.map((r: any) => ({ role: r.role, count: r._count.id })),
+        byRole: usersByRole.map((r: any) => ({
+          role: r.role,
+          count: r._count.id,
+        })),
       },
       pharmacies: {
         total: totalPharmacies,
-        byStatus: pharmaciesByStatus.map((r: any) => ({ status: r.status, count: r._count.id })),
+        byStatus: pharmaciesByStatus.map((r: any) => ({
+          status: r.status,
+          count: r._count.id,
+        })),
       },
       medicines: { activeTotal: totalMedicines },
       patients: { total: totalPatients },
       reservations: {
         total: totalReservations,
-        byStatus: reservationsByStatus.map((r: any) => ({ status: r.status, count: r._count.id })),
+        byStatus: reservationsByStatus.map((r: any) => ({
+          status: r.status,
+          count: r._count.id,
+        })),
       },
       prescriptions: { total: totalPrescriptions },
       inventory: { totalUnitsInStock: totalInventory._sum.quantity ?? 0 },

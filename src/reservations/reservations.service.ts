@@ -42,7 +42,8 @@ export class ReservationsService {
       create: { userId: safeUserId },
     });
 
-    const expiresAt = validateDate((safeDto as any).expiresAt, 'expiresAt') ||
+    const expiresAt =
+      validateDate((safeDto as any).expiresAt, 'expiresAt') ||
       new Date(Date.now() + 24 * 60 * 60 * 1000);
     const { expiresAt: _stripExpiry, ...restDto } = safeDto as any;
 
@@ -98,7 +99,9 @@ export class ReservationsService {
     const stale = await prisma.reservation.findMany({
       where: {
         patientId: patient.id,
-        status: { in: [ReservationStatus.PENDING, ReservationStatus.CONFIRMED] },
+        status: {
+          in: [ReservationStatus.PENDING, ReservationStatus.CONFIRMED],
+        },
         expiresAt: { lt: now },
       },
       include: { medicine: true, pharmacy: true },
@@ -108,12 +111,17 @@ export class ReservationsService {
     return stale.map((reservation) => ({
       id: reservation.id,
       medicineName:
-        reservation.medicine?.tradeName || reservation.medicine?.genericName || 'Medication',
+        reservation.medicine?.tradeName ||
+        reservation.medicine?.genericName ||
+        'Medication',
       pharmacyName: reservation.pharmacy?.name || 'Pharmacy',
       pickupDeadline: reservation.expiresAt,
       hoursLate: Math.max(
         0,
-        Math.floor((now.getTime() - new Date(reservation.expiresAt).getTime()) / (1000 * 60 * 60)),
+        Math.floor(
+          (now.getTime() - new Date(reservation.expiresAt).getTime()) /
+            (1000 * 60 * 60),
+        ),
       ),
       quantity: reservation.quantity,
       status: reservation.status,
@@ -202,7 +210,10 @@ export class ReservationsService {
 
     if (user.role === UserRole.ADMIN) return { pharmacy, safePharmacyId };
 
-    if (user.role === UserRole.PHARMACY_OWNER || (user.role as string) === 'PHARMACY') {
+    if (
+      user.role === UserRole.PHARMACY_OWNER ||
+      (user.role as string) === 'PHARMACY'
+    ) {
       if (pharmacy.ownerId !== user.id) {
         throw new ForbiddenException('You do not own this pharmacy');
       }
@@ -245,7 +256,9 @@ export class ReservationsService {
     const inventory = await prisma.inventory.findMany({
       where: {
         pharmacyId: safePharmacyId,
-        medicineId: { in: reservations.map((reservation) => reservation.medicineId) },
+        medicineId: {
+          in: reservations.map((reservation) => reservation.medicineId),
+        },
         deletedAt: null,
       },
       select: { medicineId: true, price: true },
@@ -253,7 +266,9 @@ export class ReservationsService {
 
     return Promise.all(
       reservations.map(async (reservation) => {
-        const stock = inventory.find((item) => item.medicineId === reservation.medicineId);
+        const stock = inventory.find(
+          (item) => item.medicineId === reservation.medicineId,
+        );
         const unitPrice = stock ? Number(stock.price) : 0;
         const totalPrice = unitPrice * reservation.quantity;
         const providerName = reservation.patient.insuranceProvider?.trim();
@@ -262,23 +277,21 @@ export class ReservationsService {
         if (providerName && totalPrice > 0) {
           const provider = await prisma.insuranceProvider.findFirst({
             where: {
-              OR: [
-                { code: providerName },
-                { name: providerName },
-              ],
+              OR: [{ code: providerName }, { name: providerName }],
               isActive: true,
             },
           });
 
           if (provider) {
-            const agreement = await prisma.pharmacyInsuranceAgreement.findUnique({
-              where: {
-                insuranceId_pharmacyId: {
-                  insuranceId: provider.id,
-                  pharmacyId: safePharmacyId,
+            const agreement =
+              await prisma.pharmacyInsuranceAgreement.findUnique({
+                where: {
+                  insuranceId_pharmacyId: {
+                    insuranceId: provider.id,
+                    pharmacyId: safePharmacyId,
+                  },
                 },
-              },
-            });
+              });
             const tariff = await prisma.insuranceMedicineTariff.findUnique({
               where: {
                 insuranceId_medicineId: {
@@ -288,15 +301,25 @@ export class ReservationsService {
               },
             });
 
-            if (agreement?.status === 'ACTIVE' && tariff?.status === 'ACTIVE' && tariff.isCovered) {
+            if (
+              agreement?.status === 'ACTIVE' &&
+              tariff?.status === 'ACTIVE' &&
+              tariff.isCovered
+            ) {
               const coveragePercentage = agreement.customCoverageRate
                 ? Number(agreement.customCoverageRate)
                 : Number(tariff.coveragePercentage);
-              const coveredBase = Number(tariff.coveredPrice) > 0
-                ? Math.min(unitPrice, Number(tariff.coveredPrice)) * reservation.quantity
-                : totalPrice;
+              const coveredBase =
+                Number(tariff.coveredPrice) > 0
+                  ? Math.min(unitPrice, Number(tariff.coveredPrice)) *
+                    reservation.quantity
+                  : totalPrice;
               insurancePays = tariff.fixedCopayAmount
-                ? Math.max(0, totalPrice - Number(tariff.fixedCopayAmount) * reservation.quantity)
+                ? Math.max(
+                    0,
+                    totalPrice -
+                      Number(tariff.fixedCopayAmount) * reservation.quantity,
+                  )
                 : coveredBase * (coveragePercentage / 100);
             }
           }
@@ -348,7 +371,10 @@ export class ReservationsService {
         });
 
         if (inventory) {
-          const newQuantity = Math.max(0, inventory.quantity - reservation.quantity);
+          const newQuantity = Math.max(
+            0,
+            inventory.quantity - reservation.quantity,
+          );
           await prisma.inventory.update({
             where: { id: inventory.id },
             data: { quantity: newQuantity },

@@ -41,10 +41,14 @@ import { CommunicationModule } from './common/communication/communication.module
       validate: (config) => {
         const required = ['DATABASE_URL', 'JWT_SECRET'];
         const missing = required.filter((name) => !config[name]?.trim());
-        if (config.NODE_ENV === 'production' && !config.FRONTEND_URL?.trim()) missing.push('FRONTEND_URL');
-        if (config.NODE_ENV === 'production' && !config.CORS_ORIGINS?.trim()) missing.push('CORS_ORIGINS');
+        if (config.NODE_ENV === 'production' && !config.FRONTEND_URL?.trim())
+          missing.push('FRONTEND_URL');
+        if (config.NODE_ENV === 'production' && !config.CORS_ORIGINS?.trim())
+          missing.push('CORS_ORIGINS');
         if (missing.length) {
-          throw new Error(`Missing required environment variable(s): ${missing.join(', ')}`);
+          throw new Error(
+            `Missing required environment variable(s): ${missing.join(', ')}`,
+          );
         }
         if (config.JWT_SECRET.trim().length < 32) {
           throw new Error('JWT_SECRET must be at least 32 characters long');
@@ -70,7 +74,11 @@ import { CommunicationModule } from './common/communication/communication.module
           },
           {
             name: 'registration',
-            ttl: getNumberConfig(config, 'THROTTLE_REGISTRATION_TTL_MS', 60_000),
+            ttl: getNumberConfig(
+              config,
+              'THROTTLE_REGISTRATION_TTL_MS',
+              60_000,
+            ),
             limit: getNumberConfig(config, 'THROTTLE_REGISTRATION_LIMIT', 3),
           },
           {
@@ -80,12 +88,24 @@ import { CommunicationModule } from './common/communication/communication.module
           },
           {
             name: 'medicineSearch',
-            ttl: getNumberConfig(config, 'THROTTLE_MEDICINE_SEARCH_TTL_MS', 60_000),
-            limit: getNumberConfig(config, 'THROTTLE_MEDICINE_SEARCH_LIMIT', 60),
+            ttl: getNumberConfig(
+              config,
+              'THROTTLE_MEDICINE_SEARCH_TTL_MS',
+              60_000,
+            ),
+            limit: getNumberConfig(
+              config,
+              'THROTTLE_MEDICINE_SEARCH_LIMIT',
+              60,
+            ),
           },
           {
             name: 'userSensitive',
-            ttl: getNumberConfig(config, 'THROTTLE_USER_SENSITIVE_TTL_MS', 60_000),
+            ttl: getNumberConfig(
+              config,
+              'THROTTLE_USER_SENSITIVE_TTL_MS',
+              60_000,
+            ),
             limit: getNumberConfig(config, 'THROTTLE_USER_SENSITIVE_LIMIT', 10),
             getTracker: userTracker,
           },
@@ -126,4 +146,4 @@ import { CommunicationModule } from './common/communication/communication.module
     { provide: APP_GUARD, useClass: FirstLoginGuard },
   ],
 })
-export class AppModule { }
+export class AppModule {}

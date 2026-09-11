@@ -11,7 +11,8 @@ function parseToISODateTime(value: any): any {
   }
   if (typeof value === 'number') {
     const d = new Date(value);
-    if (isNaN(d.getTime())) throw new BadRequestException('Invalid date timestamp');
+    if (isNaN(d.getTime()))
+      throw new BadRequestException('Invalid date timestamp');
     return d.toISOString();
   }
   if (typeof value !== 'string') return value;
@@ -30,7 +31,9 @@ function parseToISODateTime(value: any): any {
 
   const d = new Date(trimmed);
   if (isNaN(d.getTime())) {
-    throw new BadRequestException(`Invalid date format: ${trimmed}. Expected ISO-8601 (e.g. 2027-12-31 or 2027-12-31T23:59:59Z)`);
+    throw new BadRequestException(
+      `Invalid date format: ${trimmed}. Expected ISO-8601 (e.g. 2027-12-31 or 2027-12-31T23:59:59Z)`,
+    );
   }
   return d.toISOString();
 }

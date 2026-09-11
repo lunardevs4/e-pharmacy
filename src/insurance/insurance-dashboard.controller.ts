@@ -1,5 +1,22 @@
-import { Controller, Get, Post, Patch, Param, Query, Body, UseGuards, Req } from '@nestjs/common';
-import { ApiTags, ApiOperation, ApiQuery, ApiParam, ApiBearerAuth, ApiBody } from '@nestjs/swagger';
+import {
+  Controller,
+  Get,
+  Post,
+  Patch,
+  Param,
+  Query,
+  Body,
+  UseGuards,
+  Req,
+} from '@nestjs/common';
+import {
+  ApiTags,
+  ApiOperation,
+  ApiQuery,
+  ApiParam,
+  ApiBearerAuth,
+  ApiBody,
+} from '@nestjs/swagger';
 import { InsuranceDashboardService } from './insurance-dashboard.service';
 import { InsurancePharmaciesService } from './insurance-pharmacies.service';
 import { InsuranceTariffsService } from './insurance-tariffs.service';
@@ -55,7 +72,13 @@ export class InsuranceDashboardController {
   }
 
   @Get('claims')
-  @Roles(UserRole.INSURANCE, UserRole.ADMIN, UserRole.PHARMACY_OWNER, UserRole.PHARMACY, UserRole.PHARMACIST)
+  @Roles(
+    UserRole.INSURANCE,
+    UserRole.ADMIN,
+    UserRole.PHARMACY_OWNER,
+    UserRole.PHARMACY,
+    UserRole.PHARMACIST,
+  )
   @ApiOperation({ summary: 'Get insurance claims with filtering' })
   @ApiQuery({ name: 'insuranceId', required: false })
   @ApiQuery({ name: 'pharmacyId', required: false })
@@ -85,7 +108,13 @@ export class InsuranceDashboardController {
   }
 
   @Get('claims/outstanding')
-  @Roles(UserRole.INSURANCE, UserRole.ADMIN, UserRole.PHARMACY_OWNER, UserRole.PHARMACY, UserRole.PHARMACIST)
+  @Roles(
+    UserRole.INSURANCE,
+    UserRole.ADMIN,
+    UserRole.PHARMACY_OWNER,
+    UserRole.PHARMACY,
+    UserRole.PHARMACIST,
+  )
   @ApiOperation({ summary: 'Get outstanding payments' })
   @ApiQuery({ name: 'pharmacyId', required: false })
   async getOutstandingPayments(@Query('pharmacyId') pharmacyId?: string) {
@@ -93,7 +122,13 @@ export class InsuranceDashboardController {
   }
 
   @Get('claims/:id')
-  @Roles(UserRole.INSURANCE, UserRole.ADMIN, UserRole.PHARMACY_OWNER, UserRole.PHARMACY, UserRole.PHARMACIST)
+  @Roles(
+    UserRole.INSURANCE,
+    UserRole.ADMIN,
+    UserRole.PHARMACY_OWNER,
+    UserRole.PHARMACY,
+    UserRole.PHARMACIST,
+  )
   @ApiOperation({ summary: 'Get claim by ID' })
   @ApiParam({ name: 'id', description: 'Claim ID' })
   async getClaimById(@Param('id') id: string) {
@@ -101,7 +136,13 @@ export class InsuranceDashboardController {
   }
 
   @Post('claims')
-  @Roles(UserRole.INSURANCE, UserRole.ADMIN, UserRole.PHARMACY_OWNER, UserRole.PHARMACY, UserRole.PHARMACIST)
+  @Roles(
+    UserRole.INSURANCE,
+    UserRole.ADMIN,
+    UserRole.PHARMACY_OWNER,
+    UserRole.PHARMACY,
+    UserRole.PHARMACIST,
+  )
   @ApiOperation({ summary: 'Create new insurance claim' })
   async createClaim(@Body() dto: CreateInsuranceClaimDto) {
     return this.claimsService.createClaim(dto);
@@ -111,7 +152,10 @@ export class InsuranceDashboardController {
   @Roles(UserRole.INSURANCE, UserRole.ADMIN)
   @ApiOperation({ summary: 'Update claim status' })
   @ApiParam({ name: 'id', description: 'Claim ID' })
-  async updateClaimStatus(@Param('id') id: string, @Body() dto: UpdateClaimStatusDto) {
+  async updateClaimStatus(
+    @Param('id') id: string,
+    @Body() dto: UpdateClaimStatusDto,
+  ) {
     return this.claimsService.updateClaimStatus(id, dto);
   }
 
@@ -133,25 +177,40 @@ export class InsuranceDashboardController {
     @Query('pharmacyId') pharmacyId?: string,
     @Query('status') status?: string,
   ) {
-    return this.pharmaciesService.getAgreements(insuranceId, pharmacyId, status);
+    return this.pharmaciesService.getAgreements(
+      insuranceId,
+      pharmacyId,
+      status,
+    );
   }
 
   @Get('pharmacy/insurances')
   @Roles(UserRole.PHARMACY, UserRole.PHARMACY_OWNER, UserRole.PHARMACIST)
-  @ApiOperation({ summary: 'List insurance providers and this pharmacy\'s agreements' })
+  @ApiOperation({
+    summary: "List insurance providers and this pharmacy's agreements",
+  })
   async getPharmacyInsuranceOptions(@Req() req: any) {
-    return this.pharmaciesService.getPharmacyInsuranceOptions(req.user.pharmacyId);
+    return this.pharmaciesService.getPharmacyInsuranceOptions(
+      req.user.pharmacyId,
+    );
   }
 
   @Patch('pharmacy/insurances/:insuranceId')
   @Roles(UserRole.PHARMACY, UserRole.PHARMACY_OWNER)
-  @ApiOperation({ summary: 'Enable or disable an insurance agreement for this pharmacy' })
+  @ApiOperation({
+    summary: 'Enable or disable an insurance agreement for this pharmacy',
+  })
   async setPharmacyInsurance(
     @Param('insuranceId') insuranceId: string,
     @Body('enabled') enabled: boolean,
     @Req() req: any,
   ) {
-    return this.pharmaciesService.setPharmacyInsurance(req.user.pharmacyId, insuranceId, Boolean(enabled), req.user.id);
+    return this.pharmaciesService.setPharmacyInsurance(
+      req.user.pharmacyId,
+      insuranceId,
+      Boolean(enabled),
+      req.user.id,
+    );
   }
 
   @Get('pharmacies/agreements/:id')
@@ -173,7 +232,10 @@ export class InsuranceDashboardController {
   @Roles(UserRole.INSURANCE, UserRole.ADMIN)
   @ApiOperation({ summary: 'Update pharmacy agreement' })
   @ApiParam({ name: 'id', description: 'Agreement ID' })
-  async updateAgreement(@Param('id') id: string, @Body() dto: UpdatePharmacyAgreementDto) {
+  async updateAgreement(
+    @Param('id') id: string,
+    @Body() dto: UpdatePharmacyAgreementDto,
+  ) {
     return this.pharmaciesService.updateAgreement(id, dto);
   }
 
@@ -233,7 +295,10 @@ export class InsuranceDashboardController {
   @Roles(UserRole.INSURANCE, UserRole.ADMIN)
   @ApiOperation({ summary: 'Update tariff' })
   @ApiParam({ name: 'id', description: 'Tariff ID' })
-  async updateTariff(@Param('id') id: string, @Body() dto: Partial<SetMedicineTariffDto>) {
+  async updateTariff(
+    @Param('id') id: string,
+    @Body() dto: Partial<SetMedicineTariffDto>,
+  ) {
     return this.tariffsService.updateTariff(id, dto);
   }
 
@@ -248,7 +313,11 @@ export class InsuranceDashboardController {
     @Query('medicineId') medicineId: string,
     @Query('retailPrice') retailPrice: string,
   ) {
-    return this.tariffsService.calculateCopay(insuranceId, medicineId, parseFloat(retailPrice));
+    return this.tariffsService.calculateCopay(
+      insuranceId,
+      medicineId,
+      parseFloat(retailPrice),
+    );
   }
 
   @Get('patients')
@@ -294,7 +363,10 @@ export class InsuranceDashboardController {
   @Roles(UserRole.INSURANCE, UserRole.ADMIN)
   @ApiOperation({ summary: 'Update insured patient' })
   @ApiParam({ name: 'id', description: 'Patient ID' })
-  async updatePatient(@Param('id') id: string, @Body() dto: Partial<RegisterInsuredPatientDto>) {
+  async updatePatient(
+    @Param('id') id: string,
+    @Body() dto: Partial<RegisterInsuredPatientDto>,
+  ) {
     return this.patientsService.updatePatient(id, dto);
   }
 
@@ -356,15 +428,19 @@ export class InsuranceDashboardController {
       },
     },
   })
-  async updateProvider(@Param('id') id: string, @Req() req: any, @Body() data: any) {
+  async updateProvider(
+    @Param('id') id: string,
+    @Req() req: any,
+    @Body() data: any,
+  ) {
     return this.dashboardService.updateProvider(id, data, req.user);
   }
-
 
   @Post('calculate')
   @ApiOperation({
     summary: 'Calculate insurance payments for medicines',
-    description: 'Calculates insurance and patient payment amounts for one or more medicines based on coverage rules.',
+    description:
+      'Calculates insurance and patient payment amounts for one or more medicines based on coverage rules.',
   })
   @ApiBody({ type: CalculatePaymentsDto })
   async calculatePayments(@Body() dto: CalculatePaymentsDto) {
@@ -374,11 +450,15 @@ export class InsuranceDashboardController {
   @Post('validate-patient')
   @ApiOperation({
     summary: 'Validate patient insurance coverage',
-    description: 'Verifies that a patient has valid insurance with a specific provider.',
+    description:
+      'Verifies that a patient has valid insurance with a specific provider.',
   })
   @ApiBody({ type: ValidatePatientInsuranceDto })
   async validatePatientInsurance(@Body() dto: ValidatePatientInsuranceDto) {
-    return this.calculationService.validatePatientInsurance(dto.patientId, dto.insuranceId);
+    return this.calculationService.validatePatientInsurance(
+      dto.patientId,
+      dto.insuranceId,
+    );
   }
 
   // --- Reports ---
@@ -389,7 +469,7 @@ export class InsuranceDashboardController {
   @ApiQuery({ name: 'insuranceId', required: true })
   async exportMonthlySummary(
     @Query('insuranceId') insuranceId: string,
-    @Res() res: Response
+    @Res() res: Response,
   ) {
     await this.reportsService.generateMonthlySummary(insuranceId, res);
   }
@@ -400,7 +480,7 @@ export class InsuranceDashboardController {
   @ApiQuery({ name: 'insuranceId', required: true })
   async exportPayoutRegister(
     @Query('insuranceId') insuranceId: string,
-    @Res() res: Response
+    @Res() res: Response,
   ) {
     await this.reportsService.generatePayoutRegister(insuranceId, res);
   }
@@ -411,7 +491,7 @@ export class InsuranceDashboardController {
   @ApiQuery({ name: 'insuranceId', required: true })
   async exportRejectionAnalysis(
     @Query('insuranceId') insuranceId: string,
-    @Res() res: Response
+    @Res() res: Response,
   ) {
     // Placeholder, using the same method for now
     await this.reportsService.generateMonthlySummary(insuranceId, res);
@@ -423,7 +503,7 @@ export class InsuranceDashboardController {
   @ApiQuery({ name: 'insuranceId', required: true })
   async exportCoverageAudit(
     @Query('insuranceId') insuranceId: string,
-    @Res() res: Response
+    @Res() res: Response,
   ) {
     // Placeholder, using the same method for now
     await this.reportsService.generatePayoutRegister(insuranceId, res);

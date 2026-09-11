@@ -22,5 +22,4 @@ export class RegisterDto {
   @ApiProperty()
   @IsString()
   lastName: string;
-
 }

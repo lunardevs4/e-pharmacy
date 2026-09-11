@@ -28,15 +28,23 @@ export class FileUploadsService {
     });
   }
 
-  validateFile(file: Express.Multer.File, allowedTypes: string[], maxSize: number = 5 * 1024 * 1024) {
+  validateFile(
+    file: Express.Multer.File,
+    allowedTypes: string[],
+    maxSize: number = 5 * 1024 * 1024,
+  ) {
     if (!file) {
       throw new BadRequestException('A file is required');
     }
     if (!allowedTypes.includes(file.mimetype)) {
-      throw new BadRequestException(`Invalid file type. Allowed: ${allowedTypes.join(', ')}`);
+      throw new BadRequestException(
+        `Invalid file type. Allowed: ${allowedTypes.join(', ')}`,
+      );
     }
     if (file.size > maxSize) {
-      throw new BadRequestException(`File too large. Max size: ${maxSize / 1024 / 1024}MB`);
+      throw new BadRequestException(
+        `File too large. Max size: ${maxSize / 1024 / 1024}MB`,
+      );
     }
     return true;
   }

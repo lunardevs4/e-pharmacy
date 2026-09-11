@@ -124,15 +124,24 @@ export class AuthService {
     if (!delivered) {
       await this.prismaService.prisma.user.update({
         where: { id: user.id },
-        data: { emailVerified: true, emailVerificationTokenHash: null, emailVerificationExpiresAt: null },
+        data: {
+          emailVerified: true,
+          emailVerificationTokenHash: null,
+          emailVerificationExpiresAt: null,
+        },
       });
       return {
-        message: 'Account created successfully. Your account has been activated.',
+        message:
+          'Account created successfully. Your account has been activated.',
         user,
       };
     }
 
-    return { message: 'Account created. Please check your email to verify your account.', user };
+    return {
+      message:
+        'Account created. Please check your email to verify your account.',
+      user,
+    };
   }
 
   async registerPharmacy(registerPharmacyDto: RegisterPharmacyDto) {
@@ -169,11 +178,19 @@ export class AuthService {
       },
     });
 
-    const ownerEmailDelivered = await this.tryIssueVerificationEmail(owner.id, owner.email, safeDto.fullname);
+    const ownerEmailDelivered = await this.tryIssueVerificationEmail(
+      owner.id,
+      owner.email,
+      safeDto.fullname,
+    );
     if (!ownerEmailDelivered) {
       await this.prismaService.prisma.user.update({
         where: { id: owner.id },
-        data: { emailVerified: true, emailVerificationTokenHash: null, emailVerificationExpiresAt: null },
+        data: {
+          emailVerified: true,
+          emailVerificationTokenHash: null,
+          emailVerificationExpiresAt: null,
+        },
       });
     }
 
@@ -252,7 +269,10 @@ export class AuthService {
           lastName,
           role: UserRole.INSURANCE,
           position: 'Insurance Administrator',
-          permissions: AUTH_PERMISSIONS.insurance || ['VIEW_CLAIMS', 'MANAGE_CLAIMS'],
+          permissions: AUTH_PERMISSIONS.insurance || [
+            'VIEW_CLAIMS',
+            'MANAGE_CLAIMS',
+          ],
           firstLogin: false,
           isActive: true,
           emailVerified: true,
@@ -260,7 +280,9 @@ export class AuthService {
       });
 
       let uniqueCode = code;
-      const existing = await tx.insuranceProvider.findFirst({ where: { code } });
+      const existing = await tx.insuranceProvider.findFirst({
+        where: { code },
+      });
       if (existing) {
         uniqueCode = `${code}${Math.floor(Math.random() * 100)}`;
       }
@@ -322,11 +344,18 @@ export class AuthService {
       throw new ForbiddenException('This account is not active yet');
     }
     if (!user.emailVerified) {
-      if (user.emailVerificationExpiresAt && user.emailVerificationExpiresAt <= new Date()) {
+      if (
+        user.emailVerificationExpiresAt &&
+        user.emailVerificationExpiresAt <= new Date()
+      ) {
         await this.deleteExpiredUnverifiedUser(user.id);
-        throw new ForbiddenException('Your verification link expired and your account was removed. Please register again.');
+        throw new ForbiddenException(
+          'Your verification link expired and your account was removed. Please register again.',
+        );
       }
-      throw new ForbiddenException('Please verify your email before signing in');
+      throw new ForbiddenException(
+        'Please verify your email before signing in',
+      );
     }
 
     const pharmacyContext = this.resolvePharmacyContext(user);
@@ -353,7 +382,9 @@ export class AuthService {
         pharmacyId: pharmacyContext.pharmacyId,
         firstLogin: user.firstLogin,
         pharmacy: pharmacyContext.pharmacy,
-        insuranceProvider: user.patient?.insuranceProvider || (user.insuranceProvider ? user.insuranceProvider.name : null),
+        insuranceProvider:
+          user.patient?.insuranceProvider ||
+          (user.insuranceProvider ? user.insuranceProvider.name : null),
       },
       ...tokens,
     };
@@ -362,37 +393,78 @@ export class AuthService {
   async verifyEmail(token: string) {
     const tokenHash = createHash('sha256').update(token).digest('hex');
     const prisma = this.prismaService.prisma;
-    const user = await prisma.user.findFirst({ where: { emailVerificationTokenHash: tokenHash } });
-    if (!user) throw new BadRequestException('This verification link is invalid or expired');
-    if (!user.emailVerificationExpiresAt || user.emailVerificationExpiresAt <= new Date()) {
+    const user = await prisma.user.findFirst({
+      where: { emailVerificationTokenHash: tokenHash },
+    });
+    if (!user)
+      throw new BadRequestException(
+        'This verification link is invalid or expired',
+      );
+    if (
+      !user.emailVerificationExpiresAt ||
+      user.emailVerificationExpiresAt <= new Date()
+    ) {
       await this.deleteExpiredUnverifiedUser(user.id);
-      throw new BadRequestException('This verification link is invalid or expired');
+      throw new BadRequestException(
+        'This verification link is invalid or expired',
+      );
     }
-    await prisma.user.update({ where: { id: user.id }, data: { emailVerified: true, emailVerificationTokenHash: null, emailVerificationExpiresAt: null } });
+    await prisma.user.update({
+      where: { id: user.id },
+      data: {
+        emailVerified: true,
+        emailVerificationTokenHash: null,
+        emailVerificationExpiresAt: null,
+      },
+    });
     return { message: 'Email verified successfully. You can now sign in.' };
   }
 
   async resendVerificationEmail(email: string) {
-    const safeEmail = validateSafeString(email.trim().toLowerCase(), 'email', 255);
-    const user = await this.prismaService.prisma.user.findUnique({ where: { email: safeEmail } });
+    const safeEmail = validateSafeString(
+      email.trim().toLowerCase(),
+      'email',
+      255,
+    );
+    const user = await this.prismaService.prisma.user.findUnique({
+      where: { email: safeEmail },
+    });
     if (user && !user.emailVerified) {
-      if (user.emailVerificationExpiresAt && user.emailVerificationExpiresAt <= new Date()) {
+      if (
+        user.emailVerificationExpiresAt &&
+        user.emailVerificationExpiresAt <= new Date()
+      ) {
         await this.deleteExpiredUnverifiedUser(user.id);
       } else {
-        const delivered = await this.tryIssueVerificationEmail(user.id, user.email, `${user.firstName} ${user.lastName}`.trim());
+        const delivered = await this.tryIssueVerificationEmail(
+          user.id,
+          user.email,
+          `${user.firstName} ${user.lastName}`.trim(),
+        );
         if (!delivered) {
           await this.prismaService.prisma.user.update({
             where: { id: user.id },
-            data: { emailVerified: true, emailVerificationTokenHash: null, emailVerificationExpiresAt: null },
+            data: {
+              emailVerified: true,
+              emailVerificationTokenHash: null,
+              emailVerificationExpiresAt: null,
+            },
           });
         }
       }
     }
-    return { message: 'If an unverified account exists for that email, a verification email has been sent.' };
+    return {
+      message:
+        'If an unverified account exists for that email, a verification email has been sent.',
+    };
   }
 
   async requestPasswordReset(dto: PasswordResetRequestDto) {
-    const email = validateSafeString(dto.email.trim().toLowerCase(), 'email', 255);
+    const email = validateSafeString(
+      dto.email.trim().toLowerCase(),
+      'email',
+      255,
+    );
     const prisma = this.prismaService.prisma;
     const user = await prisma.user.findUnique({ where: { email } });
 
@@ -400,39 +472,76 @@ export class AuthService {
       const otp = randomInt(0, 1_000_000).toString().padStart(6, '0');
       const tokenHash = createHash('sha256').update(otp).digest('hex');
       const expiresAt = new Date(Date.now() + 15 * 60 * 1000);
-      await prisma.passwordResetToken.deleteMany({ where: { userId: user.id } });
-      await prisma.passwordResetToken.create({ data: { userId: user.id, tokenHash, expiresAt } });
+      await prisma.passwordResetToken.deleteMany({
+        where: { userId: user.id },
+      });
+      await prisma.passwordResetToken.create({
+        data: { userId: user.id, tokenHash, expiresAt },
+      });
 
       try {
-        await this.emailService.sendPasswordResetEmail(email, `${user.firstName} ${user.lastName}`.trim(), otp);
+        await this.emailService.sendPasswordResetEmail(
+          email,
+          `${user.firstName} ${user.lastName}`.trim(),
+          otp,
+        );
       } catch (error) {
         await prisma.passwordResetToken.deleteMany({ where: { tokenHash } });
-        console.warn(`Password reset email failed for ${email}: ${(error as Error).message}`);
+        console.warn(
+          `Password reset email failed for ${email}: ${(error as Error).message}`,
+        );
       }
     }
 
-    return { message: 'If an account exists for that email, a password reset code has been sent.' };
+    return {
+      message:
+        'If an account exists for that email, a password reset code has been sent.',
+    };
   }
 
   async verifyPasswordReset(dto: PasswordResetOtpDto) {
-    const email = validateSafeString(dto.email.trim().toLowerCase(), 'email', 255);
+    const email = validateSafeString(
+      dto.email.trim().toLowerCase(),
+      'email',
+      255,
+    );
     const tokenHash = createHash('sha256').update(dto.otp).digest('hex');
     const token = await this.prismaService.prisma.passwordResetToken.findFirst({
-      where: { tokenHash, expiresAt: { gt: new Date() }, usedAt: null, user: { email } },
+      where: {
+        tokenHash,
+        expiresAt: { gt: new Date() },
+        usedAt: null,
+        user: { email },
+      },
     });
-    if (!token) throw new BadRequestException('Invalid or expired password reset code');
-    await this.prismaService.prisma.passwordResetToken.update({ where: { id: token.id }, data: { verifiedAt: new Date() } });
+    if (!token)
+      throw new BadRequestException('Invalid or expired password reset code');
+    await this.prismaService.prisma.passwordResetToken.update({
+      where: { id: token.id },
+      data: { verifiedAt: new Date() },
+    });
     return { message: 'Password reset code verified' };
   }
 
   async completePasswordReset(dto: PasswordResetDto) {
-    const email = validateSafeString(dto.email.trim().toLowerCase(), 'email', 255);
+    const email = validateSafeString(
+      dto.email.trim().toLowerCase(),
+      'email',
+      255,
+    );
     const tokenHash = createHash('sha256').update(dto.otp).digest('hex');
     const token = await this.prismaService.prisma.passwordResetToken.findFirst({
-      where: { tokenHash, expiresAt: { gt: new Date() }, usedAt: null, verifiedAt: { not: null }, user: { email } },
+      where: {
+        tokenHash,
+        expiresAt: { gt: new Date() },
+        usedAt: null,
+        verifiedAt: { not: null },
+        user: { email },
+      },
       select: { id: true, userId: true },
     });
-    if (!token) throw new BadRequestException('Invalid or expired password reset code');
+    if (!token)
+      throw new BadRequestException('Invalid or expired password reset code');
 
     const hashedPassword = await bcrypt.hash(dto.newPassword, 10);
     await this.prismaService.prisma.$transaction(async (tx) => {
@@ -440,10 +549,16 @@ export class AuthService {
         where: { id: token.id, usedAt: null, expiresAt: { gt: new Date() } },
         data: { usedAt: new Date() },
       });
-      if (consumed.count !== 1) throw new BadRequestException('Invalid or expired password reset code');
-      await tx.user.update({ where: { id: token.userId }, data: { password: hashedPassword, firstLogin: false } });
+      if (consumed.count !== 1)
+        throw new BadRequestException('Invalid or expired password reset code');
+      await tx.user.update({
+        where: { id: token.userId },
+        data: { password: hashedPassword, firstLogin: false },
+      });
       await tx.refreshToken.deleteMany({ where: { userId: token.userId } });
-      await tx.passwordResetToken.deleteMany({ where: { userId: token.userId, id: { not: token.id } } });
+      await tx.passwordResetToken.deleteMany({
+        where: { userId: token.userId, id: { not: token.id } },
+      });
     });
     return { message: 'Password reset successfully. You can now sign in.' };
   }
@@ -475,14 +590,27 @@ export class AuthService {
     const rawToken = randomBytes(32).toString('hex');
     const tokenHash = createHash('sha256').update(rawToken).digest('hex');
     const expiresAt = new Date(Date.now() + 24 * 60 * 60 * 1000);
-    await this.prismaService.prisma.user.update({ where: { id: userId }, data: { emailVerificationTokenHash: tokenHash, emailVerificationExpiresAt: expiresAt } });
-    const frontendUrl = this.configService.get<string>('FRONTEND_URL') || 'http://localhost:5173';
+    await this.prismaService.prisma.user.update({
+      where: { id: userId },
+      data: {
+        emailVerificationTokenHash: tokenHash,
+        emailVerificationExpiresAt: expiresAt,
+      },
+    });
+    const frontendUrl =
+      this.configService.get<string>('FRONTEND_URL') || 'http://localhost:5173';
     const verificationUrl = `${frontendUrl}/verify-email?token=${rawToken}`;
 
     try {
-      const sent = await this.emailService.sendVerificationEmail(email, name, verificationUrl);
+      const sent = await this.emailService.sendVerificationEmail(
+        email,
+        name,
+        verificationUrl,
+      );
       if (!sent) {
-        console.warn(`Verification email not configured — skipped for ${email}`);
+        console.warn(
+          `Verification email not configured — skipped for ${email}`,
+        );
       }
       return Boolean(sent);
     } catch (error) {

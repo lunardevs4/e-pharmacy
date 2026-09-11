@@ -20,7 +20,7 @@ export class MedicinesService {
 
   async create(createMedicineDto: CreateMedicineDto) {
     const prisma = this.prismaService.prisma;
-    const safeDto = sanitizeDeep(createMedicineDto) as CreateMedicineDto;
+    const safeDto = sanitizeDeep(createMedicineDto);
     const categoryName = safeDto.categoryName?.trim();
     const manufacturerName = safeDto.manufacturerName?.trim();
     if (!safeDto.categoryId && !categoryName)
@@ -47,14 +47,16 @@ export class MedicinesService {
             create: {
               lotNumber: batch.lotNumber,
               batchNumber: batch.batchNumber,
-              expiryDate: validateDate(batch.expiryDate, 'expiryDate')!,
+              expiryDate: validateDate(batch.expiryDate, 'expiryDate'),
               unitCost: batch.unitCost,
               unitSellingPrice: batch.unitSellingPrice,
               initialStock: batch.initialStock,
-              currentStock: batch.initialStock + existingMedicine.batches?.reduce(
-                (sum, b) => sum + (b.currentStock || 0),
-                0,
-              ) || batch.initialStock,
+              currentStock:
+                batch.initialStock +
+                  existingMedicine.batches?.reduce(
+                    (sum, b) => sum + (b.currentStock || 0),
+                    0,
+                  ) || batch.initialStock,
               storageConditions: batch.storageConditions,
               minTemperature: batch.minTemperature,
               maxTemperature: batch.maxTemperature,
@@ -71,9 +73,9 @@ export class MedicinesService {
           where: { id: validateUuid(safeDto.categoryId, 'categoryId') },
         })
       : await prisma.category.upsert({
-          where: { name: categoryName! },
+          where: { name: categoryName },
           update: {},
-          create: { name: categoryName! },
+          create: { name: categoryName },
         });
     if (!category) throw new NotFoundException('Category not found');
 
@@ -84,9 +86,9 @@ export class MedicinesService {
           },
         })
       : await prisma.manufacturer.upsert({
-          where: { name: manufacturerName! },
+          where: { name: manufacturerName },
           update: {},
-          create: { name: manufacturerName! },
+          create: { name: manufacturerName },
         });
     if (!manufacturer) throw new NotFoundException('Manufacturer not found');
 
@@ -101,7 +103,7 @@ export class MedicinesService {
           create: {
             lotNumber: batch.lotNumber,
             batchNumber: batch.batchNumber,
-            expiryDate: validateDate(batch.expiryDate, 'expiryDate')!,
+            expiryDate: validateDate(batch.expiryDate, 'expiryDate'),
             unitCost: batch.unitCost,
             unitSellingPrice: batch.unitSellingPrice,
             initialStock: batch.initialStock,
@@ -171,7 +173,13 @@ export class MedicinesService {
       include: {
         category: true,
         manufacturer: true,
-        batches: { select: { storageConditions: true, minTemperature: true, maxTemperature: true } },
+        batches: {
+          select: {
+            storageConditions: true,
+            minTemperature: true,
+            maxTemperature: true,
+          },
+        },
       },
     });
   }
@@ -184,7 +192,13 @@ export class MedicinesService {
       include: {
         category: true,
         manufacturer: true,
-        batches: { select: { storageConditions: true, minTemperature: true, maxTemperature: true } },
+        batches: {
+          select: {
+            storageConditions: true,
+            minTemperature: true,
+            maxTemperature: true,
+          },
+        },
       },
     });
   }
@@ -220,8 +234,14 @@ export class MedicinesService {
     const prisma = this.prismaService.prisma;
     const safeId = validateUuid(medicineId, 'medicineId');
     const safeRadius = validatePositiveInt(radius, 'radius', 5);
-    const safeLat = latitude !== undefined ? validateGeoCoordinate(latitude, 'latitude', [-90, 90]) : undefined;
-    const safeLon = longitude !== undefined ? validateGeoCoordinate(longitude, 'longitude', [-180, 180]) : undefined;
+    const safeLat =
+      latitude !== undefined
+        ? validateGeoCoordinate(latitude, 'latitude', [-90, 90])
+        : undefined;
+    const safeLon =
+      longitude !== undefined
+        ? validateGeoCoordinate(longitude, 'longitude', [-180, 180])
+        : undefined;
 
     const inventories = await prisma.inventory.findMany({
       where: {
@@ -403,7 +423,10 @@ export class MedicinesService {
     let patientPays: number;
 
     if (tariff.fixedCopayAmount) {
-      insurancePays = Math.max(0, retailPrice - Number(tariff.fixedCopayAmount));
+      insurancePays = Math.max(
+        0,
+        retailPrice - Number(tariff.fixedCopayAmount),
+      );
       patientPays = Number(tariff.fixedCopayAmount);
     } else {
       insurancePays = retailPrice * (coveragePercentage / 100);

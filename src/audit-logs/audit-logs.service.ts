@@ -27,7 +27,7 @@ export interface CreateAuditLogDto {
 
 @Injectable()
 export class AuditLogsService {
-  constructor(private prismaService: PrismaService) { }
+  constructor(private prismaService: PrismaService) {}
 
   async log(dto: CreateAuditLogDto): Promise<void> {
     const prisma = this.prismaService.prisma;
@@ -73,7 +73,9 @@ export class AuditLogsService {
           skip,
           take: safeLimit,
           where,
-          include: { user: { select: { firstName: true, lastName: true, email: true } } },
+          include: {
+            user: { select: { firstName: true, lastName: true, email: true } },
+          },
           orderBy: { createdAt: 'desc' },
         }),
         prisma.auditLog.count({ where }),
@@ -81,7 +83,12 @@ export class AuditLogsService {
 
       return {
         data: logs,
-        meta: { page: safePage, limit: safeLimit, total, totalPages: Math.ceil(total / safeLimit) },
+        meta: {
+          page: safePage,
+          limit: safeLimit,
+          total,
+          totalPages: Math.ceil(total / safeLimit),
+        },
       };
     }
 
@@ -104,7 +111,9 @@ export class AuditLogsService {
           skip,
           take: safeLimitCapped,
           where: restrictedWhere,
-          include: { user: { select: { firstName: true, lastName: true, email: true } } },
+          include: {
+            user: { select: { firstName: true, lastName: true, email: true } },
+          },
           orderBy: { createdAt: 'desc' },
         }),
         prisma.auditLog.count({ where: restrictedWhere }),
@@ -112,7 +121,8 @@ export class AuditLogsService {
 
       return {
         access: 'LIMITED',
-        scope: 'Government allowed entities (Pharmacy, Medicine, Reservation, Inventory, Prescription)',
+        scope:
+          'Government allowed entities (Pharmacy, Medicine, Reservation, Inventory, Prescription)',
         data: logs,
         meta: {
           page: safePage,
@@ -123,22 +133,44 @@ export class AuditLogsService {
       };
     }
 
-    throw new ForbiddenException('Full audit logs access is restricted to ADMIN (full) and GOVERNMENT (limited) roles');
+    throw new ForbiddenException(
+      'Full audit logs access is restricted to ADMIN (full) and GOVERNMENT (limited) roles',
+    );
   }
 
-  async findByPharmacy(user: AuthenticatedUser, pharmacyId: string, limit = 100) {
+  async findByPharmacy(
+    user: AuthenticatedUser,
+    pharmacyId: string,
+    limit = 100,
+  ) {
     const prisma = this.prismaService.prisma;
     const safePharmacyId = validateUuid(pharmacyId, 'pharmacyId');
-    const pharmacy = await prisma.pharmacy.findUnique({ where: { id: safePharmacyId } });
+    const pharmacy = await prisma.pharmacy.findUnique({
+      where: { id: safePharmacyId },
+    });
     if (!pharmacy) throw new ForbiddenException('Pharmacy not found');
-    if (user.role === UserRole.PHARMACY_OWNER && pharmacy.ownerId !== user.id) throw new ForbiddenException('You do not own this pharmacy');
+    if (user.role === UserRole.PHARMACY_OWNER && pharmacy.ownerId !== user.id)
+      throw new ForbiddenException('You do not own this pharmacy');
     if (user.role === UserRole.PHARMACIST) {
-      const employee = await prisma.pharmacyEmployee.findFirst({ where: { pharmacyId: safePharmacyId, userId: user.id, role: UserRole.PHARMACIST } });
-      if (!employee) throw new ForbiddenException('You are not employed at this pharmacy');
+      const employee = await prisma.pharmacyEmployee.findFirst({
+        where: {
+          pharmacyId: safePharmacyId,
+          userId: user.id,
+          role: UserRole.PHARMACIST,
+        },
+      });
+      if (!employee)
+        throw new ForbiddenException('You are not employed at this pharmacy');
     }
     const [reservations, inventory] = await Promise.all([
-      prisma.reservation.findMany({ where: { pharmacyId: safePharmacyId }, select: { id: true } }),
-      prisma.inventory.findMany({ where: { pharmacyId: safePharmacyId }, select: { id: true } }),
+      prisma.reservation.findMany({
+        where: { pharmacyId: safePharmacyId },
+        select: { id: true },
+      }),
+      prisma.inventory.findMany({
+        where: { pharmacyId: safePharmacyId },
+        select: { id: true },
+      }),
     ]);
     const entityIds = {
       reservation: reservations.map((item) => item.id),
@@ -148,13 +180,27 @@ export class AuditLogsService {
       OR: [
         { pharmacyId: safePharmacyId },
         ...(entityIds.reservation.length > 0
-          ? [{ entityType: 'Reservation', entityId: { in: entityIds.reservation } }]
+          ? [
+              {
+                entityType: 'Reservation',
+                entityId: { in: entityIds.reservation },
+              },
+            ]
           : []),
         ...(entityIds.inventory.length > 0
           ? [{ entityType: 'Inventory', entityId: { in: entityIds.inventory } }]
           : []),
       ],
     };
-    return prisma.auditLog.findMany({ where, take: Math.min(Number(limit) || 100, 100), include: { user: { select: { firstName: true, lastName: true, email: true, role: true } } }, orderBy: { createdAt: 'desc' } });
+    return prisma.auditLog.findMany({
+      where,
+      take: Math.min(Number(limit) || 100, 100),
+      include: {
+        user: {
+          select: { firstName: true, lastName: true, email: true, role: true },
+        },
+      },
+      orderBy: { createdAt: 'desc' },
+    });
   }
 }

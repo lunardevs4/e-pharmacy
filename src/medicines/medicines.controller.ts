@@ -33,7 +33,15 @@ export class MedicinesController {
   constructor(private medicinesService: MedicinesService) {}
 
   @Post()
-  @Roles(UserRole.PATIENT, UserRole.PHARMACY_OWNER, UserRole.PHARMACY, UserRole.PHARMACIST, UserRole.INSURANCE, UserRole.GOVERNMENT, UserRole.ADMIN)
+  @Roles(
+    UserRole.PATIENT,
+    UserRole.PHARMACY_OWNER,
+    UserRole.PHARMACY,
+    UserRole.PHARMACIST,
+    UserRole.INSURANCE,
+    UserRole.GOVERNMENT,
+    UserRole.ADMIN,
+  )
   @ApiOperation({
     summary: 'Create medicine',
     description:
@@ -81,7 +89,15 @@ export class MedicinesController {
 
   @Get()
   @Throttle({ medicineSearch: {} })
-  @Roles(UserRole.PATIENT, UserRole.PHARMACY_OWNER, UserRole.PHARMACY, UserRole.PHARMACIST, UserRole.INSURANCE, UserRole.GOVERNMENT, UserRole.ADMIN)
+  @Roles(
+    UserRole.PATIENT,
+    UserRole.PHARMACY_OWNER,
+    UserRole.PHARMACY,
+    UserRole.PHARMACIST,
+    UserRole.INSURANCE,
+    UserRole.GOVERNMENT,
+    UserRole.ADMIN,
+  )
   @ApiOperation({
     summary: 'List all medicines',
     description:
@@ -114,7 +130,15 @@ export class MedicinesController {
   }
 
   @Get(':id')
-  @Roles(UserRole.PATIENT, UserRole.PHARMACY_OWNER, UserRole.PHARMACY, UserRole.PHARMACIST, UserRole.INSURANCE, UserRole.GOVERNMENT, UserRole.ADMIN)
+  @Roles(
+    UserRole.PATIENT,
+    UserRole.PHARMACY_OWNER,
+    UserRole.PHARMACY,
+    UserRole.PHARMACIST,
+    UserRole.INSURANCE,
+    UserRole.GOVERNMENT,
+    UserRole.ADMIN,
+  )
   @ApiOperation({
     summary: 'Get medicine details',
     description:
@@ -134,7 +158,8 @@ export class MedicinesController {
   @Get(':id/availability')
   @ApiOperation({
     summary: 'Get medicine availability across pharmacies',
-    description: 'Endpoint: GET /api/v1/medicines/:id/availability\n\nReturns all pharmacies stocking the medicine with prices, quantities, distances, and insurance co-pay splits.\n\nURL Parameters:\n- id (UUID): The unique identifier of the medicine\n\nQuery Parameters:\n- latitude (optional): User latitude for distance calculation\n- longitude (optional): User longitude for distance calculation\n- radius (optional): Search radius in km (default: 5)\n- insuranceId (optional): Insurance provider ID for co-pay calculation',
+    description:
+      'Endpoint: GET /api/v1/medicines/:id/availability\n\nReturns all pharmacies stocking the medicine with prices, quantities, distances, and insurance co-pay splits.\n\nURL Parameters:\n- id (UUID): The unique identifier of the medicine\n\nQuery Parameters:\n- latitude (optional): User latitude for distance calculation\n- longitude (optional): User longitude for distance calculation\n- radius (optional): Search radius in km (default: 5)\n- insuranceId (optional): Insurance provider ID for co-pay calculation',
   })
   @ApiParam({
     name: 'id',
@@ -142,8 +167,18 @@ export class MedicinesController {
     description: 'Medicine UUID',
     example: '550e8400-e29b-41d4-a716-446655440000',
   })
-  @ApiQuery({ name: 'latitude', required: false, type: Number, example: -1.944 })
-  @ApiQuery({ name: 'longitude', required: false, type: Number, example: 30.061 })
+  @ApiQuery({
+    name: 'latitude',
+    required: false,
+    type: Number,
+    example: -1.944,
+  })
+  @ApiQuery({
+    name: 'longitude',
+    required: false,
+    type: Number,
+    example: 30.061,
+  })
   @ApiQuery({ name: 'radius', required: false, type: Number, example: 5 })
   @ApiQuery({ name: 'insuranceId', required: false, type: 'string' })
   getAvailability(
@@ -153,11 +188,25 @@ export class MedicinesController {
     @Query('radius') radius?: number,
     @Query('insuranceId') insuranceId?: string,
   ) {
-    return this.medicinesService.getAvailability(id, latitude, longitude, radius, insuranceId);
+    return this.medicinesService.getAvailability(
+      id,
+      latitude,
+      longitude,
+      radius,
+      insuranceId,
+    );
   }
 
   @Patch(':id')
-  @Roles(UserRole.PATIENT, UserRole.PHARMACY_OWNER, UserRole.PHARMACY, UserRole.PHARMACIST, UserRole.INSURANCE, UserRole.GOVERNMENT, UserRole.ADMIN)
+  @Roles(
+    UserRole.PATIENT,
+    UserRole.PHARMACY_OWNER,
+    UserRole.PHARMACY,
+    UserRole.PHARMACIST,
+    UserRole.INSURANCE,
+    UserRole.GOVERNMENT,
+    UserRole.ADMIN,
+  )
   @ApiOperation({
     summary: 'Update medicine',
     description:
@@ -199,7 +248,15 @@ export class MedicinesController {
   }
 
   @Delete(':id')
-  @Roles(UserRole.PATIENT, UserRole.PHARMACY_OWNER, UserRole.PHARMACY, UserRole.PHARMACIST, UserRole.INSURANCE, UserRole.GOVERNMENT, UserRole.ADMIN)
+  @Roles(
+    UserRole.PATIENT,
+    UserRole.PHARMACY_OWNER,
+    UserRole.PHARMACY,
+    UserRole.PHARMACIST,
+    UserRole.INSURANCE,
+    UserRole.GOVERNMENT,
+    UserRole.ADMIN,
+  )
   @ApiOperation({
     summary: 'Delete medicine',
     description:

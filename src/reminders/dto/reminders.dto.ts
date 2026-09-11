@@ -1,4 +1,12 @@
-import { IsUUID, IsString, IsDateString, IsArray, IsOptional, IsInt, IsBoolean } from 'class-validator';
+import {
+  IsUUID,
+  IsString,
+  IsDateString,
+  IsArray,
+  IsOptional,
+  IsInt,
+  IsBoolean,
+} from 'class-validator';
 import { TransformToISODateTime } from '../../common/transformers/date.transformer';
 
 export class CreateReminderScheduleDto {
@@ -58,12 +66,19 @@ export class CreateReminderScheduleDto {
 }
 
 export class UpdateReminderScheduleDto {
-  @IsOptional() @IsArray() @IsString({ each: true })
+  @IsOptional()
+  @IsArray()
+  @IsString({ each: true })
   times?: string[];
-  @IsOptional() @IsDateString() @TransformToISODateTime()
+  @IsOptional()
+  @IsDateString()
+  @TransformToISODateTime()
   startDate?: string;
-  @IsOptional() @IsDateString() @TransformToISODateTime()
+  @IsOptional()
+  @IsDateString()
+  @TransformToISODateTime()
   endDate?: string;
-  @IsOptional() @IsBoolean()
+  @IsOptional()
+  @IsBoolean()
   isActive?: boolean;
 }

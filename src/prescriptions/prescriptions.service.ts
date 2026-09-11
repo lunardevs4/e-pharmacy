@@ -1,6 +1,13 @@
-import { Injectable, NotFoundException, ForbiddenException } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  ForbiddenException,
+} from '@nestjs/common';
 import { PrismaService } from '../common/prisma/prisma.service';
-import { CreatePrescriptionDto, UpdatePrescriptionStatusDto } from './dto/prescriptions.dto';
+import {
+  CreatePrescriptionDto,
+  UpdatePrescriptionStatusDto,
+} from './dto/prescriptions.dto';
 import { UserRole } from '@generated/prisma';
 import { validateUuid, sanitizeDeep } from '../common/security/security.util';
 
@@ -11,13 +18,18 @@ interface AuthenticatedUser {
 
 @Injectable()
 export class PrescriptionsService {
-  constructor(private prismaService: PrismaService) { }
+  constructor(private prismaService: PrismaService) {}
 
-  async create(user: AuthenticatedUser, createPrescriptionDto: CreatePrescriptionDto) {
+  async create(
+    user: AuthenticatedUser,
+    createPrescriptionDto: CreatePrescriptionDto,
+  ) {
     const prisma = this.prismaService.prisma;
     const safeUserId = validateUuid(user.id, 'userId');
     const safeDto = sanitizeDeep(createPrescriptionDto);
-    const patient = await prisma.patient.findFirst({ where: { userId: safeUserId } });
+    const patient = await prisma.patient.findFirst({
+      where: { userId: safeUserId },
+    });
     if (!patient) throw new NotFoundException('Patient profile not found');
 
     const { medicines, ...rest } = safeDto;
@@ -43,7 +55,9 @@ export class PrescriptionsService {
   async findByPatient(user: AuthenticatedUser) {
     const prisma = this.prismaService.prisma;
     const safeUserId = validateUuid(user.id, 'userId');
-    const patient = await prisma.patient.findFirst({ where: { userId: safeUserId } });
+    const patient = await prisma.patient.findFirst({
+      where: { userId: safeUserId },
+    });
     if (!patient) throw new NotFoundException('Patient profile not found');
 
     return prisma.prescription.findMany({
@@ -57,10 +71,15 @@ export class PrescriptionsService {
     });
   }
 
-  private async ensurePharmacyViewAccess(pharmacyId: string, user: AuthenticatedUser) {
+  private async ensurePharmacyViewAccess(
+    pharmacyId: string,
+    user: AuthenticatedUser,
+  ) {
     const prisma = this.prismaService.prisma;
     const safePharmacyId = validateUuid(pharmacyId, 'pharmacyId');
-    const pharmacy = await prisma.pharmacy.findUnique({ where: { id: safePharmacyId } });
+    const pharmacy = await prisma.pharmacy.findUnique({
+      where: { id: safePharmacyId },
+    });
     if (!pharmacy) throw new NotFoundException('Pharmacy not found');
 
     if (user.role === UserRole.PHARMACY_OWNER) {
@@ -79,25 +98,37 @@ export class PrescriptionsService {
         },
       });
       if (!employee) {
-        throw new ForbiddenException('You are not employed as a pharmacist at this pharmacy');
+        throw new ForbiddenException(
+          'You are not employed as a pharmacist at this pharmacy',
+        );
       }
       return { pharmacy, safePharmacyId };
     }
 
-    throw new ForbiddenException('Insufficient permissions to access prescriptions for this pharmacy');
+    throw new ForbiddenException(
+      'Insufficient permissions to access prescriptions for this pharmacy',
+    );
   }
 
-  private async ensurePharmacyWriteAccess(pharmacyId: string, user: AuthenticatedUser) {
+  private async ensurePharmacyWriteAccess(
+    pharmacyId: string,
+    user: AuthenticatedUser,
+  ) {
     const prisma = this.prismaService.prisma;
     const safePharmacyId = validateUuid(pharmacyId, 'pharmacyId');
-    const pharmacy = await prisma.pharmacy.findUnique({ where: { id: safePharmacyId } });
+    const pharmacy = await prisma.pharmacy.findUnique({
+      where: { id: safePharmacyId },
+    });
     if (!pharmacy) throw new NotFoundException('Pharmacy not found');
 
     if (user.role === UserRole.ADMIN) {
       return { pharmacy, safePharmacyId };
     }
 
-    if (user.role === UserRole.PHARMACY_OWNER || (user.role as string) === 'PHARMACY') {
+    if (
+      user.role === UserRole.PHARMACY_OWNER ||
+      (user.role as string) === 'PHARMACY'
+    ) {
       if (pharmacy.ownerId !== user.id) {
         throw new ForbiddenException('You do not own this pharmacy');
       }
@@ -113,17 +144,24 @@ export class PrescriptionsService {
         },
       });
       if (!employee) {
-        throw new ForbiddenException('You are not employed as a pharmacist at this pharmacy');
+        throw new ForbiddenException(
+          'You are not employed as a pharmacist at this pharmacy',
+        );
       }
       return { pharmacy, safePharmacyId };
     }
 
-    throw new ForbiddenException('Insufficient permissions to manage prescriptions for this pharmacy');
+    throw new ForbiddenException(
+      'Insufficient permissions to manage prescriptions for this pharmacy',
+    );
   }
 
   async findByPharmacy(pharmacyId: string, user: AuthenticatedUser) {
     const prisma = this.prismaService.prisma;
-    const { safePharmacyId } = await this.ensurePharmacyViewAccess(pharmacyId, user);
+    const { safePharmacyId } = await this.ensurePharmacyViewAccess(
+      pharmacyId,
+      user,
+    );
 
     return prisma.prescription.findMany({
       where: { pharmacyId: safePharmacyId },
@@ -135,9 +173,17 @@ export class PrescriptionsService {
     });
   }
 
-  async updateStatus(pharmacyId: string, user: AuthenticatedUser, id: string, updateDto: UpdatePrescriptionStatusDto) {
+  async updateStatus(
+    pharmacyId: string,
+    user: AuthenticatedUser,
+    id: string,
+    updateDto: UpdatePrescriptionStatusDto,
+  ) {
     const prisma = this.prismaService.prisma;
-    const { safePharmacyId } = await this.ensurePharmacyWriteAccess(pharmacyId, user);
+    const { safePharmacyId } = await this.ensurePharmacyWriteAccess(
+      pharmacyId,
+      user,
+    );
     const safeId = validateUuid(id, 'id');
     const safeUserId = validateUuid(user.id, 'userId');
     const safeDto = sanitizeDeep(updateDto);

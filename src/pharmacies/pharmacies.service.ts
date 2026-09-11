@@ -1,6 +1,16 @@
-import { Injectable, NotFoundException, ForbiddenException, BadRequestException } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  ForbiddenException,
+  BadRequestException,
+} from '@nestjs/common';
 import { PrismaService } from '../common/prisma/prisma.service';
-import { CreatePharmacyDto, UpdatePharmacyDto, AddEmployeeDto, ApprovePharmacyDto } from './dto/pharmacies.dto';
+import {
+  CreatePharmacyDto,
+  UpdatePharmacyDto,
+  AddEmployeeDto,
+  ApprovePharmacyDto,
+} from './dto/pharmacies.dto';
 import { PharmacyStatus } from '@generated/prisma';
 import {
   validatePositiveInt,
@@ -11,7 +21,7 @@ import {
 
 @Injectable()
 export class PharmaciesService {
-  constructor(private prismaService: PrismaService) { }
+  constructor(private prismaService: PrismaService) {}
 
   create(ownerId: string, createPharmacyDto: CreatePharmacyDto) {
     const prisma = this.prismaService.prisma;
@@ -61,14 +71,21 @@ export class PharmaciesService {
         skip,
         take: safeLimit,
         where,
-        include: { owner: { select: { firstName: true, lastName: true, email: true } } },
+        include: {
+          owner: { select: { firstName: true, lastName: true, email: true } },
+        },
       }),
       prisma.pharmacy.count({ where }),
     ]);
 
     return {
       data: pharmacies,
-      meta: { page: safePage, limit: safeLimit, total, totalPages: Math.ceil(total / safeLimit) },
+      meta: {
+        page: safePage,
+        limit: safeLimit,
+        total,
+        totalPages: Math.ceil(total / safeLimit),
+      },
     };
   }
 
@@ -79,7 +96,18 @@ export class PharmaciesService {
       where: { id: safeId },
       include: {
         owner: { select: { firstName: true, lastName: true, email: true } },
-        employees: { include: { user: { select: { firstName: true, lastName: true, email: true, role: true } } } },
+        employees: {
+          include: {
+            user: {
+              select: {
+                firstName: true,
+                lastName: true,
+                email: true,
+                role: true,
+              },
+            },
+          },
+        },
       },
     });
 
@@ -90,7 +118,9 @@ export class PharmaciesService {
   async findEmployees(id: string, ownerId: string) {
     const prisma = this.prismaService.prisma;
     const safeId = validateUuid(id, 'id');
-    const pharmacy = await prisma.pharmacy.findUnique({ where: { id: safeId } });
+    const pharmacy = await prisma.pharmacy.findUnique({
+      where: { id: safeId },
+    });
 
     if (!pharmacy) throw new NotFoundException('Pharmacy not found');
     if (pharmacy.ownerId !== ownerId) {
@@ -115,13 +145,20 @@ export class PharmaciesService {
     });
   }
 
-  async update(id: string, ownerId: string, updatePharmacyDto: UpdatePharmacyDto) {
+  async update(
+    id: string,
+    ownerId: string,
+    updatePharmacyDto: UpdatePharmacyDto,
+  ) {
     const prisma = this.prismaService.prisma;
     const safeId = validateUuid(id, 'id');
     const safeDto = sanitizeDeep(updatePharmacyDto);
-    const pharmacy = await prisma.pharmacy.findUnique({ where: { id: safeId } });
+    const pharmacy = await prisma.pharmacy.findUnique({
+      where: { id: safeId },
+    });
     if (!pharmacy) throw new NotFoundException('Pharmacy not found');
-    if (pharmacy.ownerId !== ownerId) throw new ForbiddenException('You do not own this pharmacy');
+    if (pharmacy.ownerId !== ownerId)
+      throw new ForbiddenException('You do not own this pharmacy');
 
     const {
       name,
@@ -138,10 +175,15 @@ export class PharmaciesService {
       ownershipType,
     } = safeDto;
 
-    const isInitialActivation = pharmacy.licenseNumber === 'PENDING' && !!licenseNumber && licenseNumber !== 'PENDING';
+    const isInitialActivation =
+      pharmacy.licenseNumber === 'PENDING' &&
+      !!licenseNumber &&
+      licenseNumber !== 'PENDING';
     const isReapplication = (pharmacy.status as string) === 'REJECTED';
     const shouldResetToPending =
-      (isInitialActivation || isReapplication) && licenseNumber && licenseNumber !== 'PENDING';
+      (isInitialActivation || isReapplication) &&
+      licenseNumber &&
+      licenseNumber !== 'PENDING';
 
     return prisma.pharmacy.update({
       where: { id: safeId },
@@ -167,7 +209,9 @@ export class PharmaciesService {
     const prisma = this.prismaService.prisma;
     const safeId = validateUuid(id, 'id');
     const safeDto = sanitizeDeep(approvePharmacyDto);
-    const pharmacy = await prisma.pharmacy.findUnique({ where: { id: safeId } });
+    const pharmacy = await prisma.pharmacy.findUnique({
+      where: { id: safeId },
+    });
     if (!pharmacy) throw new NotFoundException('Pharmacy not found');
 
     const reactivate = safeDto.status === PharmacyStatus.APPROVED;
@@ -181,13 +225,20 @@ export class PharmaciesService {
     });
   }
 
-  async addEmployee(id: string, ownerId: string, addEmployeeDto: AddEmployeeDto) {
+  async addEmployee(
+    id: string,
+    ownerId: string,
+    addEmployeeDto: AddEmployeeDto,
+  ) {
     const prisma = this.prismaService.prisma;
     const safeId = validateUuid(id, 'id');
     const safeDto = sanitizeDeep(addEmployeeDto);
-    const pharmacy = await prisma.pharmacy.findUnique({ where: { id: safeId } });
+    const pharmacy = await prisma.pharmacy.findUnique({
+      where: { id: safeId },
+    });
     if (!pharmacy) throw new NotFoundException('Pharmacy not found');
-    if (pharmacy.ownerId !== ownerId) throw new ForbiddenException('You do not own this pharmacy');
+    if (pharmacy.ownerId !== ownerId)
+      throw new ForbiddenException('You do not own this pharmacy');
 
     return prisma.pharmacyEmployee.create({
       data: {
@@ -202,13 +253,15 @@ export class PharmaciesService {
     const prisma = this.prismaService.prisma;
     const safeId = validateUuid(id, 'id');
     const safeEmployeeId = validateUuid(employeeId, 'employeeId');
-    const pharmacy = await prisma.pharmacy.findUnique({ where: { id: safeId } });
+    const pharmacy = await prisma.pharmacy.findUnique({
+      where: { id: safeId },
+    });
     if (!pharmacy) throw new NotFoundException('Pharmacy not found');
-    if (pharmacy.ownerId !== ownerId) throw new ForbiddenException('You do not own this pharmacy');
+    if (pharmacy.ownerId !== ownerId)
+      throw new ForbiddenException('You do not own this pharmacy');
 
     return prisma.pharmacyEmployee.delete({ where: { id: safeEmployeeId } });
   }
-
 
   async getInsuranceProviders(pharmacyId: string) {
     const prisma = this.prismaService.prisma;
@@ -256,14 +309,18 @@ export class PharmaciesService {
     }));
   }
 
-  async addInsuranceProvider(pharmacyId: string, ownerId: string, data: {
-    insuranceId: string;
-    contractNumber?: string;
-    discountRate?: number;
-    customCoverageRate?: number;
-    startDate?: string;
-    endDate?: string;
-  }) {
+  async addInsuranceProvider(
+    pharmacyId: string,
+    ownerId: string,
+    data: {
+      insuranceId: string;
+      contractNumber?: string;
+      discountRate?: number;
+      customCoverageRate?: number;
+      startDate?: string;
+      endDate?: string;
+    },
+  ) {
     const prisma = this.prismaService.prisma;
     const safePharmacyId = validateUuid(pharmacyId, 'pharmacyId');
     const safeInsuranceId = validateUuid(data.insuranceId, 'insuranceId');
@@ -292,17 +349,20 @@ export class PharmaciesService {
       throw new BadRequestException('Insurance provider is not active');
     }
 
-    const existingAgreement = await prisma.pharmacyInsuranceAgreement.findUnique({
-      where: {
-        insuranceId_pharmacyId: {
-          insuranceId: safeInsuranceId,
-          pharmacyId: safePharmacyId,
+    const existingAgreement =
+      await prisma.pharmacyInsuranceAgreement.findUnique({
+        where: {
+          insuranceId_pharmacyId: {
+            insuranceId: safeInsuranceId,
+            pharmacyId: safePharmacyId,
+          },
         },
-      },
-    });
+      });
 
     if (existingAgreement) {
-      throw new BadRequestException('Agreement already exists with this insurance provider');
+      throw new BadRequestException(
+        'Agreement already exists with this insurance provider',
+      );
     }
 
     const agreement = await prisma.pharmacyInsuranceAgreement.create({
@@ -330,13 +390,18 @@ export class PharmaciesService {
     return agreement;
   }
 
-  async updateInsuranceAgreement(pharmacyId: string, ownerId: string, agreementId: string, data: {
-    contractNumber?: string;
-    discountRate?: number;
-    customCoverageRate?: number;
-    endDate?: string;
-    status?: string;
-  }) {
+  async updateInsuranceAgreement(
+    pharmacyId: string,
+    ownerId: string,
+    agreementId: string,
+    data: {
+      contractNumber?: string;
+      discountRate?: number;
+      customCoverageRate?: number;
+      endDate?: string;
+      status?: string;
+    },
+  ) {
     const prisma = this.prismaService.prisma;
     const safePharmacyId = validateUuid(pharmacyId, 'pharmacyId');
     const safeAgreementId = validateUuid(agreementId, 'agreementId');
@@ -362,7 +427,9 @@ export class PharmaciesService {
     }
 
     if (agreement.pharmacyId !== safePharmacyId) {
-      throw new ForbiddenException('This agreement does not belong to your pharmacy');
+      throw new ForbiddenException(
+        'This agreement does not belong to your pharmacy',
+      );
     }
 
     const updatedAgreement = await prisma.pharmacyInsuranceAgreement.update({
@@ -388,7 +455,11 @@ export class PharmaciesService {
     return updatedAgreement;
   }
 
-  async removeInsuranceProvider(pharmacyId: string, ownerId: string, agreementId: string) {
+  async removeInsuranceProvider(
+    pharmacyId: string,
+    ownerId: string,
+    agreementId: string,
+  ) {
     const prisma = this.prismaService.prisma;
     const safePharmacyId = validateUuid(pharmacyId, 'pharmacyId');
     const safeAgreementId = validateUuid(agreementId, 'agreementId');
@@ -414,7 +485,9 @@ export class PharmaciesService {
     }
 
     if (agreement.pharmacyId !== safePharmacyId) {
-      throw new ForbiddenException('This agreement does not belong to your pharmacy');
+      throw new ForbiddenException(
+        'This agreement does not belong to your pharmacy',
+      );
     }
 
     await prisma.pharmacyInsuranceAgreement.update({

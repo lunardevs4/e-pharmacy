@@ -3,12 +3,17 @@ import { Cron, CronExpression } from '@nestjs/schedule';
 import { PrismaService } from '../common/prisma/prisma.service';
 import { NotificationType, ReminderStatus } from '@generated/prisma';
 import { EmailService } from '../common/email/email.service';
+import { CommunicationService } from '../common/communication/communication.service';
 
 @Injectable()
 export class ReminderSchedulerService {
   private readonly logger = new Logger(ReminderSchedulerService.name);
 
-  constructor(private prismaService: PrismaService, private emailService: EmailService) {}
+  constructor(
+    private prismaService: PrismaService,
+    private emailService: EmailService,
+    private communicationService: CommunicationService,
+  ) { }
 
   private isTransientDbError(error: unknown) {
     const err = error as { code?: string; message?: string };
@@ -29,13 +34,14 @@ export class ReminderSchedulerService {
         throw error;
       }
 
-      this.logger.warn(`Reminder scheduler hit a transient DB error, reconnecting: ${(error as Error).message}`);
+      this.logger.warn(
+        `Reminder scheduler hit a transient DB error, reconnecting: ${(error as Error).message}`,
+      );
       const prisma = this.prismaService.prisma;
 
       try {
         await prisma.$disconnect();
-      } catch {
-      }
+      } catch { }
 
       await prisma.$connect();
       return operation();
@@ -47,9 +53,7 @@ export class ReminderSchedulerService {
     await this.runWithReconnect(async () => {
       const prisma = this.prismaService.prisma;
       const now = new Date();
-
-      const currentHHMM = now.toTimeString().slice(0, 5); // e.g. "08:00"
-
+      const currentHHMM = now.toTimeString().slice(0, 5);
       const todayStart = new Date(now);
       todayStart.setHours(0, 0, 0, 0);
       const todayEnd = new Date(now);
@@ -61,21 +65,15 @@ export class ReminderSchedulerService {
           endDate: { gte: now },
         },
         include: {
-          patient: {
-            include: { user: true },
-          },
-          medicine: {
-            select: { id: true, tradeName: true },
-          },
+          patient: { include: { user: true } },
+          medicine: { select: { id: true, tradeName: true } },
         },
       });
 
       if (activeSchedules.length === 0) return;
-
       const dueSchedules = activeSchedules.filter((schedule) =>
         schedule.timeOfDay.includes(currentHHMM),
       );
-
       if (dueSchedules.length === 0) return;
 
       this.logger.log(
@@ -84,16 +82,16 @@ export class ReminderSchedulerService {
 
       for (const schedule of dueSchedules) {
         try {
-          const existing = await prisma.reminderLog.findFirst({
+          const sameDayLog = await prisma.reminderLog.findFirst({
             where: {
               scheduleId: schedule.id,
               createdAt: { gte: todayStart, lte: todayEnd },
             },
           });
 
-          if (existing) {
+          if (sameDayLog) {
             const diffMs = Math.abs(
-              now.getTime() - existing.createdAt.getTime(),
+              now.getTime() - sameDayLog.createdAt.getTime(),
             );
             if (diffMs < 2 * 60 * 1000) {
               this.logger.debug(
@@ -103,39 +101,51 @@ export class ReminderSchedulerService {
             }
           }
 
-          const patientUserId = schedule.patient.user.id;
+          const patientUser = schedule.patient.user;
           const medicineName = schedule.medicine.tradeName;
+          const message = `Time to take your ${medicineName} — ${schedule.dosage}.`;
+          const smsResult = await this.communicationService.sendSms(
+            patientUser.phone,
+            message,
+          );
 
-          await prisma.$transaction([
-            prisma.reminderLog.create({
-              data: {
-                scheduleId: schedule.id,
-                patientId: schedule.patientId,
-                type: NotificationType.IN_APP,
-                status: ReminderStatus.SENT,
-                sentAt: now,
-              },
-            }),
-            prisma.notification.create({
-              data: {
-                userId: patientUserId,
-                type: NotificationType.IN_APP,
-                title: 'Medication Reminder',
-                message: `Time to take your ${medicineName} — ${schedule.dosage}`,
-              },
-            }),
-          ]);
+          const status =
+            smsResult.status === 'SENT' || smsResult.status === 'DELIVERED'
+              ? ReminderStatus.SENT
+              : ReminderStatus.FAILED;
+
+          await prisma.reminderLog.create({
+            data: {
+              scheduleId: schedule.id,
+              patientId: schedule.patientId,
+              type: NotificationType.SMS,
+              status,
+              sentAt: now,
+              error:
+                smsResult.status === 'FAILED'
+                  ? (smsResult.error ?? 'Provider rejected the request')
+                  : null,
+            },
+          });
+
+          if (smsResult.status === 'FAILED') {
+            this.logger.warn(
+              `SMS reminder failed for schedule ${schedule.id}: ${smsResult.error ?? 'unknown error'}`,
+            );
+          }
 
           const preference = await prisma.systemSetting.findUnique({
-            where: { key: `email_notifications:${patientUserId}` },
+            where: { key: `email_notifications:${patientUser.id}` },
           });
-          const emailEnabled = preference ? JSON.parse(preference.value).reminders !== false : true;
-          if (emailEnabled && schedule.patient.user.email) {
+          const emailEnabled = preference
+            ? JSON.parse(preference.value).reminders !== false
+            : true;
+          if (emailEnabled && patientUser.email) {
             await this.emailService.sendNotificationEmail(
-              schedule.patient.user.email,
-              `${schedule.patient.user.firstName} ${schedule.patient.user.lastName}`.trim(),
+              patientUser.email,
+              `${patientUser.firstName} ${patientUser.lastName}`.trim(),
               'Medication Reminder',
-              `It is time to take your ${medicineName} — ${schedule.dosage}.`,
+              `${message} Please confirm within the advised window.`,
             );
           }
 
@@ -146,13 +156,12 @@ export class ReminderSchedulerService {
           this.logger.error(
             `Failed to dispatch reminder for schedule ${schedule.id}: ${(err as Error).message}`,
           );
-
           try {
             await prisma.reminderLog.create({
               data: {
                 scheduleId: schedule.id,
                 patientId: schedule.patientId,
-                type: NotificationType.IN_APP,
+                type: NotificationType.SMS,
                 status: ReminderStatus.FAILED,
                 sentAt: now,
                 error: (err as Error).message,
@@ -177,25 +186,32 @@ export class ReminderSchedulerService {
     await this.runWithReconnect(async () => {
       const prisma = this.prismaService.prisma;
       const now = new Date();
-
-      const yesterdayStart = new Date(now);
-      yesterdayStart.setDate(yesterdayStart.getDate() - 1);
-      yesterdayStart.setHours(0, 0, 0, 0);
-
-      const yesterdayEnd = new Date(now);
-      yesterdayEnd.setDate(yesterdayEnd.getDate() - 1);
-      yesterdayEnd.setHours(23, 59, 59, 999);
+      const windowStart = new Date(now);
+      windowStart.setDate(windowStart.getDate() - 1);
+      windowStart.setHours(0, 0, 0, 0);
+      const windowEnd = new Date(now);
+      windowEnd.setDate(windowEnd.getDate() - 1);
+      windowEnd.setHours(23, 59, 59, 999);
 
       const result = await prisma.reminderLog.updateMany({
         where: {
-          status: { in: [ReminderStatus.SENT, ReminderStatus.PENDING] },
-          createdAt: { gte: yesterdayStart, lte: yesterdayEnd },
+          status: {
+            in: [
+              ReminderStatus.PENDING,
+              ReminderStatus.QUEUED,
+              ReminderStatus.SENT,
+              ReminderStatus.DELIVERED,
+            ],
+          },
+          createdAt: { gte: windowStart, lte: windowEnd },
         },
         data: { status: ReminderStatus.MISSED },
       });
 
       if (result.count > 0) {
-        this.logger.log(`Marked ${result.count} dose(s) as MISSED from yesterday`);
+        this.logger.log(
+          `Marked ${result.count} dose(s) as MISSED from yesterday`,
+        );
       }
     }).catch((error) => {
       this.logger.error(

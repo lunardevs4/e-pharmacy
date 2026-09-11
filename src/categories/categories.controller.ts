@@ -1,5 +1,22 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, Query } from '@nestjs/common';
-import { ApiTags, ApiBearerAuth, ApiOperation, ApiBody, ApiParam, ApiQuery } from '@nestjs/swagger';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+  UseGuards,
+  Query,
+} from '@nestjs/common';
+import {
+  ApiTags,
+  ApiBearerAuth,
+  ApiOperation,
+  ApiBody,
+  ApiParam,
+  ApiQuery,
+} from '@nestjs/swagger';
 import { CategoriesService } from './categories.service';
 import { CreateCategoryDto, UpdateCategoryDto } from './dto/categories.dto';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
@@ -11,7 +28,7 @@ import { UserRole } from '@generated/prisma';
 @UseGuards(JwtAuthGuard)
 @ApiBearerAuth()
 export class CategoriesController {
-  constructor(private categoriesService: CategoriesService) { }
+  constructor(private categoriesService: CategoriesService) {}
 
   @Post()
   @Roles(UserRole.GOVERNMENT)
@@ -29,7 +46,8 @@ export class CategoriesController {
       withParent: {
         value: {
           name: 'Penicillins',
-          description: 'A group of antibiotics originally from Penicillium fungi',
+          description:
+            'A group of antibiotics originally from Penicillium fungi',
           parentId: '550e8400-e29b-41d4-a716-446655440000',
         },
       },
@@ -40,10 +58,17 @@ export class CategoriesController {
   }
 
   @Get()
-  @Roles(UserRole.PATIENT, UserRole.PHARMACY_OWNER, UserRole.PHARMACIST, UserRole.GOVERNMENT, UserRole.ADMIN)
+  @Roles(
+    UserRole.PATIENT,
+    UserRole.PHARMACY_OWNER,
+    UserRole.PHARMACIST,
+    UserRole.GOVERNMENT,
+    UserRole.ADMIN,
+  )
   @ApiOperation({
     summary: 'List all categories',
-    description: 'Endpoint: GET /api/v1/categories\n\nReturns a list of all categories in the system.',
+    description:
+      'Endpoint: GET /api/v1/categories\n\nReturns a list of all categories in the system.',
   })
   @ApiQuery({ name: 'search', required: false, type: String })
   findAll(@Query('search') search?: string) {
@@ -51,12 +76,24 @@ export class CategoriesController {
   }
 
   @Get(':id')
-  @Roles(UserRole.PATIENT, UserRole.PHARMACY_OWNER, UserRole.PHARMACIST, UserRole.GOVERNMENT, UserRole.ADMIN)
+  @Roles(
+    UserRole.PATIENT,
+    UserRole.PHARMACY_OWNER,
+    UserRole.PHARMACIST,
+    UserRole.GOVERNMENT,
+    UserRole.ADMIN,
+  )
   @ApiOperation({
     summary: 'Get category details',
-    description: 'Endpoint: GET /api/v1/categories/:id\n\nURL Parameters:\n- id (UUID): The unique identifier of the category',
+    description:
+      'Endpoint: GET /api/v1/categories/:id\n\nURL Parameters:\n- id (UUID): The unique identifier of the category',
   })
-  @ApiParam({ name: 'id', type: 'string', description: 'Category UUID', example: '550e8400-e29b-41d4-a716-446655440000' })
+  @ApiParam({
+    name: 'id',
+    type: 'string',
+    description: 'Category UUID',
+    example: '550e8400-e29b-41d4-a716-446655440000',
+  })
   findOne(@Param('id') id: string) {
     return this.categoriesService.findOne(id);
   }
@@ -66,9 +103,15 @@ export class CategoriesController {
   @ApiBearerAuth()
   @ApiOperation({
     summary: 'Update category (admin only)',
-    description: 'Endpoint: PATCH /api/v1/categories/:id\n\nURL Parameters:\n- id (UUID): The unique identifier of the category',
+    description:
+      'Endpoint: PATCH /api/v1/categories/:id\n\nURL Parameters:\n- id (UUID): The unique identifier of the category',
   })
-  @ApiParam({ name: 'id', type: 'string', description: 'Category UUID', example: '550e8400-e29b-41d4-a716-446655440000' })
+  @ApiParam({
+    name: 'id',
+    type: 'string',
+    description: 'Category UUID',
+    example: '550e8400-e29b-41d4-a716-446655440000',
+  })
   @ApiBody({
     type: UpdateCategoryDto,
     examples: {
@@ -86,7 +129,10 @@ export class CategoriesController {
       },
     },
   })
-  update(@Param('id') id: string, @Body() updateCategoryDto: UpdateCategoryDto) {
+  update(
+    @Param('id') id: string,
+    @Body() updateCategoryDto: UpdateCategoryDto,
+  ) {
     return this.categoriesService.update(id, updateCategoryDto);
   }
 
@@ -95,9 +141,15 @@ export class CategoriesController {
   @ApiBearerAuth()
   @ApiOperation({
     summary: 'Delete category (admin only)',
-    description: 'Endpoint: DELETE /api/v1/categories/:id\n\nURL Parameters:\n- id (UUID): The unique identifier of the category to delete',
+    description:
+      'Endpoint: DELETE /api/v1/categories/:id\n\nURL Parameters:\n- id (UUID): The unique identifier of the category to delete',
   })
-  @ApiParam({ name: 'id', type: 'string', description: 'Category UUID', example: '550e8400-e29b-41d4-a716-446655440000' })
+  @ApiParam({
+    name: 'id',
+    type: 'string',
+    description: 'Category UUID',
+    example: '550e8400-e29b-41d4-a716-446655440000',
+  })
   remove(@Param('id') id: string) {
     return this.categoriesService.remove(id);
   }

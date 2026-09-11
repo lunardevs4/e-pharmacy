@@ -1,4 +1,8 @@
-import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  BadRequestException,
+} from '@nestjs/common';
 import { PrismaService } from '../common/prisma/prisma.service';
 
 export interface MedicineCalculationInput {
@@ -96,7 +100,9 @@ export class InsuranceCalculationService {
     });
 
     if (!agreement || agreement.status !== 'ACTIVE') {
-      throw new BadRequestException('No active agreement between pharmacy and insurance provider');
+      throw new BadRequestException(
+        'No active agreement between pharmacy and insurance provider',
+      );
     }
 
     let patientCoverage: number | null = null;
@@ -116,11 +122,17 @@ export class InsuranceCalculationService {
           throw new BadRequestException('Patient insurance policy has expired');
         }
         if (patient.startDate > now) {
-          throw new BadRequestException('Patient insurance policy has not started yet');
+          throw new BadRequestException(
+            'Patient insurance policy has not started yet',
+          );
         }
-        patientCoverage = patient.coveragePercentage ? Number(patient.coveragePercentage) : null;
+        patientCoverage = patient.coveragePercentage
+          ? Number(patient.coveragePercentage)
+          : null;
       } else if (input.insuredPatientId) {
-        throw new BadRequestException('Patient does not have an active policy with this insurance provider');
+        throw new BadRequestException(
+          'Patient does not have an active policy with this insurance provider',
+        );
       }
     }
 
@@ -135,7 +147,9 @@ export class InsuranceCalculationService {
         medicineInput,
         input.pharmacyId,
         input.insuranceId,
-        agreement.customCoverageRate ? Number(agreement.customCoverageRate) : null,
+        agreement.customCoverageRate
+          ? Number(agreement.customCoverageRate)
+          : null,
         patientCoverage,
         defaultCoverage,
         prisma,
@@ -165,8 +179,10 @@ export class InsuranceCalculationService {
       medicines: medicineResults,
       summary: {
         totalMedicineCost: Math.round(totalMedicineCost * 100) / 100,
-        totalInsuranceContribution: Math.round(totalInsuranceContribution * 100) / 100,
-        totalPatientContribution: Math.round(totalPatientContribution * 100) / 100,
+        totalInsuranceContribution:
+          Math.round(totalInsuranceContribution * 100) / 100,
+        totalPatientContribution:
+          Math.round(totalPatientContribution * 100) / 100,
         medicineCount: input.medicines.length,
         coveredMedicineCount,
       },
@@ -192,7 +208,9 @@ export class InsuranceCalculationService {
     });
 
     if (!medicine) {
-      throw new NotFoundException(`Medicine with ID ${input.medicineId} not found`);
+      throw new NotFoundException(
+        `Medicine with ID ${input.medicineId} not found`,
+      );
     }
 
     const totalAmount = input.unitPrice * input.quantity;
@@ -210,11 +228,9 @@ export class InsuranceCalculationService {
 
     if (patientCoverage !== null) {
       coveragePercentage = patientCoverage;
-    }
-    else if (agreementCustomCoverage !== null) {
+    } else if (agreementCustomCoverage !== null) {
       coveragePercentage = Number(agreementCustomCoverage);
-    }
-    else if (tariff && tariff.coveragePercentage !== null) {
+    } else if (tariff && tariff.coveragePercentage !== null) {
       coveragePercentage = Number(tariff.coveragePercentage);
     }
 
@@ -240,7 +256,10 @@ export class InsuranceCalculationService {
     let patientPays: number;
 
     if (tariff.fixedCopayAmount) {
-      insurancePays = Math.max(0, totalAmount - Number(tariff.fixedCopayAmount));
+      insurancePays = Math.max(
+        0,
+        totalAmount - Number(tariff.fixedCopayAmount),
+      );
       patientPays = Number(tariff.fixedCopayAmount);
     } else {
       insurancePays = totalAmount * (coveragePercentage / 100);
@@ -337,7 +356,10 @@ export class InsuranceCalculationService {
     let patientPays: number;
 
     if (tariff.fixedCopayAmount) {
-      insurancePays = Math.max(0, retailPrice - Number(tariff.fixedCopayAmount));
+      insurancePays = Math.max(
+        0,
+        retailPrice - Number(tariff.fixedCopayAmount),
+      );
       patientPays = Number(tariff.fixedCopayAmount);
     } else {
       insurancePays = retailPrice * (coveragePercentage / 100);
@@ -388,7 +410,8 @@ export class InsuranceCalculationService {
     if (!patient) {
       return {
         valid: false,
-        message: 'Patient does not have an active policy with this insurance provider',
+        message:
+          'Patient does not have an active policy with this insurance provider',
       };
     }
 
@@ -421,7 +444,9 @@ export class InsuranceCalculationService {
         fullName: patient.fullName,
         policyNumber: patient.policyNumber,
         nationalId: patient.nationalId,
-        coveragePercentage: patient.coveragePercentage || patient.insurance.defaultCoveragePercentage,
+        coveragePercentage:
+          patient.coveragePercentage ||
+          patient.insurance.defaultCoveragePercentage,
         startDate: patient.startDate,
         endDate: patient.endDate,
         insurance: {

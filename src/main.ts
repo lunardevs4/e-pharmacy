@@ -17,10 +17,18 @@ async function bootstrap() {
   app.set('trust proxy', 1);
 
   const isProduction = process.env.NODE_ENV === 'production';
-  const configuredOrigins = (process.env.CORS_ORIGINS || '').split(',').map((s) => s.trim()).filter(Boolean);
+  const configuredOrigins = (process.env.CORS_ORIGINS || '')
+    .split(',')
+    .map((s) => s.trim())
+    .filter(Boolean);
   const frontendOrigin = process.env.FRONTEND_URL?.trim();
-  const isHttpsDeployment = isProduction || frontendOrigin?.startsWith('https://');
-  const connectSources = ["'self'", ...configuredOrigins, ...(frontendOrigin ? [frontendOrigin] : [])];
+  const isHttpsDeployment =
+    isProduction || frontendOrigin?.startsWith('https://');
+  const connectSources = [
+    "'self'",
+    ...configuredOrigins,
+    ...(frontendOrigin ? [frontendOrigin] : []),
+  ];
 
   app.use(
     helmet({
@@ -43,7 +51,9 @@ async function bootstrap() {
           ...(isHttpsDeployment ? { upgradeInsecureRequests: [] } : {}),
         },
       },
-      hsts: isHttpsDeployment ? { maxAge: 31536000, includeSubDomains: true, preload: true } : false,
+      hsts: isHttpsDeployment
+        ? { maxAge: 31536000, includeSubDomains: true, preload: true }
+        : false,
       frameguard: { action: 'deny' },
       xssFilter: true,
       noSniff: true,
@@ -65,15 +75,31 @@ async function bootstrap() {
 
   app.enableCors({
     origin: (origin, callback) => {
-      const allowedOrigins = (process.env.CORS_ORIGINS || (process.env.NODE_ENV === 'production' ? '' : '*')).split(',').map((s) => s.trim()).filter(Boolean);
-      if (!origin || allowedOrigins.includes('*') || allowedOrigins.includes(origin)) {
+      const allowedOrigins = (
+        process.env.CORS_ORIGINS ||
+        (process.env.NODE_ENV === 'production' ? '' : '*')
+      )
+        .split(',')
+        .map((s) => s.trim())
+        .filter(Boolean);
+      if (
+        !origin ||
+        allowedOrigins.includes('*') ||
+        allowedOrigins.includes(origin)
+      ) {
         callback(null, true);
       } else {
         callback(new Error('Not allowed by CORS'));
       }
     },
     methods: ['GET', 'HEAD', 'PUT', 'PATCH', 'POST', 'DELETE'],
-    allowedHeaders: ['Content-Type', 'Authorization', 'Accept', 'X-Requested-With', 'X-CSRF-Token'],
+    allowedHeaders: [
+      'Content-Type',
+      'Authorization',
+      'Accept',
+      'X-Requested-With',
+      'X-CSRF-Token',
+    ],
     exposedHeaders: ['Content-Length', 'X-Request-Id'],
     credentials: true,
     maxAge: 600,
@@ -92,7 +118,10 @@ async function bootstrap() {
     prefix: '/uploads',
     setHeaders: (res) => {
       res.setHeader('X-Content-Type-Options', 'nosniff');
-      res.setHeader('Content-Security-Policy', "default-src 'none'; img-src 'self'; style-src 'self'");
+      res.setHeader(
+        'Content-Security-Policy',
+        "default-src 'none'; img-src 'self'; style-src 'self'",
+      );
     },
   });
 

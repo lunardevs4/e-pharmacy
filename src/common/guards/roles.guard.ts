@@ -1,11 +1,17 @@
-import { Injectable, CanActivate, ExecutionContext, UnauthorizedException, ForbiddenException } from '@nestjs/common';
+import {
+  Injectable,
+  CanActivate,
+  ExecutionContext,
+  UnauthorizedException,
+  ForbiddenException,
+} from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
 import { UserRole } from '@generated/prisma';
 import { ROLES_KEY } from './roles.decorator';
 
 @Injectable()
 export class RolesGuard implements CanActivate {
-  constructor(private reflector: Reflector) { }
+  constructor(private reflector: Reflector) {}
 
   canActivate(context: ExecutionContext): boolean {
     const requiredRoles = this.reflector.getAllAndOverride<UserRole[]>(
@@ -17,10 +23,14 @@ export class RolesGuard implements CanActivate {
     }
     const { user } = context.switchToHttp().getRequest();
     if (!user) {
-      throw new UnauthorizedException('Authentication required to access this resource');
+      throw new UnauthorizedException(
+        'Authentication required to access this resource',
+      );
     }
     if (!user.role) {
-      throw new ForbiddenException('User does not have a valid role assignment');
+      throw new ForbiddenException(
+        'User does not have a valid role assignment',
+      );
     }
     const hasRequiredRole = requiredRoles.some((role) => {
       if (user.role === role) return true;
@@ -30,7 +40,9 @@ export class RolesGuard implements CanActivate {
       return false;
     });
     if (!hasRequiredRole) {
-      throw new ForbiddenException(`Insufficient permissions. Required role(s): ${requiredRoles.join(', ')}`);
+      throw new ForbiddenException(
+        `Insufficient permissions. Required role(s): ${requiredRoles.join(', ')}`,
+      );
     }
     return true;
   }

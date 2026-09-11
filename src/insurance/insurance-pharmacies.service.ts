@@ -1,6 +1,13 @@
-import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  BadRequestException,
+} from '@nestjs/common';
 import { PrismaService } from '../common/prisma/prisma.service';
-import { CreatePharmacyAgreementDto, UpdatePharmacyAgreementDto } from './dto/insurance.dto';
+import {
+  CreatePharmacyAgreementDto,
+  UpdatePharmacyAgreementDto,
+} from './dto/insurance.dto';
 
 @Injectable()
 export class InsurancePharmaciesService {
@@ -16,11 +23,22 @@ export class InsurancePharmaciesService {
       }),
       prisma.pharmacyInsuranceAgreement.findMany({
         where: { pharmacyId },
-        select: { id: true, insuranceId: true, status: true, contractNumber: true, discountRate: true, customCoverageRate: true, startDate: true, endDate: true },
+        select: {
+          id: true,
+          insuranceId: true,
+          status: true,
+          contractNumber: true,
+          discountRate: true,
+          customCoverageRate: true,
+          startDate: true,
+          endDate: true,
+        },
       }),
     ]);
 
-    const agreementByProvider = new Map(agreements.map((agreement) => [agreement.insuranceId, agreement]));
+    const agreementByProvider = new Map(
+      agreements.map((agreement) => [agreement.insuranceId, agreement]),
+    );
     return providers.map((provider) => ({
       provider,
       agreement: agreementByProvider.get(provider.id) || null,
@@ -28,13 +46,27 @@ export class InsurancePharmaciesService {
     }));
   }
 
-  async setPharmacyInsurance(pharmacyId: string, insuranceId: string, enabled: boolean, userId: string) {
+  async setPharmacyInsurance(
+    pharmacyId: string,
+    insuranceId: string,
+    enabled: boolean,
+    userId: string,
+  ) {
     const prisma = this.prismaService.prisma;
-    const pharmacy = await prisma.pharmacy.findUnique({ where: { id: pharmacyId }, select: { id: true, ownerId: true } });
+    const pharmacy = await prisma.pharmacy.findUnique({
+      where: { id: pharmacyId },
+      select: { id: true, ownerId: true },
+    });
     if (!pharmacy) throw new NotFoundException('Pharmacy not found');
-    if (pharmacy.ownerId !== userId) throw new BadRequestException('Only the pharmacy owner can manage insurance agreements');
+    if (pharmacy.ownerId !== userId)
+      throw new BadRequestException(
+        'Only the pharmacy owner can manage insurance agreements',
+      );
 
-    const provider = await prisma.insuranceProvider.findUnique({ where: { id: insuranceId }, select: { id: true } });
+    const provider = await prisma.insuranceProvider.findUnique({
+      where: { id: insuranceId },
+      select: { id: true },
+    });
     if (!provider) throw new NotFoundException('Insurance provider not found');
 
     return prisma.pharmacyInsuranceAgreement.upsert({
@@ -71,17 +103,20 @@ export class InsurancePharmaciesService {
       throw new NotFoundException('Pharmacy not found');
     }
 
-    const existingAgreement = await prisma.pharmacyInsuranceAgreement.findUnique({
-      where: {
-        insuranceId_pharmacyId: {
-          insuranceId: dto.insuranceId,
-          pharmacyId: dto.pharmacyId,
+    const existingAgreement =
+      await prisma.pharmacyInsuranceAgreement.findUnique({
+        where: {
+          insuranceId_pharmacyId: {
+            insuranceId: dto.insuranceId,
+            pharmacyId: dto.pharmacyId,
+          },
         },
-      },
-    });
+      });
 
     if (existingAgreement) {
-      throw new BadRequestException('Agreement already exists between this insurance and pharmacy');
+      throw new BadRequestException(
+        'Agreement already exists between this insurance and pharmacy',
+      );
     }
 
     const agreement = await prisma.pharmacyInsuranceAgreement.create({
@@ -159,7 +194,11 @@ export class InsurancePharmaciesService {
     return updatedAgreement;
   }
 
-  async getAgreements(insuranceId?: string, pharmacyId?: string, status?: string) {
+  async getAgreements(
+    insuranceId?: string,
+    pharmacyId?: string,
+    status?: string,
+  ) {
     const prisma = this.prismaService.prisma;
 
     const where: any = {};
@@ -244,27 +283,40 @@ export class InsurancePharmaciesService {
     });
 
     const totalClaims = claims.length;
-    const outstandingClaims = claims.filter(c => c.status === 'APPROVED' && !c.paidAt);
-    const outstandingAmount = outstandingClaims.reduce((sum, claim) => sum + Number(claim.insuranceAmount), 0);
-    const paidAmount = claims.filter(c => c.status === 'PAID').reduce((sum, claim) => sum + Number(claim.insuranceAmount), 0);
+    const outstandingClaims = claims.filter(
+      (c) => c.status === 'APPROVED' && !c.paidAt,
+    );
+    const outstandingAmount = outstandingClaims.reduce(
+      (sum, claim) => sum + Number(claim.insuranceAmount),
+      0,
+    );
+    const paidAmount = claims
+      .filter((c) => c.status === 'PAID')
+      .reduce((sum, claim) => sum + Number(claim.insuranceAmount), 0);
 
-    const claimsByInsurance = claims.reduce((acc, claim) => {
-      const insuranceName = claim.insurance.name;
-      if (!acc[insuranceName]) {
-        acc[insuranceName] = {
-          totalClaims: 0,
-          outstandingAmount: 0,
-          paidAmount: 0,
-        };
-      }
-      acc[insuranceName].totalClaims++;
-      if (claim.status === 'APPROVED' && !claim.paidAt) {
-        acc[insuranceName].outstandingAmount += Number(claim.insuranceAmount);
-      } else if (claim.status === 'PAID') {
-        acc[insuranceName].paidAmount += Number(claim.insuranceAmount);
-      }
-      return acc;
-    }, {} as Record<string, { totalClaims: number; outstandingAmount: number; paidAmount: number }>);
+    const claimsByInsurance = claims.reduce(
+      (acc, claim) => {
+        const insuranceName = claim.insurance.name;
+        if (!acc[insuranceName]) {
+          acc[insuranceName] = {
+            totalClaims: 0,
+            outstandingAmount: 0,
+            paidAmount: 0,
+          };
+        }
+        acc[insuranceName].totalClaims++;
+        if (claim.status === 'APPROVED' && !claim.paidAt) {
+          acc[insuranceName].outstandingAmount += Number(claim.insuranceAmount);
+        } else if (claim.status === 'PAID') {
+          acc[insuranceName].paidAmount += Number(claim.insuranceAmount);
+        }
+        return acc;
+      },
+      {} as Record<
+        string,
+        { totalClaims: number; outstandingAmount: number; paidAmount: number }
+      >,
+    );
 
     return {
       pharmacyId,
@@ -300,7 +352,7 @@ export class InsurancePharmaciesService {
       insuranceId,
       affectedPharmacies: agreements.length,
       tariffUpdates: tariffs.length,
-      pharmacies: agreements.map(a => ({
+      pharmacies: agreements.map((a) => ({
         pharmacyId: a.pharmacyId,
         pharmacyName: a.pharmacy.name,
         agreementStatus: a.status,

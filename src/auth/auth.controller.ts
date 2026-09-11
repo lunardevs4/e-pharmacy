@@ -1,4 +1,15 @@
-import { Controller, Post, Body, UseGuards, Req, Param, Get, Patch, Query, Res } from '@nestjs/common';
+import {
+  Controller,
+  Post,
+  Body,
+  UseGuards,
+  Req,
+  Param,
+  Get,
+  Patch,
+  Query,
+  Res,
+} from '@nestjs/common';
 import { Response } from 'express';
 import { ApiTags, ApiOperation, ApiBearerAuth, ApiBody } from '@nestjs/swagger';
 import { AuthService } from './auth.service';
@@ -15,7 +26,13 @@ import { Public } from '../common/guards/public.decorator';
 import { Roles } from '../common/guards/roles.decorator';
 import { Permissions } from '../common/guards/permissions.decorator';
 import { PermissionsGuard } from '../common/guards/permissions.guard';
-import { clearAuthCookies, issueCsrfToken, readCookie, REFRESH_TOKEN_COOKIE, setAuthCookies } from '../common/auth-cookies';
+import {
+  clearAuthCookies,
+  issueCsrfToken,
+  readCookie,
+  REFRESH_TOKEN_COOKIE,
+  setAuthCookies,
+} from '../common/auth-cookies';
 import { Throttle } from '@nestjs/throttler';
 import { PasswordResetRequestDto } from './dto/password-reset-request.dto';
 import { PasswordResetOtpDto } from './dto/password-reset-otp.dto';
@@ -24,12 +41,15 @@ import { PasswordResetDto } from './dto/password-reset.dto';
 @ApiTags('Auth')
 @Controller('api/v1/auth')
 export class AuthController {
-  constructor(private authService: AuthService) { }
+  constructor(private authService: AuthService) {}
 
   @Public()
   @Get('csrf-token')
   @ApiOperation({ summary: 'Issue a CSRF token for browser clients' })
-  getCsrfToken(@Req() request: any, @Res({ passthrough: true }) response: Response) {
+  getCsrfToken(
+    @Req() request: any,
+    @Res({ passthrough: true }) response: Response,
+  ) {
     return { csrfToken: request.csrfToken || issueCsrfToken(response) };
   }
 
@@ -38,12 +58,27 @@ export class AuthController {
   @Throttle({ registration: {} })
   @ApiOperation({ summary: 'Register a new patient account' })
   @ApiBody({ type: RegisterDto })
-  async register(@Body() registerDto: RegisterDto, @Res({ passthrough: true }) response: Response) {
+  async register(
+    @Body() registerDto: RegisterDto,
+    @Res({ passthrough: true }) response: Response,
+  ) {
     const result = await this.authService.register(registerDto);
     if ('accessToken' in result && 'refreshToken' in result) {
-      const authenticatedResult = result as { accessToken: string; refreshToken: string; [key: string]: unknown };
-      setAuthCookies(response, authenticatedResult.accessToken, authenticatedResult.refreshToken);
-      const { accessToken: _accessToken, refreshToken: _refreshToken, ...safeResult } = authenticatedResult;
+      const authenticatedResult = result as {
+        accessToken: string;
+        refreshToken: string;
+        [key: string]: unknown;
+      };
+      setAuthCookies(
+        response,
+        authenticatedResult.accessToken,
+        authenticatedResult.refreshToken,
+      );
+      const {
+        accessToken: _accessToken,
+        refreshToken: _refreshToken,
+        ...safeResult
+      } = authenticatedResult;
       return safeResult;
     }
     return result;
@@ -82,21 +117,32 @@ export class AuthController {
       },
     },
   })
-  async login(@Body() loginDto: LoginDto, @Res({ passthrough: true }) response: Response) {
+  async login(
+    @Body() loginDto: LoginDto,
+    @Res({ passthrough: true }) response: Response,
+  ) {
     const result = await this.authService.login(loginDto);
     setAuthCookies(response, result.accessToken, result.refreshToken);
-    const { accessToken: _accessToken, refreshToken: _refreshToken, ...safeResult } = result;
+    const {
+      accessToken: _accessToken,
+      refreshToken: _refreshToken,
+      ...safeResult
+    } = result;
     return safeResult;
   }
 
   @Public()
   @Get('verify-email')
-  async verifyEmail(@Query('token') token: string) { return this.authService.verifyEmail(token); }
+  async verifyEmail(@Query('token') token: string) {
+    return this.authService.verifyEmail(token);
+  }
 
   @Public()
   @Post('resend-verification')
   @Throttle({ password: {} })
-  async resendVerification(@Body('email') email: string) { return this.authService.resendVerificationEmail(email); }
+  async resendVerification(@Body('email') email: string) {
+    return this.authService.resendVerificationEmail(email);
+  }
 
   @Public()
   @Post('password-reset/request')
@@ -131,8 +177,16 @@ export class AuthController {
   @Post('pharmacies/:pharmacyId/staff')
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Create a pharmacy staff account' })
-  async createStaff(@Param('pharmacyId') pharmacyId: string, @Req() req: any, @Body() createStaffDto: CreateStaffDto) {
-    return this.authService.createStaff(pharmacyId, req.user.id, createStaffDto);
+  async createStaff(
+    @Param('pharmacyId') pharmacyId: string,
+    @Req() req: any,
+    @Body() createStaffDto: CreateStaffDto,
+  ) {
+    return this.authService.createStaff(
+      pharmacyId,
+      req.user.id,
+      createStaffDto,
+    );
   }
 
   @UseGuards(JwtAuthGuard)
@@ -140,19 +194,30 @@ export class AuthController {
   @Throttle({ password: {} })
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Change the current user password' })
-  async changePassword(@Req() req: any, @Body() changePasswordDto: ChangePasswordDto) {
+  async changePassword(
+    @Req() req: any,
+    @Body() changePasswordDto: ChangePasswordDto,
+  ) {
     return this.authService.changePassword(req.user.id, changePasswordDto);
   }
 
   @Public()
   @Post('refresh')
   @ApiOperation({ summary: 'Refresh access token' })
-  async refreshTokens(@Req() request: any, @Res({ passthrough: true }) response: Response) {
+  async refreshTokens(
+    @Req() request: any,
+    @Res({ passthrough: true }) response: Response,
+  ) {
     const refreshToken = readCookie(request, REFRESH_TOKEN_COOKIE);
-    if (!refreshToken) return this.authService.refreshTokens({ refreshToken: '' });
+    if (!refreshToken)
+      return this.authService.refreshTokens({ refreshToken: '' });
     const result = await this.authService.refreshTokens({ refreshToken });
     setAuthCookies(response, result.accessToken, result.refreshToken);
-    const { accessToken: _accessToken, refreshToken: _refreshToken, ...safeResult } = result;
+    const {
+      accessToken: _accessToken,
+      refreshToken: _refreshToken,
+      ...safeResult
+    } = result;
     return safeResult;
   }
 
@@ -161,8 +226,13 @@ export class AuthController {
   @Post('managed-users/insurance')
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Create an insurance company user' })
-  async createInsuranceUser(@Body() createManagedUserDto: CreateManagedUserDto) {
-    return this.authService.createManagedUser(UserRole.INSURANCE, createManagedUserDto);
+  async createInsuranceUser(
+    @Body() createManagedUserDto: CreateManagedUserDto,
+  ) {
+    return this.authService.createManagedUser(
+      UserRole.INSURANCE,
+      createManagedUserDto,
+    );
   }
 
   @UseGuards(JwtAuthGuard)
@@ -170,8 +240,13 @@ export class AuthController {
   @Post('managed-users/government')
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Create a government user' })
-  async createGovernmentUser(@Body() createManagedUserDto: CreateManagedUserDto) {
-    return this.authService.createManagedUser(UserRole.GOVERNMENT, createManagedUserDto);
+  async createGovernmentUser(
+    @Body() createManagedUserDto: CreateManagedUserDto,
+  ) {
+    return this.authService.createManagedUser(
+      UserRole.GOVERNMENT,
+      createManagedUserDto,
+    );
   }
 
   @UseGuards(JwtAuthGuard)
@@ -180,7 +255,10 @@ export class AuthController {
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Create a managed user (admin only)' })
   async createManagedUser(@Body() createManagedUserDto: CreateManagedUserDto) {
-    return this.authService.createManagedUser(createManagedUserDto.role, createManagedUserDto);
+    return this.authService.createManagedUser(
+      createManagedUserDto.role,
+      createManagedUserDto,
+    );
   }
 
   @UseGuards(JwtAuthGuard)
@@ -197,14 +275,20 @@ export class AuthController {
   @Patch('pharmacies/:pharmacyId/approve')
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Approve or reject a pharmacy registration' })
-  async approvePharmacy(@Param('pharmacyId') pharmacyId: string, @Body('approved') approved: boolean) {
+  async approvePharmacy(
+    @Param('pharmacyId') pharmacyId: string,
+    @Body('approved') approved: boolean,
+  ) {
     return this.authService.approvePharmacy(pharmacyId, approved);
   }
 
   @Public()
   @Post('logout')
   @ApiOperation({ summary: 'Logout user' })
-  async logout(@Req() request: any, @Res({ passthrough: true }) response: Response) {
+  async logout(
+    @Req() request: any,
+    @Res({ passthrough: true }) response: Response,
+  ) {
     const refreshToken = readCookie(request, REFRESH_TOKEN_COOKIE);
     const result = await this.authService.logout(refreshToken);
     clearAuthCookies(response);

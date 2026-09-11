@@ -1,4 +1,12 @@
-import { Controller, Get, Post, Put, Body, UseGuards, Req } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Put,
+  Body,
+  UseGuards,
+  Req,
+} from '@nestjs/common';
 import { ApiTags, ApiBearerAuth, ApiOperation, ApiBody } from '@nestjs/swagger';
 import { PatientsService } from './patients.service';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
@@ -9,7 +17,7 @@ import { CreatePatientDto, UpdatePatientDto } from './dto/patients.dto';
 @UseGuards(JwtAuthGuard)
 @ApiBearerAuth()
 export class PatientsController {
-  constructor(private patientsService: PatientsService) { }
+  constructor(private patientsService: PatientsService) {}
 
   @Post('profile')
   @ApiOperation({
@@ -21,7 +29,8 @@ export class PatientsController {
     examples: {
       fullProfile: {
         value: {
-          medicalProfile: 'Hypertension, Type 2 Diabetes. Allergic to Penicillin.',
+          medicalProfile:
+            'Hypertension, Type 2 Diabetes. Allergic to Penicillin.',
           address: '123 Healthcare Street, Lagos, Nigeria',
           dateOfBirth: '1990-05-15',
           gender: 'Male',
@@ -42,7 +51,8 @@ export class PatientsController {
   @Get('profile')
   @ApiOperation({
     summary: 'Get patient profile',
-    description: 'Endpoint: GET /api/v1/patients/profile\n\nReturns the profile of the currently authenticated patient.',
+    description:
+      'Endpoint: GET /api/v1/patients/profile\n\nReturns the profile of the currently authenticated patient.',
   })
   findOne(@Req() req: any) {
     return this.patientsService.findOne(req.user.id);
@@ -63,7 +73,8 @@ export class PatientsController {
       },
       updateMedical: {
         value: {
-          medicalProfile: 'Updated: Hypertension well-controlled. Recent blood work normal.',
+          medicalProfile:
+            'Updated: Hypertension well-controlled. Recent blood work normal.',
           address: '456 Wellness Avenue, Abuja, Nigeria',
           dateOfBirth: '1990-05-15',
           gender: 'Male',

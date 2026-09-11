@@ -70,40 +70,42 @@ export class SearchService {
       },
     });
 
-    const results = await Promise.all(inventories.map(async (inv) => {
-      const baseResult = {
-        medicine: inv.medicine,
-        pharmacy: inv.pharmacy,
-        price: inv.price,
-        quantity: inv.quantity,
-        expiryDate: inv.expiryDate,
-        distance:
-          safeLat !== undefined &&
-          safeLon !== undefined &&
-          inv.pharmacy.latitude &&
-          inv.pharmacy.longitude
-            ? this.calculateDistance(
-                safeLat,
-                safeLon,
-                parseFloat(inv.pharmacy.latitude.toString()),
-                parseFloat(inv.pharmacy.longitude.toString()),
-              )
-            : null,
-      };
+    const results = await Promise.all(
+      inventories.map(async (inv) => {
+        const baseResult = {
+          medicine: inv.medicine,
+          pharmacy: inv.pharmacy,
+          price: inv.price,
+          quantity: inv.quantity,
+          expiryDate: inv.expiryDate,
+          distance:
+            safeLat !== undefined &&
+            safeLon !== undefined &&
+            inv.pharmacy.latitude &&
+            inv.pharmacy.longitude
+              ? this.calculateDistance(
+                  safeLat,
+                  safeLon,
+                  parseFloat(inv.pharmacy.latitude.toString()),
+                  parseFloat(inv.pharmacy.longitude.toString()),
+                )
+              : null,
+        };
 
-      if (insuranceId) {
-        const insuranceCoverage = await this.calculateInsuranceCoverage(
-          insuranceId,
-          inv.pharmacyId,
-          inv.medicineId,
-          Number(inv.price),
-          prisma,
-        );
-        return { ...baseResult, insuranceCoverage };
-      }
+        if (insuranceId) {
+          const insuranceCoverage = await this.calculateInsuranceCoverage(
+            insuranceId,
+            inv.pharmacyId,
+            inv.medicineId,
+            Number(inv.price),
+            prisma,
+          );
+          return { ...baseResult, insuranceCoverage };
+        }
 
-      return baseResult;
-    }));
+        return baseResult;
+      }),
+    );
 
     const hasLocation = safeLat !== undefined && safeLon !== undefined;
     const nearbyResults = hasLocation
@@ -245,7 +247,10 @@ export class SearchService {
     let patientPays: number;
 
     if (tariff.fixedCopayAmount) {
-      insurancePays = Math.max(0, retailPrice - Number(tariff.fixedCopayAmount));
+      insurancePays = Math.max(
+        0,
+        retailPrice - Number(tariff.fixedCopayAmount),
+      );
       patientPays = Number(tariff.fixedCopayAmount);
     } else {
       insurancePays = retailPrice * (coveragePercentage / 100);

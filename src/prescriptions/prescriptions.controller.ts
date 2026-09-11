@@ -1,7 +1,25 @@
-import { Controller, Get, Post, Body, Patch, Param, UseGuards, Req } from '@nestjs/common';
-import { ApiTags, ApiBearerAuth, ApiOperation, ApiBody, ApiParam } from '@nestjs/swagger';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  UseGuards,
+  Req,
+} from '@nestjs/common';
+import {
+  ApiTags,
+  ApiBearerAuth,
+  ApiOperation,
+  ApiBody,
+  ApiParam,
+} from '@nestjs/swagger';
 import { PrescriptionsService } from './prescriptions.service';
-import { CreatePrescriptionDto, UpdatePrescriptionStatusDto } from './dto/prescriptions.dto';
+import {
+  CreatePrescriptionDto,
+  UpdatePrescriptionStatusDto,
+} from './dto/prescriptions.dto';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { Roles } from '../common/guards/roles.decorator';
 import { UserRole, PrescriptionStatus } from '@generated/prisma';
@@ -13,7 +31,7 @@ import { Throttle } from '@nestjs/throttler';
 @Controller('api/v1')
 @Throttle({ userSensitive: {} })
 export class PrescriptionsController {
-  constructor(private prescriptionsService: PrescriptionsService) { }
+  constructor(private prescriptionsService: PrescriptionsService) {}
 
   @Post('prescriptions')
   @Roles(UserRole.PATIENT)
@@ -63,7 +81,10 @@ export class PrescriptionsController {
       },
     },
   })
-  create(@Req() req: any, @Body() createPrescriptionDto: CreatePrescriptionDto) {
+  create(
+    @Req() req: any,
+    @Body() createPrescriptionDto: CreatePrescriptionDto,
+  ) {
     return this.prescriptionsService.create(req.user, createPrescriptionDto);
   }
 
@@ -71,7 +92,8 @@ export class PrescriptionsController {
   @Roles(UserRole.PATIENT)
   @ApiOperation({
     summary: 'View my prescriptions (patient only)',
-    description: 'Endpoint: GET /api/v1/prescriptions\n\nReturns all prescriptions for the currently authenticated patient.',
+    description:
+      'Endpoint: GET /api/v1/prescriptions\n\nReturns all prescriptions for the currently authenticated patient.',
   })
   findByPatient(@Req() req: any) {
     return this.prescriptionsService.findByPatient(req.user);
@@ -81,9 +103,15 @@ export class PrescriptionsController {
   @Roles(UserRole.PHARMACY_OWNER, UserRole.PHARMACIST)
   @ApiOperation({
     summary: 'View pharmacy prescriptions',
-    description: 'Endpoint: GET /api/v1/pharmacies/:pharmacyId/prescriptions\n\nURL Parameters:\n- pharmacyId (UUID): The unique identifier of the pharmacy',
+    description:
+      'Endpoint: GET /api/v1/pharmacies/:pharmacyId/prescriptions\n\nURL Parameters:\n- pharmacyId (UUID): The unique identifier of the pharmacy',
   })
-  @ApiParam({ name: 'pharmacyId', type: 'string', description: 'Pharmacy UUID', example: '550e8400-e29b-41d4-a716-446655440000' })
+  @ApiParam({
+    name: 'pharmacyId',
+    type: 'string',
+    description: 'Pharmacy UUID',
+    example: '550e8400-e29b-41d4-a716-446655440000',
+  })
   findByPharmacy(@Param('pharmacyId') pharmacyId: string, @Req() req: any) {
     return this.prescriptionsService.findByPharmacy(pharmacyId, req.user);
   }
@@ -92,10 +120,21 @@ export class PrescriptionsController {
   @Roles(UserRole.PHARMACIST)
   @ApiOperation({
     summary: 'Approve/reject prescription (pharmacist only)',
-    description: 'Endpoint: PATCH /api/v1/pharmacies/:pharmacyId/prescriptions/:id\n\nURL Parameters:\n- pharmacyId (UUID): The unique identifier of the pharmacy\n- id (UUID): The unique identifier of the prescription',
+    description:
+      'Endpoint: PATCH /api/v1/pharmacies/:pharmacyId/prescriptions/:id\n\nURL Parameters:\n- pharmacyId (UUID): The unique identifier of the pharmacy\n- id (UUID): The unique identifier of the prescription',
   })
-  @ApiParam({ name: 'pharmacyId', type: 'string', description: 'Pharmacy UUID', example: '550e8400-e29b-41d4-a716-446655440000' })
-  @ApiParam({ name: 'id', type: 'string', description: 'Prescription UUID', example: '550e8400-e29b-41d4-a716-446655440001' })
+  @ApiParam({
+    name: 'pharmacyId',
+    type: 'string',
+    description: 'Pharmacy UUID',
+    example: '550e8400-e29b-41d4-a716-446655440000',
+  })
+  @ApiParam({
+    name: 'id',
+    type: 'string',
+    description: 'Prescription UUID',
+    example: '550e8400-e29b-41d4-a716-446655440001',
+  })
   @ApiBody({
     type: UpdatePrescriptionStatusDto,
     examples: {
@@ -122,6 +161,11 @@ export class PrescriptionsController {
     @Req() req: any,
     @Body() updateDto: UpdatePrescriptionStatusDto,
   ) {
-    return this.prescriptionsService.updateStatus(pharmacyId, req.user, id, updateDto);
+    return this.prescriptionsService.updateStatus(
+      pharmacyId,
+      req.user,
+      id,
+      updateDto,
+    );
   }
 }
