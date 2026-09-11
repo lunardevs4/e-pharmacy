@@ -29,11 +29,11 @@ import { Throttle } from '@nestjs/throttler';
 @UseGuards(JwtAuthGuard)
 @ApiBearerAuth()
 @Controller('api/v1')
-@Throttle({ userSensitive: {} })
 export class PrescriptionsController {
   constructor(private prescriptionsService: PrescriptionsService) {}
 
   @Post('prescriptions')
+  @Throttle({ userSensitive: {} })
   @Roles(UserRole.PATIENT)
   @ApiOperation({
     summary: 'Upload prescription (patient only)',
@@ -117,6 +117,7 @@ export class PrescriptionsController {
   }
 
   @Patch('pharmacies/:pharmacyId/prescriptions/:id')
+  @Throttle({ userSensitive: {} })
   @Roles(UserRole.PHARMACIST)
   @ApiOperation({
     summary: 'Approve/reject prescription (pharmacist only)',

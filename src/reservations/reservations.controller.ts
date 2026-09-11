@@ -1,13 +1,5 @@
-import {
-  Controller,
-  Get,
-  Post,
-  Body,
-  Patch,
-  Param,
-  UseGuards,
-  Req,
-} from '@nestjs/common';
+import {  Controller,Get,Post,Body,Patch,Param,UseGuards,
+  Req,} from '@nestjs/common';
 import {
   ApiTags,
   ApiBearerAuth,
@@ -29,11 +21,11 @@ import { Throttle } from '@nestjs/throttler';
 @UseGuards(JwtAuthGuard)
 @ApiBearerAuth()
 @Controller('api/v1')
-@Throttle({ userSensitive: {} })
 export class ReservationsController {
   constructor(private reservationsService: ReservationsService) {}
 
   @Post('reservations')
+  @Throttle({ userSensitive: {} })
   @Roles(UserRole.PATIENT)
   @ApiOperation({
     summary: 'Create reservation (patient only)',
@@ -87,6 +79,7 @@ export class ReservationsController {
   }
 
   @Patch('reservations/:id/cancel')
+  @Throttle({ userSensitive: {} })
   @Roles(UserRole.PATIENT)
   @ApiOperation({
     summary: 'Cancel my reservation (patient only)',
@@ -121,6 +114,7 @@ export class ReservationsController {
   }
 
   @Patch('pharmacies/:pharmacyId/reservations/:id')
+  @Throttle({ userSensitive: {} })
   @Roles(UserRole.PHARMACY_OWNER, UserRole.PHARMACIST)
   @ApiOperation({
     summary: 'Confirm/manage reservation status (pharmacist or owner)',

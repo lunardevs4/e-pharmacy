@@ -4,7 +4,7 @@ import { AppService } from './app.service';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { ScheduleModule } from '@nestjs/schedule';
 import { APP_GUARD, APP_INTERCEPTOR, APP_FILTER } from '@nestjs/core';
-import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
+import { ThrottlerModule } from '@nestjs/throttler';
 import { getNumberConfig, userTracker } from './common/throttling';
 import { PrismaModule } from './common/prisma/prisma.module';
 import { AuthModule } from './auth/auth.module';
@@ -33,6 +33,8 @@ import { FileUploadsModule } from './file-uploads/file-uploads.module';
 import { ReportsModule } from './reports/reports.module';
 import { InsuranceDashboardModule } from './insurance/insurance-dashboard.module';
 import { CommunicationModule } from './common/communication/communication.module';
+import { ScopedThrottlerGuard } from './common/guards/scoped-throttler.guard';
+import { ThrottlerStorageRedisService } from '@nest-lab/throttler-storage-redis';
 
 @Module({
   imports: [
@@ -45,6 +47,8 @@ import { CommunicationModule } from './common/communication/communication.module
           missing.push('FRONTEND_URL');
         if (config.NODE_ENV === 'production' && !config.CORS_ORIGINS?.trim())
           missing.push('CORS_ORIGINS');
+        if (config.NODE_ENV === 'production' && !config.REDIS_URL?.trim())
+          missing.push('REDIS_URL');
         if (missing.length) {
           throw new Error(
             `Missing required environment variable(s): ${missing.join(', ')}`,
@@ -61,11 +65,19 @@ import { CommunicationModule } from './common/communication/communication.module
       imports: [ConfigModule],
       inject: [ConfigService],
       useFactory: (config: ConfigService) => ({
+        ...(config.get<string>('REDIS_URL')?.trim()
+          ? {
+              storage: new ThrottlerStorageRedisService(
+                config.get<string>('REDIS_URL')!.trim(),
+              ),
+            }
+          : {}),
         throttlers: [
           {
             name: 'default',
             ttl: getNumberConfig(config, 'THROTTLE_GLOBAL_TTL_MS', 60_000),
-            limit: getNumberConfig(config, 'THROTTLE_GLOBAL_LIMIT', 100),
+            limit: getNumberConfig(config, 'THROTTLE_GLOBAL_LIMIT', 1000),
+            getTracker: userTracker,
           },
           {
             name: 'login',
@@ -106,7 +118,7 @@ import { CommunicationModule } from './common/communication/communication.module
               'THROTTLE_USER_SENSITIVE_TTL_MS',
               60_000,
             ),
-            limit: getNumberConfig(config, 'THROTTLE_USER_SENSITIVE_LIMIT', 10),
+            limit: getNumberConfig(config, 'THROTTLE_USER_SENSITIVE_LIMIT', 20),
             getTracker: userTracker,
           },
         ],
@@ -140,7 +152,7 @@ import { CommunicationModule } from './common/communication/communication.module
     { provide: APP_INTERCEPTOR, useClass: AuditInterceptor },
     { provide: APP_FILTER, useClass: HttpExceptionFilter },
     { provide: APP_GUARD, useClass: JwtAuthGuard },
-    { provide: APP_GUARD, useClass: ThrottlerGuard },
+    { provide: APP_GUARD, useClass: ScopedThrottlerGuard },
     { provide: APP_GUARD, useClass: RolesGuard },
     { provide: APP_GUARD, useClass: PermissionsGuard },
     { provide: APP_GUARD, useClass: FirstLoginGuard },
