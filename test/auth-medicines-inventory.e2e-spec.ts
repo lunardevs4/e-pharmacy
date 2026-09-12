@@ -120,6 +120,10 @@ describe('Auth, medicines, and inventory API (e2e)', () => {
       const response = await request(app.getHttpServer()).get('/api/v1/auth/csrf-token');
 
       expect(response.status).toBe(200);
+      expect(response.body).toMatchObject({
+        success: true,
+        requestId: expect.any(String),
+      });
       expect(response.body.data.csrfToken).toBeTruthy();
       const cookie = (response.headers['set-cookie'] as unknown as string[]).find((value) =>
         value.startsWith(`${CSRF_TOKEN_COOKIE}=`),
@@ -153,7 +157,10 @@ describe('Auth, medicines, and inventory API (e2e)', () => {
         .send({});
 
       expect(response.status).toBe(403);
-      expect(response.body.message).toBe('Invalid CSRF token');
+      expect(response.body.error).toMatchObject({
+        code: 'FORBIDDEN',
+        message: 'Invalid CSRF token',
+      });
     });
   });
 
@@ -206,12 +213,16 @@ describe('Auth, medicines, and inventory API (e2e)', () => {
       const csrfResponse = await request(app.getHttpServer()).get('/api/v1/auth/csrf-token');
       const csrfToken = csrfResponse.body.data.csrfToken as string;
 
-      await request(app.getHttpServer())
+      const response = await request(app.getHttpServer())
         .post('/api/v1/medicines')
         .set('Authorization', `Bearer ${tokenFor(UserRole.ADMIN)}`)
         .set(csrfHeaders(csrfToken))
         .send({ tradeName: 'Incomplete' })
         .expect(400);
+      expect(response.body.error).toMatchObject({
+        code: 'VALIDATION_ERROR',
+        message: 'Request validation failed',
+      });
       expect(medicinesService.create).toHaveBeenCalledTimes(1);
     });
   });

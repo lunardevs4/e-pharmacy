@@ -10,10 +10,8 @@ export class AppController {
   @Get()
   getHello() {
     return {
-      success: true,
       message: 'Welcome to the Rwanda E-Pharmacy API',
       version: '1.0.0',
-      timestamp: new Date().toISOString(),
       docs: '/api/docs',
     };
   }

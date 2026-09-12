@@ -6,11 +6,13 @@ import {
 } from '@nestjs/common';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
+import { getRequestId } from '../http/api-response';
 
 export interface Response<T> {
-  success: boolean;
+  success: true;
   data: T;
   timestamp: string;
+  requestId: string;
 }
 
 @Injectable()
@@ -23,11 +25,16 @@ export class TransformInterceptor<T> implements NestInterceptor<
     next: CallHandler,
   ): Observable<Response<T>> {
     return next.handle().pipe(
-      map((data) => ({
-        success: true,
-        data,
-        timestamp: new Date().toISOString(),
-      })),
+      map((data) => {
+        const response = context.switchToHttp().getResponse();
+        const request = context.switchToHttp().getRequest();
+        return {
+          success: true as const,
+          data,
+          timestamp: new Date().toISOString(),
+          requestId: getRequestId(request, response),
+        };
+      }),
     );
   }
 }
