@@ -123,7 +123,8 @@ All list endpoints support:
 {
   "success": true,
   "data": {},
-  "timestamp": "2026-07-24T12:00:00.000Z"
+  "timestamp": "2026-07-24T12:00:00.000Z",
+  "requestId": "8b8b2a0a-0e9c-4a27-9f5b-72f9abf1a4c2"
 }
 ```
 
@@ -132,13 +133,22 @@ All list endpoints support:
 ```json
 {
   "success": false,
+  "error": {
+    "code": "VALIDATION_ERROR",
+    "message": "Request validation failed",
+    "details": ["email must be an email"]
+  },
   "statusCode": 400,
-  "message": "Validation error message",
-  "error": "Bad Request",
   "path": "/api/v1/auth/register",
-  "timestamp": "2026-07-24T12:00:00.000Z"
+  "timestamp": "2026-07-24T12:00:00.000Z",
+  "requestId": "8b8b2a0a-0e9c-4a27-9f5b-72f9abf1a4c2"
 }
 ```
+
+All public API field names use `camelCase`. Snake-case identifiers are limited
+to internal database composite keys, environment variables, and file/import
+formats; they are not emitted as API response fields. Every response also
+includes the `X-Request-Id` header for tracing.
 
 ### 🧪 Validation Rules
 

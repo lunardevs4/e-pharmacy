@@ -6,6 +6,7 @@ import {
   issueCsrfToken,
   readCookie,
 } from '../auth-cookies';
+import { sendApiError } from '../http/api-response';
 
 const SAFE_METHODS = new Set(['GET', 'HEAD', 'OPTIONS']);
 const EXEMPT_ROUTES = ['/api/v1/auth/login', '/api/v1/auth/register'];
@@ -37,14 +38,13 @@ export function csrfMiddleware(
 
   const suppliedToken = request.get(CSRF_TOKEN_HEADER);
   if (!tokensMatch(csrfToken, suppliedToken)) {
-    return response.status(403).json({
-      success: false,
-      statusCode: 403,
-      error: 'Forbidden',
-      message: 'Invalid CSRF token',
-      path: request.url,
-      timestamp: new Date().toISOString(),
-    });
+    return sendApiError(
+      request,
+      response,
+      403,
+      'FORBIDDEN',
+      'Invalid CSRF token',
+    );
   }
 
   return next();
