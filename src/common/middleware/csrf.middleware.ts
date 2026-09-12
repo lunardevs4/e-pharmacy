@@ -8,6 +8,7 @@ import {
 } from '../auth-cookies';
 
 const SAFE_METHODS = new Set(['GET', 'HEAD', 'OPTIONS']);
+const EXEMPT_ROUTES = ['/api/v1/auth/login', '/api/v1/auth/register'];
 
 function tokensMatch(
   expected: string | undefined,
@@ -24,6 +25,8 @@ export function csrfMiddleware(
   response: Response,
   next: NextFunction,
 ) {
+  if (EXEMPT_ROUTES.includes(request.path)) return next();
+
   let csrfToken = readCookie(request, CSRF_TOKEN_COOKIE);
   if (!csrfToken) {
     csrfToken = issueCsrfToken(response);

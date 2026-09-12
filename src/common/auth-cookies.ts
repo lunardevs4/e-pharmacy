@@ -3,7 +3,7 @@ import { randomBytes } from 'crypto';
 
 export const ACCESS_TOKEN_COOKIE = 'epharmacy_access';
 export const REFRESH_TOKEN_COOKIE = 'epharmacy_refresh';
-export const CSRF_TOKEN_COOKIE = 'epharmacy_csrf';
+export const CSRF_TOKEN_COOKIE = '__Host-epharmacy_csrf';
 export const CSRF_TOKEN_HEADER = 'x-csrf-token';
 
 const DAY_MS = 24 * 60 * 60 * 1000;
@@ -66,7 +66,12 @@ export function setAuthCookies(
 
 export function csrfCookieOptions() {
   return {
-    ...authCookieOptions(0),
+    // __Host- cookies must be Secure, use Path=/, and must not define Domain.
+    // Keep these properties explicit so they cannot inherit an unsafe value
+    // from the general authentication-cookie configuration.
+    sameSite: authCookieOptions(0).sameSite,
+    secure: true,
+    path: '/',
     httpOnly: false,
     maxAge: undefined,
   } as const;
