@@ -153,32 +153,34 @@ export class InsuranceDashboardService {
       outstandingClaims.map((claim) => claim.pharmacyId),
     ).size;
 
+    // Fetch the seven-month window once, then aggregate in memory. The old
+    // implementation issued one aggregate query per month (7 round trips).
+    const trendStart = new Date(now.getFullYear(), now.getMonth() - 6, 1);
+    const trendClaims = await prisma.insuranceClaim.findMany({
+      where: { ...whereClause, claimedAt: { gte: trendStart } },
+      select: { claimedAt: true, totalAmount: true },
+    });
     const monthlyTrend = [];
     for (let i = 6; i >= 0; i--) {
       const monthStart = new Date(now.getFullYear(), now.getMonth() - i, 1);
-      const monthEnd = new Date(now.getFullYear(), now.getMonth() - i + 1, 0);
-
-      const monthData = await prisma.insuranceClaim.aggregate({
-        where: {
-          ...whereClause,
-          claimedAt: {
-            gte: monthStart,
-            lte: monthEnd,
-          },
-        },
-        _sum: {
-          totalAmount: true,
-        },
-        _count: true,
-      });
-
+      const nextMonthStart = new Date(
+        now.getFullYear(),
+        now.getMonth() - i + 1,
+        1,
+      );
+      const monthClaims = trendClaims.filter(
+        (claim) => claim.claimedAt >= monthStart && claim.claimedAt < nextMonthStart,
+      );
       monthlyTrend.push({
         month: monthStart.toLocaleString('default', {
           month: 'short',
           year: 'numeric',
         }),
-        volume: monthData._count,
-        value: Number(monthData._sum.totalAmount || 0),
+        volume: monthClaims.length,
+        value: monthClaims.reduce(
+          (sum, claim) => sum + Number(claim.totalAmount || 0),
+          0,
+        ),
       });
     }
 

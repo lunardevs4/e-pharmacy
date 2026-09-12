@@ -6,12 +6,53 @@ import {
   validatePositiveInt,
   validateGeoCoordinate,
 } from '../common/security/security.util';
+import { ApiCacheService } from '../common/cache/api-cache.service';
 
 @Injectable()
 export class SearchService {
-  constructor(private prismaService: PrismaService) {}
+  constructor(
+    private prismaService: PrismaService,
+    private apiCache: ApiCacheService,
+  ) {}
 
   async searchMedicines(
+    query?: string,
+    categoryId?: string,
+    latitude?: number,
+    longitude?: number,
+    radius: number = 5,
+    page: number = 1,
+    limit: number = 10,
+    insuranceId?: string,
+  ) {
+    const cacheKey = `search:medicines:${JSON.stringify({
+      query: query?.trim() ?? '',
+      categoryId: categoryId ?? '',
+      latitude: latitude ?? null,
+      longitude: longitude ?? null,
+      radius,
+      page,
+      limit,
+      insuranceId: insuranceId ?? '',
+    })}`;
+
+    return this.apiCache.getOrSet(
+      cacheKey,
+      () => this.executeSearchMedicines(
+        query,
+        categoryId,
+        latitude,
+        longitude,
+        radius,
+        page,
+        limit,
+        insuranceId,
+      ),
+      15_000,
+    );
+  }
+
+  private async executeSearchMedicines(
     query?: string,
     categoryId?: string,
     latitude?: number,
@@ -70,8 +111,35 @@ export class SearchService {
       },
     });
 
+    const agreementsByPharmacy = new Map<string, any>();
+    const tariffsByMedicine = new Map<string, any>();
+    if (insuranceId && inventories.length > 0) {
+      const pharmacyIds = [...new Set(inventories.map((item) => item.pharmacyId))];
+      const medicineIds = [...new Set(inventories.map((item) => item.medicineId))];
+      const [agreements, tariffs] = await Promise.all([
+        prisma.pharmacyInsuranceAgreement.findMany({
+          where: { insuranceId, pharmacyId: { in: pharmacyIds } },
+          include: {
+            insurance: {
+              select: {
+                id: true,
+                name: true,
+                code: true,
+                defaultCoveragePercentage: true,
+              },
+            },
+          },
+        }),
+        prisma.insuranceMedicineTariff.findMany({
+          where: { insuranceId, medicineId: { in: medicineIds } },
+        }),
+      ]);
+      agreements.forEach((agreement) => agreementsByPharmacy.set(agreement.pharmacyId, agreement));
+      tariffs.forEach((tariff) => tariffsByMedicine.set(tariff.medicineId, tariff));
+    }
+
     const results = await Promise.all(
-      inventories.map(async (inv) => {
+      inventories.map((inv) => {
         const baseResult = {
           medicine: inv.medicine,
           pharmacy: inv.pharmacy,
@@ -93,12 +161,10 @@ export class SearchService {
         };
 
         if (insuranceId) {
-          const insuranceCoverage = await this.calculateInsuranceCoverage(
-            insuranceId,
-            inv.pharmacyId,
-            inv.medicineId,
+          const insuranceCoverage = this.calculateInsuranceCoverage(
             Number(inv.price),
-            prisma,
+            agreementsByPharmacy.get(inv.pharmacyId),
+            tariffsByMedicine.get(inv.medicineId),
           );
           return { ...baseResult, insuranceCoverage };
         }
@@ -182,32 +248,11 @@ export class SearchService {
     return (Value * Math.PI) / 180;
   }
 
-  private async calculateInsuranceCoverage(
-    insuranceId: string,
-    pharmacyId: string,
-    medicineId: string,
+  private calculateInsuranceCoverage(
     retailPrice: number,
-    prisma: any,
+    agreement: any,
+    tariff: any,
   ) {
-    const agreement = await prisma.pharmacyInsuranceAgreement.findUnique({
-      where: {
-        insuranceId_pharmacyId: {
-          insuranceId,
-          pharmacyId,
-        },
-      },
-      include: {
-        insurance: {
-          select: {
-            id: true,
-            name: true,
-            code: true,
-            defaultCoveragePercentage: true,
-          },
-        },
-      },
-    });
-
     if (!agreement || agreement.status !== 'ACTIVE') {
       return {
         isCovered: false,
@@ -217,15 +262,6 @@ export class SearchService {
         message: 'No active agreement between pharmacy and insurance',
       };
     }
-
-    const tariff = await prisma.insuranceMedicineTariff.findUnique({
-      where: {
-        insuranceId_medicineId: {
-          insuranceId,
-          medicineId,
-        },
-      },
-    });
 
     if (!tariff || !tariff.isCovered || tariff.status !== 'ACTIVE') {
       return {
