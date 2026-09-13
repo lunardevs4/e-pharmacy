@@ -192,7 +192,7 @@ For production, Gmail is acceptable only for development or a temporary internal
 
 ### Recommended stack
 
-- Sentry for API errors and release monitoring
+- Grafana Cloud via OpenTelemetry for API errors, traces, and release monitoring
 - Datadog / Azure Monitor / Logtail for metrics and logs
 - uptime service for health checks
 
@@ -211,8 +211,8 @@ For production, Gmail is acceptable only for development or a temporary internal
 
 ### Required env values
 
-- MONITORING_PROVIDER
-- MONITORING_API_KEY
+- OTEL_EXPORTER_OTLP_ENDPOINT
+- OTEL_EXPORTER_OTLP_HEADERS
 
 ---
 
@@ -265,7 +265,7 @@ The most realistic setup is:
 - TTS via Azure Speech or Google TTS with Kinyarwanda support
 - Email via SendGrid or a transactional SMTP provider
 - Object storage via AWS S3 or Azure Blob Storage
-- Sentry plus uptime monitoring
+- Grafana Cloud via OpenTelemetry plus uptime monitoring
 - Central secret manager for API keys and tokens
 
 This fits the app’s architecture and keeps the integration points clean without rewriting the backend.

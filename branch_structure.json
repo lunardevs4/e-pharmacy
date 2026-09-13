@@ -1,0 +1,21 @@
+{
+  "default_branch": "main",
+  "branches": [
+    "be2",
+    "feature/be1",
+    "main",
+    "origin"
+  ],
+  "parent": {
+    "be2": "main",
+    "feature/be1": "main",
+    "main": null,
+    "origin": "main"
+  },
+  "order": [
+    "main",
+    "be2",
+    "feature/be1",
+    "origin"
+  ]
+}
