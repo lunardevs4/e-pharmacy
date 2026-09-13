@@ -33,11 +33,13 @@ export interface ApiErrorResponse {
 
 export function getRequestId(request: Request, response: Response) {
   const header = request.header('x-request-id');
-  const requestId =
-    typeof header === 'string' && /^[\w:.\-]{1,128}$/.test(header)
+  const existing = (request as Request & { requestId?: string }).requestId;
+  const requestId = existing ||
+    (typeof header === 'string' && /^[\w:.\-]{1,128}$/.test(header)
       ? header
-      : randomUUID();
+      : randomUUID());
 
+  (request as Request & { requestId?: string }).requestId = requestId;
   response.setHeader('X-Request-Id', requestId);
   return requestId;
 }
