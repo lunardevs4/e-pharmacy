@@ -10,6 +10,7 @@ import {
   Req,
   UseInterceptors,
   UploadedFile,
+  BadRequestException,
 } from '@nestjs/common';
 import {
   ApiTags,
@@ -270,11 +271,15 @@ export class InventoryController {
     @Req() req: any,
     @UploadedFile() file: Express.Multer.File,
   ) {
+    if (!file || !file.buffer) {
+      throw new BadRequestException('No file provided or file is empty.');
+    }
     return this.inventoryService.importInventory(
       pharmacyId,
       req.user,
       file.buffer,
       file.mimetype,
+      file.originalname,
     );
   }
 }

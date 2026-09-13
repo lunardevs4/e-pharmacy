@@ -31,7 +31,7 @@ export class InventoryService {
     private prismaService: PrismaService,
     private emailService: EmailService,
     private apiCache: ApiCacheService,
-  ) {}
+  ) { }
 
   private async ensureViewAccess(pharmacyId: string, user: AuthenticatedUser) {
     const prisma = this.prismaService.prisma;
@@ -297,11 +297,100 @@ export class InventoryService {
     return result;
   }
 
+  private normalizeRow(row: Record<string, any>): Record<string, any> {
+    const normalized: Record<string, any> = {};
+    for (const key of Object.keys(row)) {
+      const cleanKey = key.trim().toLowerCase().replace(/[\s\-_]+/g, '');
+      normalized[cleanKey] = row[key];
+    }
+
+    const tradeName =
+      normalized.tradename ||
+      normalized.trade ||
+      normalized.name ||
+      normalized.medicinename ||
+      normalized.medicine;
+    const genericName =
+      normalized.genericname ||
+      normalized.generic ||
+      normalized.activeingredient;
+    const quantity =
+      normalized.quantity ||
+      normalized.qty ||
+      normalized.stock ||
+      normalized.count;
+    const price =
+      normalized.price ||
+      normalized.unitprice ||
+      normalized.sellingprice ||
+      normalized.rate;
+    const category = normalized.category || normalized.categoryname;
+    const manufacturer =
+      normalized.manufacturer ||
+      normalized.manufacturername ||
+      normalized.brand;
+    const batchNumber =
+      normalized.batchnumber || normalized.batchno || normalized.batch;
+    const lotNumber =
+      normalized.lotnumber || normalized.lotno || normalized.lot;
+    const expiryDate =
+      normalized.expirydate ||
+      normalized.expdate ||
+      normalized.expiry ||
+      normalized.expiration;
+    const unitCost =
+      normalized.unitcost || normalized.costprice || normalized.cost;
+
+    return {
+      tradeName:
+        tradeName !== undefined && tradeName !== null
+          ? String(tradeName).trim()
+          : undefined,
+      genericName:
+        genericName !== undefined && genericName !== null
+          ? String(genericName).trim()
+          : undefined,
+      quantity:
+        quantity !== undefined && quantity !== null
+          ? String(quantity).trim()
+          : undefined,
+      price:
+        price !== undefined && price !== null
+          ? String(price).trim()
+          : undefined,
+      category:
+        category !== undefined && category !== null
+          ? String(category).trim()
+          : undefined,
+      manufacturer:
+        manufacturer !== undefined && manufacturer !== null
+          ? String(manufacturer).trim()
+          : undefined,
+      batchNumber:
+        batchNumber !== undefined && batchNumber !== null
+          ? String(batchNumber).trim()
+          : undefined,
+      lotNumber:
+        lotNumber !== undefined && lotNumber !== null
+          ? String(lotNumber).trim()
+          : undefined,
+      expiryDate:
+        expiryDate !== undefined && expiryDate !== null
+          ? String(expiryDate).trim()
+          : undefined,
+      unitCost:
+        unitCost !== undefined && unitCost !== null
+          ? String(unitCost).trim()
+          : undefined,
+    };
+  }
+
   async importInventory(
     pharmacyId: string,
     user: AuthenticatedUser,
     fileBuffer: Buffer,
     mimeType: string,
+    originalName?: string,
   ) {
     const prisma = this.prismaService.prisma;
     const safePharmacyId = validateUuid(pharmacyId, 'pharmacyId');
@@ -310,18 +399,46 @@ export class InventoryService {
     await this.ensureWriteAccess(safePharmacyId, user);
 
     let rows: any[] = [];
+    const lowerName = (originalName || '').toLowerCase();
+    const isCsv =
+      mimeType.includes('csv') ||
+      mimeType === 'text/plain' ||
+      mimeType === 'application/vnd.ms-excel' ||
+      lowerName.endsWith('.csv');
 
-    if (mimeType === 'text/csv' || mimeType === 'application/vnd.ms-excel') {
-      rows = await this.parseCSV(fileBuffer);
-    } else if (
-      mimeType ===
-      'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
-    ) {
-      rows = await this.parseExcel(fileBuffer);
+    if (isCsv) {
+      try {
+        rows = await this.parseCSV(fileBuffer);
+      } catch {
+        rows = [];
+      }
+      if (!rows || rows.length === 0) {
+        try {
+          rows = await this.parseExcel(fileBuffer);
+        } catch {
+          // ignore
+        }
+      }
     } else {
-      throw new BadRequestException(
-        'Unsupported file format. Please upload CSV or Excel file.',
-      );
+      try {
+        rows = await this.parseExcel(fileBuffer);
+      } catch {
+        try {
+          rows = await this.parseCSV(fileBuffer);
+        } catch {
+          rows = [];
+        }
+      }
+    }
+
+    if (!rows || rows.length === 0) {
+      try {
+        rows = await this.parseExcel(fileBuffer);
+      } catch {
+        throw new BadRequestException(
+          'Could not parse file. Please ensure it is a valid CSV or Excel file.',
+        );
+      }
     }
 
     const results = {
@@ -332,11 +449,19 @@ export class InventoryService {
     };
 
     for (let i = 0; i < rows.length; i++) {
-      const row = rows[i];
+      const rawRow = rows[i];
       const rowNum = i + 1;
 
       try {
-        if (!row.tradeName || !row.quantity || !row.price) {
+        const row = this.normalizeRow(rawRow);
+
+        if (
+          !row.tradeName ||
+          row.quantity === undefined ||
+          row.quantity === '' ||
+          row.price === undefined ||
+          row.price === ''
+        ) {
           throw new Error(
             'Missing required fields: tradeName, quantity, or price',
           );
@@ -362,14 +487,12 @@ export class InventoryService {
         const safeLotNumber = row.lotNumber
           ? validateSafeString(row.lotNumber, 'lotNumber', 100)
           : null;
-        const safeUnitCost = row.unitCost
-          ? validatePositiveInt(Number(row.unitCost), 'unitCost', 0)
-          : null;
+        const safeUnitCost =
+          row.unitCost && !isNaN(Number(row.unitCost))
+            ? validatePositiveInt(Number(row.unitCost), 'unitCost', 0)
+            : null;
 
-        let expiryDate: Date | undefined;
-        if (row.expiryDate) {
-          expiryDate = validateDate(row.expiryDate, 'expiryDate');
-        }
+        const expiryDate = this.parseSpreadsheetDate(row.expiryDate);
 
         let categoryId: string | undefined;
         if (row.category) {
@@ -389,6 +512,16 @@ export class InventoryService {
             });
             categoryId = newCategory.id;
           }
+        } else {
+          let defaultCategory = await prisma.category.findFirst({
+            where: { name: { equals: 'General', mode: 'insensitive' } },
+          });
+          if (!defaultCategory) {
+            defaultCategory = await prisma.category.create({
+              data: { name: 'General' },
+            });
+          }
+          categoryId = defaultCategory.id;
         }
 
         let manufacturerId: string | undefined;
@@ -409,12 +542,21 @@ export class InventoryService {
             });
             manufacturerId = newManufacturer.id;
           }
+        } else {
+          let defaultManufacturer = await prisma.manufacturer.findFirst({
+            where: { name: { equals: 'General', mode: 'insensitive' } },
+          });
+          if (!defaultManufacturer) {
+            defaultManufacturer = await prisma.manufacturer.create({
+              data: { name: 'General' },
+            });
+          }
+          manufacturerId = defaultManufacturer.id;
         }
 
         const existingMedicine = await prisma.medicine.findFirst({
           where: {
-            tradeName: safeTradeName,
-            genericName: safeGenericName || '',
+            tradeName: { equals: safeTradeName, mode: 'insensitive' },
           },
         });
 
@@ -425,7 +567,7 @@ export class InventoryService {
           medicine = await prisma.medicine.create({
             data: {
               tradeName: safeTradeName,
-              genericName: safeGenericName,
+              genericName: safeGenericName || safeTradeName,
               categoryId,
               manufacturerId,
             },
@@ -446,7 +588,7 @@ export class InventoryService {
             data: {
               quantity: existingInventory.quantity + safeQuantity,
               price: safePrice,
-              expiryDate,
+              expiryDate: expiryDate ?? existingInventory.expiryDate,
             },
           });
 
@@ -543,7 +685,7 @@ export class InventoryService {
         results.errors.push({
           row: rowNum,
           error: (error as Error).message,
-          data: row,
+          data: rawRow,
         });
       }
     }
@@ -551,6 +693,44 @@ export class InventoryService {
     this.apiCache.invalidate('medicine:availability:');
     this.apiCache.invalidate('search:');
     return results;
+  }
+
+  private parseSpreadsheetDate(value: any): Date | undefined {
+    if (!value) return undefined;
+    if (value instanceof Date) return isNaN(value.getTime()) ? undefined : value;
+
+    if (
+      typeof value === 'number' ||
+      (typeof value === 'string' && !isNaN(Number(value)) && !value.includes('/') && !value.includes('-'))
+    ) {
+      const num = Number(value);
+      if (num > 30000 && num < 100000) {
+        const utcDays = num - 25569;
+        const date = new Date(utcDays * 86400 * 1000);
+        if (!isNaN(date.getTime())) return date;
+      }
+    }
+
+    const str = String(value).trim();
+    const parsed = new Date(str);
+    if (!isNaN(parsed.getTime())) {
+      return parsed;
+    }
+
+    const parts = str.split(/[\/\-\.]/);
+    if (parts.length === 3) {
+      const p1 = parseInt(parts[0], 10);
+      const p2 = parseInt(parts[1], 10);
+      const p3 = parseInt(parts[2], 10);
+      if (p3 > 1000) {
+        const d1 = new Date(p3, p1 - 1, p2);
+        if (!isNaN(d1.getTime())) return d1;
+        const d2 = new Date(p3, p2 - 1, p1);
+        if (!isNaN(d2.getTime())) return d2;
+      }
+    }
+
+    return undefined;
   }
 
   private async parseCSV(buffer: Buffer): Promise<any[]> {
@@ -569,6 +749,7 @@ export class InventoryService {
   private async parseExcel(buffer: Buffer): Promise<any[]> {
     const workbook = xlsx.read(buffer, { type: 'buffer' });
     const sheetName = workbook.SheetNames[0];
+    if (!sheetName) return [];
     const worksheet = workbook.Sheets[sheetName];
     const jsonData = xlsx.utils.sheet_to_json(worksheet);
     return jsonData;
