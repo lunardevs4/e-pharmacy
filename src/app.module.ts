@@ -36,6 +36,8 @@ import { CommunicationModule } from './common/communication/communication.module
 import { ScopedThrottlerGuard } from './common/guards/scoped-throttler.guard';
 import { ThrottlerStorageRedisService } from '@nest-lab/throttler-storage-redis';
 import { ApiCacheModule } from './common/cache/api-cache.module';
+import { MonitoringModule } from './common/monitoring/monitoring.module';
+import { HealthModule } from './health/health.module';
 
 @Module({
   imports: [
@@ -63,6 +65,8 @@ import { ApiCacheModule } from './common/cache/api-cache.module';
     }),
     ScheduleModule.forRoot(),
     ApiCacheModule,
+    MonitoringModule,
+    HealthModule,
     ThrottlerModule.forRootAsync({
       imports: [ConfigModule],
       inject: [ConfigService],
