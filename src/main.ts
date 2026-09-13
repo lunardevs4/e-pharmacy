@@ -1,3 +1,4 @@
+import './instrument';
 import { NestFactory } from '@nestjs/core';
 import { ValidationPipe } from '@nestjs/common';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
@@ -6,15 +7,21 @@ import { join } from 'path';
 import helmet from 'helmet';
 import * as hpp from 'hpp';
 import { AppModule } from './app.module';
-import { HttpExceptionFilter } from './common/filters/http-exception.filter';
 import { XssSanitizationPipe } from './common/pipes/xss-sanitization.pipe';
 import { noSqlSanitize } from './common/middleware/nosql-sanitize.middleware';
 import { csrfMiddleware } from './common/middleware/csrf.middleware';
+import { StructuredLogger } from './common/logging/structured.logger';
+import { RequestLoggingMiddleware } from './common/logging/request-logging.middleware';
+import { MonitoringService } from './common/monitoring/monitoring.service';
 
 async function bootstrap() {
-  const app = await NestFactory.create<NestExpressApplication>(AppModule);
+  const app = await NestFactory.create<NestExpressApplication>(AppModule, {
+    logger: new StructuredLogger(),
+  });
 
   app.set('trust proxy', 1);
+  const requestLogger = new RequestLoggingMiddleware(app.get(MonitoringService));
+  app.use(requestLogger.use.bind(requestLogger));
 
   const isProduction = process.env.NODE_ENV === 'production';
   const configuredOrigins = (process.env.CORS_ORIGINS || '')
@@ -124,8 +131,6 @@ async function bootstrap() {
       );
     },
   });
-
-  app.useGlobalFilters(new HttpExceptionFilter());
 
   app.useGlobalPipes(
     new XssSanitizationPipe(),
