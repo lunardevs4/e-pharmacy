@@ -140,19 +140,17 @@ Required to monitor application health and reminder delivery quality.
 
 Recommended services:
 
-- Sentry for errors and release tracking
-- Logtail / Datadog / New Relic / Azure Monitor for logs and metrics
+- Grafana Cloud via OpenTelemetry for errors, traces, metrics, and alerting
 - uptime monitoring (Pingdom, Better Stack, Uptime.com)
 
 Required variables:
 
-- `MONITORING_PROVIDER`
-- `MONITORING_API_KEY`
+- `OTEL_EXPORTER_OTLP_ENDPOINT`
+- `OTEL_EXPORTER_OTLP_HEADERS`
 
 Suggested values:
 
-- `MONITORING_PROVIDER=sentry`
-- `MONITORING_PROVIDER=mock` for local development
+- Leave the OTLP values empty for local development.
 
 ---
 
@@ -254,8 +252,10 @@ TTS_API_SECRET=
 TTS_LANGUAGE=rw
 TTS_VOICE=
 
-MONITORING_PROVIDER=sentry
-MONITORING_API_KEY=
+OTEL_SERVICE_NAME=e-pharmacy-api
+OTEL_EXPORTER_OTLP_ENDPOINT=
+OTEL_EXPORTER_OTLP_HEADERS=
+OTEL_METRIC_EXPORT_INTERVAL_MS=15000
 
 GMAIL_USER=
 GMAIL_APP_PASSWORD=
@@ -272,7 +272,7 @@ For Rwanda deployment, the most realistic production stack is:
 - Voice reminders: Twilio Voice or local telecom IVR provider
 - TTS: Azure Speech or Google Cloud TTS with Kinyarwanda voice support, or prerecorded Kinyarwanda voice prompts via telecom provider
 - SMTP: SendGrid or dedicated transactional email provider
-- Monitoring: Sentry + uptime monitoring
+- Monitoring: Grafana Cloud via OpenTelemetry + uptime monitoring
 - Storage: S3/Blob storage for uploaded documents
 - Secrets: centralized secret store
 
