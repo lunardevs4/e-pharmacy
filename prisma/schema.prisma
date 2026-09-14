@@ -423,6 +423,7 @@ model ReminderSchedule {
   endDate       DateTime
   timeOfDay     String[]
   intervalHours Int?
+  channel       NotificationType @default(SMS)
   createdAt     DateTime         @default(now())
   updatedAt     DateTime         @updatedAt
 
@@ -458,6 +459,7 @@ model ReminderLog {
   @@index([patientId])
   @@index([status])
   @@index([provider])
+  @@index([providerReference])
   @@index([createdAt])
 }
 
