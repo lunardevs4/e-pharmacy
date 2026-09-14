@@ -6,6 +6,7 @@ import {
   Patch,
   Delete,
   Param,
+  Query,
   UseGuards,
   Req,
 } from '@nestjs/common';
@@ -15,11 +16,13 @@ import {
   ApiOperation,
   ApiBody,
   ApiParam,
+  ApiQuery,
 } from '@nestjs/swagger';
 import { RemindersService } from './reminders.service';
 import {
   CreateReminderScheduleDto,
   UpdateReminderScheduleDto,
+  ReminderLogQueryDto,
 } from './dto/reminders.dto';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { Roles } from '../common/guards/roles.decorator';
@@ -128,9 +131,19 @@ export class RemindersController {
   }
 
   @Get('history')
-  @Roles(UserRole.PATIENT)
-  getReminderHistory(@Req() req: any) {
-    return this.remindersService.getLogs(req.user);
+  @Roles(
+    UserRole.PATIENT,
+    UserRole.PHARMACIST,
+    UserRole.PHARMACY_OWNER,
+    UserRole.ADMIN,
+  )
+  @ApiOperation({
+    summary: 'Get reminder delivery history',
+    description:
+      'Endpoint: GET /api/v1/reminders/history\n\nFilter by status, startDate, endDate, and (for staff) patientId.',
+  })
+  getReminderHistory(@Req() req: any, @Query() query: ReminderLogQueryDto) {
+    return this.remindersService.getLogs(req.user, query);
   }
 
   @Get('adherence/summary')
@@ -140,13 +153,18 @@ export class RemindersController {
   }
 
   @Get('logs')
-  @Roles(UserRole.PATIENT)
+  @Roles(
+    UserRole.PATIENT,
+    UserRole.PHARMACIST,
+    UserRole.PHARMACY_OWNER,
+    UserRole.ADMIN,
+  )
   @ApiOperation({
-    summary: 'Get my reminder logs (patient only)',
+    summary: 'Get reminder delivery logs',
     description:
-      'Endpoint: GET /api/v1/reminders/logs\n\nReturns all medication reminder logs (intake history) for the currently authenticated patient.',
+      'Endpoint: GET /api/v1/reminders/logs\n\nReturns all medication reminder logs with status, delivery info, and timestamps.',
   })
-  getLogs(@Req() req: any) {
-    return this.remindersService.getLogs(req.user);
+  getLogs(@Req() req: any, @Query() query: ReminderLogQueryDto) {
+    return this.remindersService.getLogs(req.user, query);
   }
 }

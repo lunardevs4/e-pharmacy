@@ -8,8 +8,11 @@ import { PrismaService } from '../common/prisma/prisma.service';
 import {
   CreateReminderScheduleDto,
   UpdateReminderScheduleDto,
+  ReminderLogQueryDto,
+  DeliveryStatusWebhookDto,
+  InboundSmsWebhookDto,
 } from './dto/reminders.dto';
-import { UserRole, ReminderStatus } from '@generated/prisma';
+import { UserRole, ReminderStatus, NotificationType } from '@generated/prisma';
 import {
   validateUuid,
   sanitizeDeep,
@@ -78,6 +81,7 @@ export class RemindersService {
       dosage,
       notes,
       pharmacistInstructions,
+      channel,
       ...restDto
     } = safeDto as any;
 
@@ -140,6 +144,7 @@ export class RemindersService {
         patientId: safePatientId,
         medicineId: safeMedicineId,
         dosage: dosage || 'As directed',
+        channel: channel || NotificationType.SMS,
         startDate,
         endDate: scheduleEndDate,
         timeOfDay: scheduleTimes,
@@ -333,33 +338,274 @@ export class RemindersService {
     });
   }
 
-  async getLogs(user: AuthenticatedUser, page = 1, limit = 20) {
+  async getLogs(
+    user: AuthenticatedUser,
+    query: ReminderLogQueryDto | number = 1,
+    limitParam = 20,
+  ) {
     const prisma = this.prismaService.prisma;
+    const isObjectQuery = typeof query === 'object' && query !== null;
+    const page = isObjectQuery
+      ? Number(query.page) > 0
+        ? Number(query.page)
+        : 1
+      : Number(query) > 0
+        ? Number(query)
+        : 1;
+    const limit = isObjectQuery
+      ? Math.min(Number(query.limit) > 0 ? Number(query.limit) : 20, 100)
+      : Math.min(Number(limitParam) > 0 ? Number(limitParam) : 20, 100);
+
     const safeUserId = validateUuid(user.id, 'userId');
-    const patient = await this.getPatientFromUser(prisma, safeUserId);
-    const safePage = Number(page) > 0 ? Number(page) : 1;
-    const safeLimit = Math.min(Number(limit) > 0 ? Number(limit) : 20, 100);
+    const where: any = {};
+
+    if (user.role === UserRole.PATIENT) {
+      const patient = await this.getPatientFromUser(prisma, safeUserId);
+      where.patientId = patient.id;
+    } else if (
+      user.role === UserRole.PHARMACIST ||
+      user.role === UserRole.PHARMACY_OWNER ||
+      user.role === UserRole.ADMIN ||
+      user.role === UserRole.GOVERNMENT
+    ) {
+      if (isObjectQuery && query.patientId) {
+        where.patientId = validateUuid(query.patientId, 'patientId');
+      }
+    } else {
+      throw new ForbiddenException(
+        'You do not have permission to view reminder logs',
+      );
+    }
+
+    if (isObjectQuery && query.status) {
+      where.status = query.status;
+    }
+
+    if (isObjectQuery && (query.startDate || query.endDate)) {
+      where.createdAt = {};
+      if (query.startDate) {
+        where.createdAt.gte = validateDate(query.startDate, 'startDate');
+      }
+      if (query.endDate) {
+        const end = validateDate(query.endDate, 'endDate');
+        end.setHours(23, 59, 59, 999);
+        where.createdAt.lte = end;
+      }
+    }
+
     const [data, total] = await Promise.all([
       prisma.reminderLog.findMany({
-        where: { schedule: { patientId: patient.id } },
-        include: { schedule: { include: { medicine: true } } },
+        where,
+        include: {
+          schedule: { include: { medicine: true } },
+          patient: {
+            select: {
+              id: true,
+              user: {
+                select: {
+                  firstName: true,
+                  lastName: true,
+                  phone: true,
+                },
+              },
+            },
+          },
+        },
         orderBy: { createdAt: 'desc' },
-        skip: (safePage - 1) * safeLimit,
-        take: safeLimit,
+        skip: (page - 1) * limit,
+        take: limit,
       }),
-      prisma.reminderLog.count({
-        where: { schedule: { patientId: patient.id } },
-      }),
+      prisma.reminderLog.count({ where }),
     ]);
 
     return {
       data,
       meta: {
-        page: safePage,
-        limit: safeLimit,
+        page,
+        limit,
         total,
-        totalPages: Math.ceil(total / safeLimit) || 1,
+        totalPages: Math.ceil(total / limit) || 1,
       },
+    };
+  }
+
+  async handleDeliveryStatusWebhook(dto: DeliveryStatusWebhookDto) {
+    const prisma = this.prismaService.prisma;
+    const providerReference = dto.id || dto.providerMessageId;
+
+    if (!providerReference) {
+      return {
+        success: false,
+        message: 'Missing message ID / provider reference in webhook payload',
+      };
+    }
+
+    const rawStatus = (dto.status || '').toLowerCase();
+    let mappedStatus: ReminderStatus = ReminderStatus.SENT;
+
+    if (
+      rawStatus === 'delivered' ||
+      rawStatus === 'success' ||
+      rawStatus === 'completed'
+    ) {
+      mappedStatus = ReminderStatus.DELIVERED;
+    } else if (
+      rawStatus === 'failed' ||
+      rawStatus === 'rejected' ||
+      rawStatus === 'undelivered'
+    ) {
+      mappedStatus = ReminderStatus.FAILED;
+    } else if (
+      rawStatus === 'sent' ||
+      rawStatus === 'submitted' ||
+      rawStatus === 'buffered' ||
+      rawStatus === 'queued'
+    ) {
+      mappedStatus = ReminderStatus.SENT;
+    }
+
+    const log = await prisma.reminderLog.findFirst({
+      where: { providerReference },
+    });
+
+    if (!log) {
+      return {
+        success: true,
+        updated: false,
+        message: `No reminder log found with providerReference: ${providerReference}`,
+      };
+    }
+
+    // Do not downgrade a COMPLETED dose back to DELIVERED/SENT
+    if (log.status === ReminderStatus.COMPLETED) {
+      return {
+        success: true,
+        updated: false,
+        logId: log.id,
+        currentStatus: log.status,
+        message: 'Dose already marked as COMPLETED by patient',
+      };
+    }
+
+    const updated = await prisma.reminderLog.update({
+      where: { id: log.id },
+      data: {
+        status: mappedStatus,
+        error:
+          mappedStatus === ReminderStatus.FAILED
+            ? (dto.failureReason || dto.error || 'Provider delivery failure')
+            : null,
+      },
+    });
+
+    return {
+      success: true,
+      updated: true,
+      logId: updated.id,
+      previousStatus: log.status,
+      newStatus: updated.status,
+    };
+  }
+
+  async handleInboundSmsWebhook(dto: InboundSmsWebhookDto) {
+    const prisma = this.prismaService.prisma;
+    const rawFrom = (dto.from || dto.phoneNumber || '').trim();
+    const rawText = (dto.text || dto.message || '').trim();
+
+    if (!rawFrom || !rawText) {
+      return {
+        success: false,
+        message: 'Inbound webhook payload missing sender phone number or text',
+      };
+    }
+
+    // Check affirmative keywords (English and Kinyarwanda)
+    const isAffirmative =
+      /^(YES|Y|TAKEN|DONE|1|OK|EGO|NAYIFASHE|NAKIRIYE)(\b|!|\.)/i.test(rawText);
+
+    if (!isAffirmative) {
+      return {
+        success: true,
+        confirmed: false,
+        message: `Inbound message "${rawText}" is not a recognized confirmation keyword`,
+      };
+    }
+
+    // Normalize phone number: e.g. +250788123456 -> matches 0788123456, 250788123456, +250788123456
+    const digitsOnly = rawFrom.replace(/\D/g, '');
+    const phoneCandidates = [rawFrom];
+    if (digitsOnly.startsWith('250')) {
+      phoneCandidates.push('+' + digitsOnly);
+      phoneCandidates.push('0' + digitsOnly.slice(3));
+      phoneCandidates.push(digitsOnly);
+    } else if (digitsOnly.startsWith('07')) {
+      phoneCandidates.push('+250' + digitsOnly.slice(1));
+      phoneCandidates.push('250' + digitsOnly.slice(1));
+      phoneCandidates.push(digitsOnly);
+    }
+
+    const user = await prisma.user.findFirst({
+      where: {
+        phone: { in: phoneCandidates },
+      },
+      include: { patient: true },
+    });
+
+    if (!user || !user.patient) {
+      return {
+        success: true,
+        confirmed: false,
+        message: `No registered patient found with phone number ${rawFrom}`,
+      };
+    }
+
+    // Find the most recent active/due reminder log for this patient within the last 12 hours
+    const twelveHoursAgo = new Date(Date.now() - 12 * 60 * 60 * 1000);
+    const activeLog = await prisma.reminderLog.findFirst({
+      where: {
+        patientId: user.patient.id,
+        status: {
+          in: [
+            ReminderStatus.SENT,
+            ReminderStatus.DELIVERED,
+            ReminderStatus.PENDING,
+            ReminderStatus.QUEUED,
+          ],
+        },
+        createdAt: { gte: twelveHoursAgo },
+      },
+      include: {
+        schedule: {
+          include: { medicine: { select: { tradeName: true } } },
+        },
+      },
+      orderBy: { createdAt: 'desc' },
+    });
+
+    if (!activeLog) {
+      return {
+        success: true,
+        confirmed: false,
+        message: `No pending or delivered reminder found in the active window for patient ${user.patient.id}`,
+      };
+    }
+
+    const confirmedLog = await prisma.reminderLog.update({
+      where: { id: activeLog.id },
+      data: {
+        status: ReminderStatus.COMPLETED,
+        confirmationSource: 'SMS',
+        confirmationTime: new Date(),
+      },
+    });
+
+    return {
+      success: true,
+      confirmed: true,
+      logId: confirmedLog.id,
+      patientId: user.patient.id,
+      medicine: activeLog.schedule.medicine.tradeName,
+      confirmationTime: confirmedLog.confirmationTime,
     };
   }
 
