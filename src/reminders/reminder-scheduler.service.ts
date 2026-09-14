@@ -4,6 +4,7 @@ import { PrismaService } from '../common/prisma/prisma.service';
 import { NotificationType, ReminderStatus } from '@generated/prisma';
 import { EmailService } from '../common/email/email.service';
 import { CommunicationService } from '../common/communication/communication.service';
+import { buildMedicationReminderMessage } from './helpers/reminder-message.helper';
 
 @Injectable()
 export class ReminderSchedulerService {
@@ -103,7 +104,13 @@ export class ReminderSchedulerService {
 
           const patientUser = schedule.patient.user;
           const medicineName = schedule.medicine.tradeName;
-          const message = `Time to take your ${medicineName} — ${schedule.dosage}.`;
+          const message = buildMedicationReminderMessage({
+            patientName: patientUser.firstName,
+            medicineName,
+            dosage: schedule.dosage,
+            time: currentHHMM,
+          });
+
           const smsResult = await this.communicationService.sendSms(
             patientUser.phone,
             message,
@@ -118,9 +125,11 @@ export class ReminderSchedulerService {
             data: {
               scheduleId: schedule.id,
               patientId: schedule.patientId,
-              type: NotificationType.SMS,
+              type: schedule.channel || NotificationType.SMS,
               status,
               sentAt: now,
+              provider: smsResult.provider,
+              providerReference: smsResult.providerReference,
               error:
                 smsResult.status === 'FAILED'
                   ? (smsResult.error ?? 'Provider rejected the request')
@@ -150,7 +159,7 @@ export class ReminderSchedulerService {
           }
 
           this.logger.log(
-            `Dispatched reminder for patient ${schedule.patientId} | medicine: ${medicineName} | time: ${currentHHMM}`,
+            `Dispatched reminder for patient ${schedule.patientId} | medicine: ${medicineName} | time: ${currentHHMM} | ref: ${smsResult.providerReference ?? 'none'}`,
           );
         } catch (err) {
           this.logger.error(
@@ -161,7 +170,7 @@ export class ReminderSchedulerService {
               data: {
                 scheduleId: schedule.id,
                 patientId: schedule.patientId,
-                type: NotificationType.SMS,
+                type: schedule.channel || NotificationType.SMS,
                 status: ReminderStatus.FAILED,
                 sentAt: now,
                 error: (err as Error).message,
@@ -216,6 +225,106 @@ export class ReminderSchedulerService {
     }).catch((error) => {
       this.logger.error(
         `Mark missed doses run failed: ${(error as Error).message}`,
+      );
+    });
+  }
+
+  @Cron('*/5 * * * *')
+  async retryFailedReminders() {
+    await this.runWithReconnect(async () => {
+      const prisma = this.prismaService.prisma;
+      const maxRetries = Number(process.env.SMS_MAX_RETRIES) || 3;
+      const now = new Date();
+      const twoHoursAgo = new Date(now.getTime() - 2 * 60 * 60 * 1000);
+
+      const failedLogs = await prisma.reminderLog.findMany({
+        where: {
+          status: ReminderStatus.FAILED,
+          type: NotificationType.SMS,
+          confirmationTime: null,
+          retryCount: { lt: maxRetries },
+          createdAt: { gte: twoHoursAgo },
+        },
+        include: {
+          schedule: {
+            include: {
+              medicine: { select: { tradeName: true } },
+            },
+          },
+          patient: {
+            include: {
+              user: true,
+            },
+          },
+        },
+      });
+
+      if (failedLogs.length === 0) return;
+      this.logger.log(
+        `Found ${failedLogs.length} failed reminder(s) eligible for retry evaluation`,
+      );
+
+      for (const log of failedLogs) {
+        // Exponential backoff: attempt 0 -> 5m, attempt 1 -> 15m, attempt 2 -> 45m
+        const backoffMinutes = Math.pow(3, log.retryCount) * 5;
+        const eligibleAt = new Date(
+          log.createdAt.getTime() + backoffMinutes * 60 * 1000,
+        );
+        if (now < eligibleAt) {
+          continue;
+        }
+
+        const patientUser = log.patient.user;
+        const medicineName = log.schedule.medicine.tradeName;
+        const message = buildMedicationReminderMessage({
+          patientName: patientUser.firstName,
+          medicineName,
+          dosage: log.schedule.dosage,
+        });
+
+        this.logger.log(
+          `Retrying SMS reminder for log ${log.id} (attempt ${log.retryCount + 1}/${maxRetries}) to ${patientUser.phone}`,
+        );
+
+        const smsResult = await this.communicationService.sendSms(
+          patientUser.phone,
+          message,
+        );
+
+        if (smsResult.status === 'SENT' || smsResult.status === 'DELIVERED') {
+          await prisma.reminderLog.update({
+            where: { id: log.id },
+            data: {
+              status: ReminderStatus.SENT,
+              sentAt: now,
+              provider: smsResult.provider,
+              providerReference: smsResult.providerReference,
+              retryCount: log.retryCount + 1,
+              error: null,
+            },
+          });
+          this.logger.log(
+            `Retry succeeded for reminder log ${log.id} | ref: ${smsResult.providerReference}`,
+          );
+        } else {
+          const nextRetryCount = log.retryCount + 1;
+          await prisma.reminderLog.update({
+            where: { id: log.id },
+            data: {
+              retryCount: nextRetryCount,
+              error: smsResult.error ?? 'Retry failed',
+            },
+          });
+          if (nextRetryCount >= maxRetries) {
+            this.logger.error(
+              `Reminder log ${log.id} exhausted max retries (${maxRetries}). Permanent failure: ${smsResult.error}`,
+            );
+          }
+        }
+      }
+    }).catch((error) => {
+      this.logger.error(
+        `Retry failed reminders run failed: ${(error as Error).message}`,
       );
     });
   }

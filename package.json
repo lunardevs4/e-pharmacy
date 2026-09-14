@@ -109,6 +109,9 @@
       "**/*.(t|j)s"
     ],
     "coverageDirectory": "../coverage",
-    "testEnvironment": "node"
+    "testEnvironment": "node",
+    "moduleNameMapper": {
+      "^@generated/prisma$": "<rootDir>/generated/prisma"
+    }
   }
 }
