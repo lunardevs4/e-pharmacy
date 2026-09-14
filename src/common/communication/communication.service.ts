@@ -1,4 +1,9 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { Injectable, Logger, Inject, Optional } from '@nestjs/common';
+import {
+  ISmsProvider,
+  SMS_PROVIDER_TOKEN,
+} from './sms/sms-provider.interface';
+import { MockSmsProvider } from './sms/mock-sms.provider';
 
 export type CommunicationChannel = 'SMS' | 'VOICE' | 'EMAIL' | 'TTS';
 export type DeliveryStatus =
@@ -205,18 +210,49 @@ export class TtsProvider implements NotificationProvider {
 export class CommunicationService {
   private readonly logger = new Logger(CommunicationService.name);
 
-  private readonly smsProvider = new SmsProvider();
+  private readonly activeSmsProvider: ISmsProvider;
   private readonly voiceProvider = new VoiceProvider();
   private readonly ttsProvider = new TtsProvider();
 
-  async sendSms(phone: string, message: string): Promise<CommunicationResult> {
-    const result = await this.smsProvider.deliver(phone, message);
-    if (result.status === 'FAILED') {
+  constructor(
+    @Optional()
+    @Inject(SMS_PROVIDER_TOKEN)
+    private readonly smsProviderAdapter?: ISmsProvider,
+  ) {
+    this.activeSmsProvider = smsProviderAdapter ?? new MockSmsProvider(0);
+  }
+
+  get smsProvider(): ISmsProvider {
+    return this.activeSmsProvider;
+  }
+
+  async sendSms(
+    phone: string,
+    message: string,
+    callbackUrl?: string,
+  ): Promise<CommunicationResult> {
+    const res = await this.activeSmsProvider.send({
+      toNumber: phone,
+      message,
+      callbackUrl,
+    });
+
+    if (res.status === 'FAILED') {
       this.logger.warn(
-        `SMS delivery failed for ${phone}: ${result.error ?? 'provider rejected the request'}`,
+        `SMS delivery failed for ${phone}: ${res.error ?? 'provider rejected the request'}`,
       );
     }
-    return result;
+
+    return {
+      channel: 'SMS',
+      recipient: phone,
+      status: res.status,
+      provider: this.activeSmsProvider.name,
+      providerReference: res.providerMessageId,
+      error: res.error,
+      retryable: res.status === 'FAILED',
+      timestamp: new Date(),
+    };
   }
 
   async sendVoiceCall(
