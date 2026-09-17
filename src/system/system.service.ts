@@ -186,6 +186,10 @@ export class SystemService implements OnModuleInit {
 
     const prisma = this.prismaService.prisma;
     const now = new Date();
+
+    // Refresh cache to ensure valid DB record ID
+    await this.refreshCache();
+
     const previousState = { ...this.cachedStatus };
 
     const message = dto.message?.trim() || 'Rwanda E-Pharmacy is temporarily undergoing scheduled maintenance.';
@@ -289,6 +293,10 @@ export class SystemService implements OnModuleInit {
 
     const prisma = this.prismaService.prisma;
     const now = new Date();
+
+    // Refresh cache to ensure valid DB record ID
+    await this.refreshCache();
+
     const previousState = { ...this.cachedStatus };
 
     const reason = dto.reason?.trim() || 'System maintenance completed.';
@@ -401,6 +409,10 @@ export class SystemService implements OnModuleInit {
 
     const prisma = this.prismaService.prisma;
     const now = new Date();
+
+    // Always refresh cache first to ensure we have a valid DB record ID
+    await this.refreshCache();
+
     const previousState = { ...this.cachedStatus };
     this.activeReason = dto.reason;
 
@@ -415,27 +427,33 @@ export class SystemService implements OnModuleInit {
           updatedBy: adminUserId,
         },
       });
-    } catch {
-      const current = await prisma.systemStatus.findFirst({ orderBy: { createdAt: 'desc' } });
-      if (current) {
-        updated = await prisma.systemStatus.update({
-          where: { id: current.id },
-          data: {
-            emergencyLockdown: true,
-            maintenanceMode: true,
-            enabledAt: now,
-            updatedBy: adminUserId,
-          },
-        });
-      } else {
-        updated = await prisma.systemStatus.create({
-          data: {
-            emergencyLockdown: true,
-            maintenanceMode: true,
-            enabledAt: now,
-            updatedBy: adminUserId,
-          },
-        });
+    } catch (primaryErr: any) {
+      this.logger.warn(`Primary lockdown update failed (id=${this.cachedStatus.id}): ${primaryErr.message}`);
+      try {
+        const current = await prisma.systemStatus.findFirst({ orderBy: { createdAt: 'desc' } });
+        if (current) {
+          updated = await prisma.systemStatus.update({
+            where: { id: current.id },
+            data: {
+              emergencyLockdown: true,
+              maintenanceMode: true,
+              enabledAt: now,
+              updatedBy: adminUserId,
+            },
+          });
+        } else {
+          updated = await prisma.systemStatus.create({
+            data: {
+              emergencyLockdown: true,
+              maintenanceMode: true,
+              enabledAt: now,
+              updatedBy: adminUserId,
+            },
+          });
+        }
+      } catch (fallbackErr: any) {
+        this.logger.error(`Fallback lockdown update also failed: ${fallbackErr.message}`);
+        throw fallbackErr;
       }
     }
 
@@ -453,19 +471,24 @@ export class SystemService implements OnModuleInit {
       updatedAt: updated.updatedAt,
     };
 
-    await this.auditLogsService.log({
-      userId: adminUserId,
-      action: 'SYSTEM_EMERGENCY_LOCKDOWN',
-      entityType: 'SystemStatus',
-      entityId: updated.id,
-      changes: {
-        previousState: { emergencyLockdown: previousState.emergencyLockdown },
-        newState: { emergencyLockdown: true, maintenanceMode: true },
-        reason: dto.reason,
-      },
-      ipAddress: ipAddress ?? null,
-      userAgent: userAgent ?? null,
-    });
+    try {
+      await this.auditLogsService.log({
+        userId: adminUserId,
+        action: 'SYSTEM_EMERGENCY_LOCKDOWN',
+        entityType: 'SystemStatus',
+        entityId: updated.id,
+        changes: {
+          previousState: { emergencyLockdown: previousState.emergencyLockdown },
+          newState: { emergencyLockdown: true, maintenanceMode: true },
+          reason: dto.reason,
+        },
+        ipAddress: ipAddress ?? null,
+        userAgent: userAgent ?? null,
+      });
+    } catch (auditErr: any) {
+      this.logger.error(`Failed to write lockdown audit log: ${auditErr.message}`);
+      // Don't fail the lockdown itself if audit logging fails
+    }
 
     const currentStatus = await this.getSystemStatus();
     return {
