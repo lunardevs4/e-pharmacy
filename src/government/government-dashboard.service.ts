@@ -49,16 +49,6 @@ export class GovernmentDashboardService {
   async getSummary() {
     const prisma = this.prismaService.prisma;
 
-    const pharmacies = await prisma.pharmacy.findMany({
-      select: {
-        id: true,
-        name: true,
-        status: true,
-        deletedAt: true,
-      },
-    });
-
-    console.log('Pharmacies seen by Prisma: ', pharmacies);
     const [
       totalPharmacies,
       approvedPharmacies,
@@ -74,11 +64,6 @@ export class GovernmentDashboardService {
       prisma.reservation.count(),
       prisma.reservation.count({ where: { status: 'PENDING' } }),
     ]);
-
-    console.log({
-      totalPharmacies,
-      approvedPharmacies,
-    });
 
     return {
       totalPharmacies,

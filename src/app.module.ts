@@ -38,6 +38,8 @@ import { ThrottlerStorageRedisService } from '@nest-lab/throttler-storage-redis'
 import { ApiCacheModule } from './common/cache/api-cache.module';
 import { MonitoringModule } from './common/monitoring/monitoring.module';
 import { HealthModule } from './health/health.module';
+import { SystemModule } from './system/system.module';
+import { MaintenanceGuard } from './common/guards/maintenance.guard';
 
 @Module({
   imports: [
@@ -150,6 +152,7 @@ import { HealthModule } from './health/health.module';
     ReportsModule,
     InsuranceDashboardModule,
     CommunicationModule,
+    SystemModule,
   ],
   controllers: [AppController],
   providers: [
@@ -158,6 +161,7 @@ import { HealthModule } from './health/health.module';
     { provide: APP_INTERCEPTOR, useClass: AuditInterceptor },
     { provide: APP_FILTER, useClass: HttpExceptionFilter },
     { provide: APP_GUARD, useClass: JwtAuthGuard },
+    { provide: APP_GUARD, useClass: MaintenanceGuard },
     { provide: APP_GUARD, useClass: ScopedThrottlerGuard },
     { provide: APP_GUARD, useClass: RolesGuard },
     { provide: APP_GUARD, useClass: PermissionsGuard },

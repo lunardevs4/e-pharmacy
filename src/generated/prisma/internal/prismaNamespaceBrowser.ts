@@ -77,7 +77,8 @@ export const ModelName = {
   InsuredPatient: 'InsuredPatient',
   PharmacyInsuranceAgreement: 'PharmacyInsuranceAgreement',
   InsuranceMedicineTariff: 'InsuranceMedicineTariff',
-  InsuranceClaim: 'InsuranceClaim'
+  InsuranceClaim: 'InsuranceClaim',
+  SystemStatus: 'SystemStatus'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -535,6 +536,23 @@ export const InsuranceClaimScalarFieldEnum = {
 } as const
 
 export type InsuranceClaimScalarFieldEnum = (typeof InsuranceClaimScalarFieldEnum)[keyof typeof InsuranceClaimScalarFieldEnum]
+
+
+export const SystemStatusScalarFieldEnum = {
+  id: 'id',
+  maintenanceMode: 'maintenanceMode',
+  emergencyLockdown: 'emergencyLockdown',
+  maintenanceMessage: 'maintenanceMessage',
+  enabledAt: 'enabledAt',
+  disabledAt: 'disabledAt',
+  scheduledStart: 'scheduledStart',
+  scheduledEnd: 'scheduledEnd',
+  updatedBy: 'updatedBy',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type SystemStatusScalarFieldEnum = (typeof SystemStatusScalarFieldEnum)[keyof typeof SystemStatusScalarFieldEnum]
 
 
 export const SortOrder = {

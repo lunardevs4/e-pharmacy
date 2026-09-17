@@ -24,7 +24,11 @@ export class AuditInterceptor implements NestInterceptor {
       return next.handle();
     }
 
-    const path: string = req.route?.path ?? req.url ?? '';
+    const rawPath =
+      req.originalUrl ||
+      ((req.baseUrl || '') + (req.path || req.url || '')) ||
+      '';
+    const path = rawPath.split('?')[0].replace(/\/+$/, '') || '/';
 
     const match = AUDIT_ROUTE_MAP.find(
       (rule) => rule.method === method && rule.pattern.test(path),
@@ -37,10 +41,20 @@ export class AuditInterceptor implements NestInterceptor {
     return next.handle().pipe(
       tap({
         next: (responseBody: any) => {
-          const user = req.user as { id?: string } | undefined;
-          const userId = user?.id ?? null;
+          const user = req.user as { id?: string; pharmacyId?: string } | undefined;
+          const userId =
+            user?.id ??
+            responseBody?.data?.user?.id ??
+            responseBody?.user?.id ??
+            null;
 
           const entityId = this.extractEntityId(responseBody, req);
+          const pharmacyId =
+            this.extractPharmacyId(req) ??
+            user?.pharmacyId ??
+            responseBody?.data?.pharmacyId ??
+            responseBody?.pharmacyId ??
+            null;
 
           this.auditLogsService
             .log({
@@ -48,7 +62,7 @@ export class AuditInterceptor implements NestInterceptor {
               action: match.action,
               entityType: match.entityType,
               entityId,
-              pharmacyId: this.extractPharmacyId(req),
+              pharmacyId,
               changes: this.sanitizeChanges(req.body),
               ipAddress: this.extractIp(req),
               userAgent: req.headers?.['user-agent'] ?? null,
@@ -69,8 +83,17 @@ export class AuditInterceptor implements NestInterceptor {
     if (payload?.id && typeof payload.id === 'string') {
       return payload.id;
     }
+    if (payload?.user?.id && typeof payload.user.id === 'string') {
+      return payload.user.id;
+    }
+    if (payload?.claim?.id && typeof payload.claim.id === 'string') {
+      return payload.claim.id;
+    }
+    if (payload?.reservation?.id && typeof payload.reservation.id === 'string') {
+      return payload.reservation.id;
+    }
 
-    const paramId = req.params?.id;
+    const paramId = req.params?.id ?? req.params?.pharmacyId ?? req.params?.medicineId;
     if (paramId && typeof paramId === 'string') {
       return paramId;
     }
