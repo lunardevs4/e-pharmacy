@@ -29,7 +29,6 @@ export const ALLOWED_AUDIT_ENTITY_TYPES = [
   'InsuranceAgreement',
   'InsuranceTariff',
   'InsuranceProvider',
-  'SystemStatus',
 ];
 
 export const ALLOWED_AUDIT_ACTIONS = [
@@ -48,11 +47,6 @@ export const ALLOWED_AUDIT_ACTIONS = [
   'MARK_READ',
   'UPLOAD',
   'DISPENSE',
-  'SYSTEM_MAINTENANCE_ENABLED',
-  'SYSTEM_MAINTENANCE_DISABLED',
-  'SYSTEM_EMERGENCY_LOCKDOWN',
-  'SYSTEM_EMERGENCY_UNLOCKED',
-  'SYSTEM_MAINTENANCE_SCHEDULED',
 ];
 
 export function sanitizeXss(input: string): string {

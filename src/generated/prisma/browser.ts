@@ -152,8 +152,3 @@ export type InsuranceMedicineTariff = Prisma.InsuranceMedicineTariffModel
  * 
  */
 export type InsuranceClaim = Prisma.InsuranceClaimModel
-/**
- * Model SystemStatus
- * 
- */
-export type SystemStatus = Prisma.SystemStatusModel

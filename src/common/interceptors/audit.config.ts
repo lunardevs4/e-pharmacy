@@ -463,24 +463,4 @@ export const AUDIT_ROUTE_MAP: AuditRouteConfig[] = [
     entityType: 'User',
     action: 'UPLOAD',
   },
-
-  // ── System Maintenance & Emergency Controls ────────────────────────
-  {
-    method: 'POST',
-    pattern: /\/admin\/system\/maintenance$/,
-    entityType: 'SystemStatus',
-    action: 'SYSTEM_MAINTENANCE_ENABLED',
-  },
-  {
-    method: 'POST',
-    pattern: /\/admin\/system\/lockdown$/,
-    entityType: 'SystemStatus',
-    action: 'SYSTEM_EMERGENCY_LOCKDOWN',
-  },
-  {
-    method: 'POST',
-    pattern: /\/admin\/system\/resume$/,
-    entityType: 'SystemStatus',
-    action: 'SYSTEM_MAINTENANCE_DISABLED',
-  },
 ];

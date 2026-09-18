@@ -650,20 +650,3 @@ model InsuranceClaim {
   @@index([insuranceId, status, claimedAt])
   @@index([claimedAt])
 }
-
-model SystemStatus {
-  id                 String    @id @default(uuid())
-  maintenanceMode    Boolean   @default(false)
-  emergencyLockdown  Boolean   @default(false)
-  maintenanceMessage String?
-  enabledAt          DateTime?
-  disabledAt         DateTime?
-  scheduledStart     DateTime?
-  scheduledEnd       DateTime?
-  updatedBy          String?
-  createdAt          DateTime  @default(now())
-  updatedAt          DateTime  @updatedAt
-
-  @@index([maintenanceMode])
-  @@index([emergencyLockdown])
-}

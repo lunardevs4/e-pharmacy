@@ -423,8 +423,7 @@ export const ModelName = {
   InsuredPatient: 'InsuredPatient',
   PharmacyInsuranceAgreement: 'PharmacyInsuranceAgreement',
   InsuranceMedicineTariff: 'InsuranceMedicineTariff',
-  InsuranceClaim: 'InsuranceClaim',
-  SystemStatus: 'SystemStatus'
+  InsuranceClaim: 'InsuranceClaim'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -440,7 +439,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "user" | "refreshToken" | "passwordResetToken" | "patient" | "pharmacy" | "pharmacyOwner" | "pharmacyEmployee" | "category" | "manufacturer" | "medicine" | "medicineBatch" | "inventory" | "inventoryHistory" | "stockMovement" | "reservation" | "prescription" | "prescriptionMedicine" | "reminderSchedule" | "reminderLog" | "notification" | "auditLog" | "systemSetting" | "insuranceProvider" | "insuredPatient" | "pharmacyInsuranceAgreement" | "insuranceMedicineTariff" | "insuranceClaim" | "systemStatus"
+    modelProps: "user" | "refreshToken" | "passwordResetToken" | "patient" | "pharmacy" | "pharmacyOwner" | "pharmacyEmployee" | "category" | "manufacturer" | "medicine" | "medicineBatch" | "inventory" | "inventoryHistory" | "stockMovement" | "reservation" | "prescription" | "prescriptionMedicine" | "reminderSchedule" | "reminderLog" | "notification" | "auditLog" | "systemSetting" | "insuranceProvider" | "insuredPatient" | "pharmacyInsuranceAgreement" | "insuranceMedicineTariff" | "insuranceClaim"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -2442,80 +2441,6 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         }
       }
     }
-    SystemStatus: {
-      payload: Prisma.$SystemStatusPayload<ExtArgs>
-      fields: Prisma.SystemStatusFieldRefs
-      operations: {
-        findUnique: {
-          args: Prisma.SystemStatusFindUniqueArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$SystemStatusPayload> | null
-        }
-        findUniqueOrThrow: {
-          args: Prisma.SystemStatusFindUniqueOrThrowArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$SystemStatusPayload>
-        }
-        findFirst: {
-          args: Prisma.SystemStatusFindFirstArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$SystemStatusPayload> | null
-        }
-        findFirstOrThrow: {
-          args: Prisma.SystemStatusFindFirstOrThrowArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$SystemStatusPayload>
-        }
-        findMany: {
-          args: Prisma.SystemStatusFindManyArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$SystemStatusPayload>[]
-        }
-        create: {
-          args: Prisma.SystemStatusCreateArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$SystemStatusPayload>
-        }
-        createMany: {
-          args: Prisma.SystemStatusCreateManyArgs<ExtArgs>
-          result: BatchPayload
-        }
-        createManyAndReturn: {
-          args: Prisma.SystemStatusCreateManyAndReturnArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$SystemStatusPayload>[]
-        }
-        delete: {
-          args: Prisma.SystemStatusDeleteArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$SystemStatusPayload>
-        }
-        update: {
-          args: Prisma.SystemStatusUpdateArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$SystemStatusPayload>
-        }
-        deleteMany: {
-          args: Prisma.SystemStatusDeleteManyArgs<ExtArgs>
-          result: BatchPayload
-        }
-        updateMany: {
-          args: Prisma.SystemStatusUpdateManyArgs<ExtArgs>
-          result: BatchPayload
-        }
-        updateManyAndReturn: {
-          args: Prisma.SystemStatusUpdateManyAndReturnArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$SystemStatusPayload>[]
-        }
-        upsert: {
-          args: Prisma.SystemStatusUpsertArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$SystemStatusPayload>
-        }
-        aggregate: {
-          args: Prisma.SystemStatusAggregateArgs<ExtArgs>
-          result: runtime.Types.Utils.Optional<Prisma.AggregateSystemStatus>
-        }
-        groupBy: {
-          args: Prisma.SystemStatusGroupByArgs<ExtArgs>
-          result: runtime.Types.Utils.Optional<Prisma.SystemStatusGroupByOutputType>[]
-        }
-        count: {
-          args: Prisma.SystemStatusCountArgs<ExtArgs>
-          result: runtime.Types.Utils.Optional<Prisma.SystemStatusCountAggregateOutputType> | number
-        }
-      }
-    }
   }
 } & {
   other: {
@@ -2996,23 +2921,6 @@ export const InsuranceClaimScalarFieldEnum = {
 export type InsuranceClaimScalarFieldEnum = (typeof InsuranceClaimScalarFieldEnum)[keyof typeof InsuranceClaimScalarFieldEnum]
 
 
-export const SystemStatusScalarFieldEnum = {
-  id: 'id',
-  maintenanceMode: 'maintenanceMode',
-  emergencyLockdown: 'emergencyLockdown',
-  maintenanceMessage: 'maintenanceMessage',
-  enabledAt: 'enabledAt',
-  disabledAt: 'disabledAt',
-  scheduledStart: 'scheduledStart',
-  scheduledEnd: 'scheduledEnd',
-  updatedBy: 'updatedBy',
-  createdAt: 'createdAt',
-  updatedAt: 'updatedAt'
-} as const
-
-export type SystemStatusScalarFieldEnum = (typeof SystemStatusScalarFieldEnum)[keyof typeof SystemStatusScalarFieldEnum]
-
-
 export const SortOrder = {
   asc: 'asc',
   desc: 'desc'
@@ -3412,7 +3320,6 @@ export type GlobalOmitConfig = {
   pharmacyInsuranceAgreement?: Prisma.PharmacyInsuranceAgreementOmit
   insuranceMedicineTariff?: Prisma.InsuranceMedicineTariffOmit
   insuranceClaim?: Prisma.InsuranceClaimOmit
-  systemStatus?: Prisma.SystemStatusOmit
 }
 
 /* Types for Logging */
