@@ -3,6 +3,7 @@ import {
   NotFoundException,
   ForbiddenException,
 } from '@nestjs/common';
+import { Cron } from '@nestjs/schedule';
 import { PrismaService } from '../common/prisma/prisma.service';
 import {
   CreateReservationDto,
@@ -42,9 +43,17 @@ export class ReservationsService {
       create: { userId: safeUserId },
     });
 
+    const pharmacyId = validateUuid(safeDto.pharmacyId, 'pharmacyId');
+    const settings = await prisma.pharmacySettings.findUnique({
+      where: { pharmacyId },
+      select: { reservationDurationHours: true },
+    });
     const expiresAt =
       validateDate((safeDto as any).expiresAt, 'expiresAt') ||
-      new Date(Date.now() + 24 * 60 * 60 * 1000);
+      new Date(
+        Date.now() +
+          (settings?.reservationDurationHours || 24) * 60 * 60 * 1000,
+      );
     const { expiresAt: _stripExpiry, ...restDto } = safeDto as any;
 
     return prisma.reservation.create({
@@ -54,6 +63,29 @@ export class ReservationsService {
         expiresAt,
       },
     });
+  }
+
+  @Cron('*/5 * * * *')
+  async expireConfiguredReservations() {
+    const prisma = this.prismaService.prisma;
+    const settings = await prisma.pharmacySettings.findMany({
+      where: { autoExpireReservations: true },
+      select: { pharmacyId: true },
+    });
+    if (!settings.length) return;
+
+    await Promise.all(
+      settings.map(({ pharmacyId }) =>
+        prisma.reservation.updateMany({
+          where: {
+            pharmacyId,
+            status: { in: [ReservationStatus.PENDING, ReservationStatus.CONFIRMED] },
+            expiresAt: { lt: new Date() },
+          },
+          data: { status: ReservationStatus.CANCELLED },
+        }),
+      ),
+    );
   }
 
   async findByPatient(user: AuthenticatedUser) {

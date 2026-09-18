@@ -24,6 +24,7 @@ import {
   UpdatePharmacyDto,
   AddEmployeeDto,
   ApprovePharmacyDto,
+  UpdatePharmacySettingsDto,
 } from './dto/pharmacies.dto';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { Roles } from '../common/guards/roles.decorator';
@@ -160,6 +161,28 @@ export class PharmaciesController {
     @Body() updatePharmacyDto: UpdatePharmacyDto,
   ) {
     return this.pharmaciesService.update(id, req.user.id, updatePharmacyDto);
+  }
+
+  @Get(':id/settings')
+  @UseGuards(JwtAuthGuard)
+  @Roles(UserRole.PHARMACY_OWNER)
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Get pharmacy operational settings (owner only)' })
+  getSettings(@Param('id') id: string, @Req() req: any) {
+    return this.pharmaciesService.getSettings(id, req.user.id);
+  }
+
+  @Patch(':id/settings')
+  @UseGuards(JwtAuthGuard)
+  @Roles(UserRole.PHARMACY_OWNER)
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Update pharmacy operational settings (owner only)' })
+  updateSettings(
+    @Param('id') id: string,
+    @Req() req: any,
+    @Body() updateDto: UpdatePharmacySettingsDto,
+  ) {
+    return this.pharmaciesService.updateSettings(id, req.user.id, updateDto);
   }
 
   @Patch(':id/approve')

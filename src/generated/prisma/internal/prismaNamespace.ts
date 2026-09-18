@@ -402,6 +402,7 @@ export const ModelName = {
   PasswordResetToken: 'PasswordResetToken',
   Patient: 'Patient',
   Pharmacy: 'Pharmacy',
+  PharmacySettings: 'PharmacySettings',
   PharmacyOwner: 'PharmacyOwner',
   PharmacyEmployee: 'PharmacyEmployee',
   Category: 'Category',
@@ -439,7 +440,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "user" | "refreshToken" | "passwordResetToken" | "patient" | "pharmacy" | "pharmacyOwner" | "pharmacyEmployee" | "category" | "manufacturer" | "medicine" | "medicineBatch" | "inventory" | "inventoryHistory" | "stockMovement" | "reservation" | "prescription" | "prescriptionMedicine" | "reminderSchedule" | "reminderLog" | "notification" | "auditLog" | "systemSetting" | "insuranceProvider" | "insuredPatient" | "pharmacyInsuranceAgreement" | "insuranceMedicineTariff" | "insuranceClaim"
+    modelProps: "user" | "refreshToken" | "passwordResetToken" | "patient" | "pharmacy" | "pharmacySettings" | "pharmacyOwner" | "pharmacyEmployee" | "category" | "manufacturer" | "medicine" | "medicineBatch" | "inventory" | "inventoryHistory" | "stockMovement" | "reservation" | "prescription" | "prescriptionMedicine" | "reminderSchedule" | "reminderLog" | "notification" | "auditLog" | "systemSetting" | "insuranceProvider" | "insuredPatient" | "pharmacyInsuranceAgreement" | "insuranceMedicineTariff" | "insuranceClaim"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -810,6 +811,80 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         count: {
           args: Prisma.PharmacyCountArgs<ExtArgs>
           result: runtime.Types.Utils.Optional<Prisma.PharmacyCountAggregateOutputType> | number
+        }
+      }
+    }
+    PharmacySettings: {
+      payload: Prisma.$PharmacySettingsPayload<ExtArgs>
+      fields: Prisma.PharmacySettingsFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.PharmacySettingsFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PharmacySettingsPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.PharmacySettingsFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PharmacySettingsPayload>
+        }
+        findFirst: {
+          args: Prisma.PharmacySettingsFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PharmacySettingsPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.PharmacySettingsFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PharmacySettingsPayload>
+        }
+        findMany: {
+          args: Prisma.PharmacySettingsFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PharmacySettingsPayload>[]
+        }
+        create: {
+          args: Prisma.PharmacySettingsCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PharmacySettingsPayload>
+        }
+        createMany: {
+          args: Prisma.PharmacySettingsCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.PharmacySettingsCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PharmacySettingsPayload>[]
+        }
+        delete: {
+          args: Prisma.PharmacySettingsDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PharmacySettingsPayload>
+        }
+        update: {
+          args: Prisma.PharmacySettingsUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PharmacySettingsPayload>
+        }
+        deleteMany: {
+          args: Prisma.PharmacySettingsDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.PharmacySettingsUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.PharmacySettingsUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PharmacySettingsPayload>[]
+        }
+        upsert: {
+          args: Prisma.PharmacySettingsUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PharmacySettingsPayload>
+        }
+        aggregate: {
+          args: Prisma.PharmacySettingsAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregatePharmacySettings>
+        }
+        groupBy: {
+          args: Prisma.PharmacySettingsGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.PharmacySettingsGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.PharmacySettingsCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.PharmacySettingsCountAggregateOutputType> | number
         }
       }
     }
@@ -2576,6 +2651,22 @@ export const PharmacyScalarFieldEnum = {
 export type PharmacyScalarFieldEnum = (typeof PharmacyScalarFieldEnum)[keyof typeof PharmacyScalarFieldEnum]
 
 
+export const PharmacySettingsScalarFieldEnum = {
+  id: 'id',
+  pharmacyId: 'pharmacyId',
+  lowStockThreshold: 'lowStockThreshold',
+  expiryWarningDays: 'expiryWarningDays',
+  reservationDurationHours: 'reservationDurationHours',
+  autoExpireReservations: 'autoExpireReservations',
+  language: 'language',
+  twoFactorEnabled: 'twoFactorEnabled',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type PharmacySettingsScalarFieldEnum = (typeof PharmacySettingsScalarFieldEnum)[keyof typeof PharmacySettingsScalarFieldEnum]
+
+
 export const PharmacyOwnerScalarFieldEnum = {
   id: 'id',
   userId: 'userId',
@@ -3298,6 +3389,7 @@ export type GlobalOmitConfig = {
   passwordResetToken?: Prisma.PasswordResetTokenOmit
   patient?: Prisma.PatientOmit
   pharmacy?: Prisma.PharmacyOmit
+  pharmacySettings?: Prisma.PharmacySettingsOmit
   pharmacyOwner?: Prisma.PharmacyOwnerOmit
   pharmacyEmployee?: Prisma.PharmacyEmployeeOmit
   category?: Prisma.CategoryOmit

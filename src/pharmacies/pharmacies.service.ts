@@ -10,6 +10,7 @@ import {
   UpdatePharmacyDto,
   AddEmployeeDto,
   ApprovePharmacyDto,
+  UpdatePharmacySettingsDto,
 } from './dto/pharmacies.dto';
 import { PharmacyStatus } from '@generated/prisma';
 import {
@@ -222,6 +223,47 @@ export class PharmaciesService {
         status: safeDto.status,
         ...(reactivate ? { isActive: true } : {}),
       },
+    });
+  }
+
+  async getSettings(id: string, ownerId: string) {
+    const prisma = this.prismaService.prisma;
+    const safeId = validateUuid(id, 'id');
+    const pharmacy = await prisma.pharmacy.findUnique({
+      where: { id: safeId },
+      select: { id: true, ownerId: true },
+    });
+    if (!pharmacy) throw new NotFoundException('Pharmacy not found');
+    if (pharmacy.ownerId !== ownerId)
+      throw new ForbiddenException('You do not own this pharmacy');
+
+    return prisma.pharmacySettings.upsert({
+      where: { pharmacyId: safeId },
+      create: { pharmacyId: safeId },
+      update: {},
+    });
+  }
+
+  async updateSettings(
+    id: string,
+    ownerId: string,
+    updateDto: UpdatePharmacySettingsDto,
+  ) {
+    const prisma = this.prismaService.prisma;
+    const safeId = validateUuid(id, 'id');
+    const pharmacy = await prisma.pharmacy.findUnique({
+      where: { id: safeId },
+      select: { id: true, ownerId: true },
+    });
+    if (!pharmacy) throw new NotFoundException('Pharmacy not found');
+    if (pharmacy.ownerId !== ownerId)
+      throw new ForbiddenException('You do not own this pharmacy');
+
+    const data = sanitizeDeep(updateDto);
+    return prisma.pharmacySettings.upsert({
+      where: { pharmacyId: safeId },
+      create: { pharmacyId: safeId, ...data },
+      update: data,
     });
   }
 

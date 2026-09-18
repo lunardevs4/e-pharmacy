@@ -56,6 +56,7 @@ export const ModelName = {
   PasswordResetToken: 'PasswordResetToken',
   Patient: 'Patient',
   Pharmacy: 'Pharmacy',
+  PharmacySettings: 'PharmacySettings',
   PharmacyOwner: 'PharmacyOwner',
   PharmacyEmployee: 'PharmacyEmployee',
   Category: 'Category',
@@ -190,6 +191,22 @@ export const PharmacyScalarFieldEnum = {
 } as const
 
 export type PharmacyScalarFieldEnum = (typeof PharmacyScalarFieldEnum)[keyof typeof PharmacyScalarFieldEnum]
+
+
+export const PharmacySettingsScalarFieldEnum = {
+  id: 'id',
+  pharmacyId: 'pharmacyId',
+  lowStockThreshold: 'lowStockThreshold',
+  expiryWarningDays: 'expiryWarningDays',
+  reservationDurationHours: 'reservationDurationHours',
+  autoExpireReservations: 'autoExpireReservations',
+  language: 'language',
+  twoFactorEnabled: 'twoFactorEnabled',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type PharmacySettingsScalarFieldEnum = (typeof PharmacySettingsScalarFieldEnum)[keyof typeof PharmacySettingsScalarFieldEnum]
 
 
 export const PharmacyOwnerScalarFieldEnum = {
