@@ -4,10 +4,18 @@ export interface SendSmsOptions {
   callbackUrl?: string;
 }
 
-export type SmsDeliveryStatus = 'SENT' | 'DELIVERED' | 'FAILED';
+export type SmsDeliveryStatus =
+  | 'PENDING'
+  | 'SUBMITTED'
+  | 'QUEUED'
+  | 'SENT'
+  | 'DELIVERED'
+  | 'FAILED'
+  | 'UNKNOWN';
 
 export interface SmsSendResult {
-  providerMessageId: string;
+  internalMessageId: string;
+  providerMessageId?: string;
   status: SmsDeliveryStatus;
   rawResponse?: unknown;
   error?: string;
@@ -16,6 +24,8 @@ export interface SmsSendResult {
 export interface ISmsProvider {
   readonly name: string;
   send(options: SendSmsOptions): Promise<SmsSendResult>;
+  getDeliveryStatus?(providerMessageId: string): Promise<SmsSendResult>;
 }
 
 export const SMS_PROVIDER_TOKEN = 'SMS_PROVIDER_TOKEN';
+

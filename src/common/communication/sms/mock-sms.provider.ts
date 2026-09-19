@@ -17,6 +17,8 @@ export class MockSmsProvider implements ISmsProvider {
       await new Promise((resolve) => setTimeout(resolve, this.simulatedLatencyMs));
     }
 
+    const internalMessageId = `int-mock-${Date.now()}-${Math.random().toString(36).substring(2, 7)}`;
+
     // Allow simulating failure in tests via specific phone number or flag
     if (
       options.toNumber.includes('000000000') ||
@@ -26,6 +28,7 @@ export class MockSmsProvider implements ISmsProvider {
         `[MockSmsProvider] Simulating delivery failure for recipient ${options.toNumber}`,
       );
       return {
+        internalMessageId,
         providerMessageId: `mock-fail-${Date.now()}`,
         status: 'FAILED',
         error: 'Simulated carrier delivery failure',
@@ -38,6 +41,7 @@ export class MockSmsProvider implements ISmsProvider {
     );
 
     return {
+      internalMessageId,
       providerMessageId,
       status: 'SENT',
       rawResponse: {
@@ -45,6 +49,25 @@ export class MockSmsProvider implements ISmsProvider {
         callbackUrl: options.callbackUrl,
         timestamp: new Date().toISOString(),
       },
+    };
+  }
+
+  async getDeliveryStatus(providerMessageId: string): Promise<SmsSendResult> {
+    const internalMessageId = `int-status-${Date.now()}`;
+    if (providerMessageId.includes('fail')) {
+      return {
+        internalMessageId,
+        providerMessageId,
+        status: 'FAILED',
+        error: 'Simulated failure status',
+      };
+    }
+
+    return {
+      internalMessageId,
+      providerMessageId,
+      status: 'DELIVERED',
+      rawResponse: { providerMessageId, status: 'DELIVERED' },
     };
   }
 }

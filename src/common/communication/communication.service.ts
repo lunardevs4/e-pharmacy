@@ -8,10 +8,12 @@ import { MockSmsProvider } from './sms/mock-sms.provider';
 export type CommunicationChannel = 'SMS' | 'VOICE' | 'EMAIL' | 'TTS';
 export type DeliveryStatus =
   | 'PENDING'
+  | 'SUBMITTED'
   | 'QUEUED'
   | 'SENT'
   | 'DELIVERED'
   | 'FAILED'
+  | 'UNKNOWN'
   | 'CANCELLED'
   | 'INITIATED'
   | 'RINGING'
@@ -247,10 +249,39 @@ export class CommunicationService {
       channel: 'SMS',
       recipient: phone,
       status: res.status,
+      messageId: res.internalMessageId,
       provider: this.activeSmsProvider.name,
       providerReference: res.providerMessageId,
       error: res.error,
       retryable: res.status === 'FAILED',
+      timestamp: new Date(),
+    };
+  }
+
+  async checkSmsStatus(
+    providerMessageId: string,
+  ): Promise<CommunicationResult> {
+    if (!this.activeSmsProvider.getDeliveryStatus) {
+      return {
+        channel: 'SMS',
+        recipient: 'unknown',
+        status: 'UNKNOWN',
+        provider: this.activeSmsProvider.name,
+        providerReference: providerMessageId,
+        error: `Provider ${this.activeSmsProvider.name} does not support status tracking queries`,
+        timestamp: new Date(),
+      };
+    }
+
+    const res = await this.activeSmsProvider.getDeliveryStatus(providerMessageId);
+    return {
+      channel: 'SMS',
+      recipient: 'unknown',
+      status: res.status,
+      messageId: res.internalMessageId,
+      provider: this.activeSmsProvider.name,
+      providerReference: res.providerMessageId ?? providerMessageId,
+      error: res.error,
       timestamp: new Date(),
     };
   }
