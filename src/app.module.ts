@@ -73,10 +73,10 @@ import { HealthModule } from './health/health.module';
       useFactory: (config: ConfigService) => ({
         ...(config.get<string>('REDIS_URL')?.trim()
           ? {
-              storage: new ThrottlerStorageRedisService(
-                config.get<string>('REDIS_URL')!.trim(),
-              ),
-            }
+            storage: new ThrottlerStorageRedisService(
+              config.get<string>('REDIS_URL')!.trim(),
+            ),
+          }
           : {}),
         throttlers: [
           {
@@ -165,4 +165,4 @@ import { HealthModule } from './health/health.module';
     { provide: APP_GUARD, useClass: FirstLoginGuard },
   ],
 })
-export class AppModule {}
+export class AppModule { }
