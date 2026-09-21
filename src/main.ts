@@ -106,6 +106,7 @@ async function bootstrap() {
       'Accept',
       'X-Requested-With',
       'X-CSRF-Token',
+      'X-Request-ID',
     ],
     exposedHeaders: ['Content-Length', 'X-Request-Id'],
     credentials: true,
