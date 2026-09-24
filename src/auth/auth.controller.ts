@@ -173,7 +173,7 @@ export class AuthController {
 
   @UseGuards(JwtAuthGuard, PermissionsGuard)
   @Permissions('MANAGE_STAFF')
-  @Roles(UserRole.PHARMACY)
+  @Roles(UserRole.PHARMACY, UserRole.PHARMACY_OWNER)
   @Post('pharmacies/:pharmacyId/staff')
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Create a pharmacy staff account' })

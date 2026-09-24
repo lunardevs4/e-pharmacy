@@ -4,9 +4,9 @@
 
 | Service | Provider | URL |
 |---|---|---|
-| Backend API | Render (Web Service) | `https://e-pharmacy-5o3f.onrender.com` |
+| Backend API | Render (Web Service) | `https://e-pharmacy-iany.onrender.com` |
 | Database | Neon PostgreSQL (serverless) | Pooled connection via `DATABASE_URL` |
-| Frontend | Vercel | `https://e-pharmacy-phi-dun.vercel.app` |
+| Frontend | Custom domain | `https://www.rwandaepharmacy.co.rw` |
 
 ---
 
@@ -23,7 +23,7 @@ All variables must be set in the Render dashboard under **Environment → Enviro
 | `GMAIL_USER` | ✅ | Gmail address for transactional email | `noreply@yourdomain.com` |
 | `GMAIL_APP_PASSWORD` | ✅ | Gmail App Password (not account password) | `xxxx xxxx xxxx xxxx` |
 | `PORT` | ✅ | Server listen port | `3000` |
-| `CORS_ORIGINS` | ✅ | Comma-separated allowed origins | `https://e-pharmacy-phi-dun.vercel.app` |
+| `CORS_ORIGINS` | ✅ | Comma-separated allowed origins | `https://www.rwandaepharmacy.co.rw,https://rwandaepharmacy.co.rw` |
 | `RATE_LIMIT_WINDOW_MS` | optional | Rate limit window in ms | `900000` (15min) |
 | `RATE_LIMIT_MAX` | optional | Max requests per window for `/api/` | `1000` |
 | `AUTH_RATE_LIMIT_MAX` | optional | Max auth attempts per 15min | `20` |
@@ -67,7 +67,7 @@ Render pings `GET /` for health. The app returns a welcome JSON response on that
 ## Vercel Frontend Deployment
 
 1. Connect the `e-pharmacy-frontend` repo to Vercel
-2. Set environment variable: `VITE_API_URL=https://e-pharmacy-5o3f.onrender.com`
+2. Set environment variable: `VITE_API_URL=https://e-pharmacy-iany.onrender.com/api/v1`
 3. Build command: `npm run build` (auto-detected)
 4. Output directory: `dist` (auto-detected)
 
@@ -113,7 +113,7 @@ phone:     +250700000000
 
 ## Swagger / OpenAPI
 
-Live at: `https://e-pharmacy-5o3f.onrender.com/api/docs`
+Live at: `https://e-pharmacy-iany.onrender.com/api/docs`
 
 To authenticate in Swagger UI:
 1. Call `POST /api/v1/auth/login` with your credentials

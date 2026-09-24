@@ -24,11 +24,14 @@ async function bootstrap() {
   app.use(requestLogger.use.bind(requestLogger));
 
   const isProduction = process.env.NODE_ENV === 'production';
+  const normalizeOrigin = (origin: string) => origin.trim().replace(/\/+$/, '');
   const configuredOrigins = (process.env.CORS_ORIGINS || '')
     .split(',')
-    .map((s) => s.trim())
+    .map(normalizeOrigin)
     .filter(Boolean);
-  const frontendOrigin = process.env.FRONTEND_URL?.trim();
+  const frontendOrigin = process.env.FRONTEND_URL
+    ? normalizeOrigin(process.env.FRONTEND_URL)
+    : undefined;
   const isHttpsDeployment =
     isProduction || frontendOrigin?.startsWith('https://');
   const connectSources = [
@@ -82,13 +85,13 @@ async function bootstrap() {
 
   app.enableCors({
     origin: (origin, callback) => {
-      const allowedOrigins = (
-        process.env.CORS_ORIGINS ||
-        (process.env.NODE_ENV === 'production' ? '' : '*')
-      )
-        .split(',')
-        .map((s) => s.trim())
-        .filter(Boolean);
+      const allowedOrigins = [
+        ...configuredOrigins,
+        ...(frontendOrigin ? [frontendOrigin] : []),
+      ];
+      if (allowedOrigins.length === 0 && process.env.NODE_ENV !== 'production') {
+        allowedOrigins.push('*');
+      }
       if (
         !origin ||
         allowedOrigins.includes('*') ||

@@ -290,9 +290,9 @@ export type ManufacturerMinOrderByAggregateInput = {
   updatedAt?: Prisma.SortOrder
 }
 
-export type ManufacturerScalarRelationFilter = {
-  is?: Prisma.ManufacturerWhereInput
-  isNot?: Prisma.ManufacturerWhereInput
+export type ManufacturerNullableScalarRelationFilter = {
+  is?: Prisma.ManufacturerWhereInput | null
+  isNot?: Prisma.ManufacturerWhereInput | null
 }
 
 export type ManufacturerCreateNestedOneWithoutMedicinesInput = {
@@ -301,10 +301,12 @@ export type ManufacturerCreateNestedOneWithoutMedicinesInput = {
   connect?: Prisma.ManufacturerWhereUniqueInput
 }
 
-export type ManufacturerUpdateOneRequiredWithoutMedicinesNestedInput = {
+export type ManufacturerUpdateOneWithoutMedicinesNestedInput = {
   create?: Prisma.XOR<Prisma.ManufacturerCreateWithoutMedicinesInput, Prisma.ManufacturerUncheckedCreateWithoutMedicinesInput>
   connectOrCreate?: Prisma.ManufacturerCreateOrConnectWithoutMedicinesInput
   upsert?: Prisma.ManufacturerUpsertWithoutMedicinesInput
+  disconnect?: Prisma.ManufacturerWhereInput | boolean
+  delete?: Prisma.ManufacturerWhereInput | boolean
   connect?: Prisma.ManufacturerWhereUniqueInput
   update?: Prisma.XOR<Prisma.XOR<Prisma.ManufacturerUpdateToOneWithWhereWithoutMedicinesInput, Prisma.ManufacturerUpdateWithoutMedicinesInput>, Prisma.ManufacturerUncheckedUpdateWithoutMedicinesInput>
 }

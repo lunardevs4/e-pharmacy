@@ -262,10 +262,10 @@ model Medicine {
   genericName    String
 
   categoryId     String
-  manufacturerId String
+  manufacturerId String?
 
   category       Category     @relation(fields: [categoryId], references: [id])
-  manufacturer   Manufacturer @relation(fields: [manufacturerId], references: [id])
+  manufacturer   Manufacturer? @relation(fields: [manufacturerId], references: [id])
 
   batches        MedicineBatch[]
   inventories    Inventory[]

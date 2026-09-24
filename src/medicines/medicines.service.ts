@@ -29,10 +29,6 @@ export class MedicinesService {
     const manufacturerName = safeDto.manufacturerName?.trim();
     if (!safeDto.categoryId && !categoryName)
       throw new BadRequestException('categoryId or categoryName is required');
-    if (!safeDto.manufacturerId && !manufacturerName)
-      throw new BadRequestException(
-        'manufacturerId or manufacturerName is required',
-      );
 
     const existingMedicine = await this.medicineExists(
       safeDto.tradeName,
@@ -91,12 +87,16 @@ export class MedicinesService {
             id: validateUuid(safeDto.manufacturerId, 'manufacturerId'),
           },
         })
-      : await prisma.manufacturer.upsert({
-          where: { name: manufacturerName },
-          update: {},
-          create: { name: manufacturerName },
-        });
-    if (!manufacturer) throw new NotFoundException('Manufacturer not found');
+      : manufacturerName
+        ? await prisma.manufacturer.upsert({
+            where: { name: manufacturerName },
+            update: {},
+            create: { name: manufacturerName },
+          })
+        : null;
+    if ((safeDto.manufacturerId || manufacturerName) && !manufacturer) {
+      throw new NotFoundException('Manufacturer not found');
+    }
 
     const batch = safeDto.initialBatch;
     const medicine = await prisma.medicine.create({
@@ -104,7 +104,7 @@ export class MedicinesService {
         tradeName: safeDto.tradeName,
         genericName: safeDto.genericName,
         categoryId: category.id,
-        manufacturerId: manufacturer.id,
+        manufacturerId: manufacturer?.id ?? null,
         batches: {
           create: {
             lotNumber: batch.lotNumber,
