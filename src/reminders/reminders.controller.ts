@@ -146,12 +146,6 @@ export class RemindersController {
     return this.remindersService.getLogs(req.user, query);
   }
 
-  @Get('adherence/summary')
-  @Roles(UserRole.PATIENT)
-  getAdherenceSummary(@Req() req: any) {
-    return this.remindersService.getAdherenceSummary(req.user, 'month');
-  }
-
   @Get('logs')
   @Roles(
     UserRole.PATIENT,

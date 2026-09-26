@@ -70,7 +70,7 @@ describe('EsmsAfricaSmsProvider & Utilities', () => {
 
       const result = await provider.send({
         toNumber: '+250788123456',
-        message: 'Medication adherence reminder',
+        message: 'Medication reminder',
       });
 
       expect(result.status).toBe('QUEUED');
@@ -80,7 +80,7 @@ describe('EsmsAfricaSmsProvider & Utilities', () => {
       expect(result.error).toBeUndefined();
       expect(mockEsmsClient.messages.send).toHaveBeenCalledWith({
         to: '+250788123456',
-        text: 'Medication adherence reminder',
+        text: 'Medication reminder',
         senderId: 'eSMSAfrica',
       });
     });

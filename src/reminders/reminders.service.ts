@@ -34,32 +34,6 @@ export class RemindersService {
     return patient;
   }
 
-  private computeAdherence(logs: any[]) {
-    const totalEligible = logs.filter(
-      (log) => ![ReminderStatus.CANCELLED].includes(log.status),
-    ).length;
-    const completed = logs.filter(
-      (log) => log.status === ReminderStatus.COMPLETED,
-    ).length;
-    const missed = logs.filter(
-      (log) => log.status === ReminderStatus.MISSED,
-    ).length;
-    const skipped = logs.filter(
-      (log) => log.status === ReminderStatus.SKIPPED,
-    ).length;
-    const adherencePercentage =
-      totalEligible > 0
-        ? Number(((completed / totalEligible) * 100).toFixed(2))
-        : 0;
-    return {
-      scheduledDoses: totalEligible,
-      completedDoses: completed,
-      missedDoses: missed,
-      skippedDoses: skipped,
-      adherencePercentage,
-    };
-  }
-
   async createSchedule(
     user: AuthenticatedUser,
     dto: CreateReminderScheduleDto,
@@ -218,15 +192,12 @@ export class RemindersService {
       const completedLogs = await prisma.reminderLog.count({
         where: { status: ReminderStatus.COMPLETED },
       });
-      const adherenceRate =
-        totalLogs > 0 ? Math.round((completedLogs / totalLogs) * 100) : 0;
       return {
         aggregatedAnalytics: true,
         totalSchedules,
         activeSchedules,
         totalLogs,
         completedLogs,
-        adherenceRatePercent: adherenceRate,
       };
     }
 
@@ -297,7 +268,7 @@ export class RemindersService {
   async markIntake(
     user: AuthenticatedUser,
     logId: string,
-    confirmationSource: 'APP' | 'SMS' | 'VOICE' | 'IVR' | 'SYSTEM' = 'APP',
+    confirmationSource: 'APP' | 'SMS' | 'SYSTEM' = 'APP',
   ) {
     const prisma = this.prismaService.prisma;
     const safeUserId = validateUuid(user.id, 'userId');
@@ -609,49 +580,5 @@ export class RemindersService {
     };
   }
 
-  async getAdherenceSummary(
-    user: AuthenticatedUser,
-    period: 'day' | 'week' | 'month' = 'month',
-    startDate?: string,
-    endDate?: string,
-  ) {
-    const prisma = this.prismaService.prisma;
-    if (user.role !== UserRole.PATIENT) {
-      throw new ForbiddenException(
-        'Only patients can access their adherence summary',
-      );
-    }
 
-    const patient = await this.getPatientFromUser(
-      prisma,
-      validateUuid(user.id, 'userId'),
-    );
-    const lowerBound = startDate
-      ? validateDate(startDate, 'startDate')
-      : undefined;
-    const upperBound = endDate ? validateDate(endDate, 'endDate') : undefined;
-    const where: any = { schedule: { patientId: patient.id } };
-    if (lowerBound || upperBound) {
-      where.createdAt = {};
-      if (lowerBound) where.createdAt.gte = lowerBound;
-      if (upperBound) where.createdAt.lte = upperBound;
-    }
-
-    const logs = await prisma.reminderLog.findMany({
-      where,
-      include: {
-        schedule: {
-          select: {
-            id: true,
-            dosage: true,
-            medicine: { select: { tradeName: true } },
-          },
-        },
-      },
-      orderBy: { createdAt: 'desc' },
-    });
-
-    const summary = this.computeAdherence(logs);
-    return { period, ...summary, generatedAt: new Date().toISOString() };
-  }
 }
