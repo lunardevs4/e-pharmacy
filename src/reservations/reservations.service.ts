@@ -295,43 +295,61 @@ export class ReservationsService {
       },
       select: { medicineId: true, price: true },
     });
+    const inventoryByMedicine = new Map(
+      inventory.map((item) => [item.medicineId, item]),
+    );
 
-    return Promise.all(
-      reservations.map(async (reservation) => {
-        const stock = inventory.find(
-          (item) => item.medicineId === reservation.medicineId,
-        );
+    const providerNames = [
+      ...new Set(
+        reservations
+          .map((reservation) => reservation.patient.insuranceProvider?.trim())
+          .filter((name): name is string => Boolean(name)),
+      ),
+    ];
+    const providers = providerNames.length
+      ? await prisma.insuranceProvider.findMany({
+          where: {
+            isActive: true,
+            OR: [{ code: { in: providerNames } }, { name: { in: providerNames } }],
+          },
+          select: { id: true, code: true, name: true },
+        })
+      : [];
+    const providerByName = new Map<string, any>();
+    providers.forEach((provider) => {
+      providerByName.set(provider.code, provider);
+      providerByName.set(provider.name, provider);
+    });
+    const providerIds = providers.map((provider) => provider.id);
+    const medicineIds = [...new Set(reservations.map((reservation) => reservation.medicineId))];
+    const [agreements, tariffs] = providerIds.length
+      ? await Promise.all([
+          prisma.pharmacyInsuranceAgreement.findMany({
+            where: { pharmacyId: safePharmacyId, insuranceId: { in: providerIds } },
+          }),
+          prisma.insuranceMedicineTariff.findMany({
+            where: { insuranceId: { in: providerIds }, medicineId: { in: medicineIds } },
+          }),
+        ])
+      : [[], []];
+    const agreementByProvider = new Map(agreements.map((item: any) => [item.insuranceId, item]));
+    const tariffByProviderMedicine = new Map(
+      tariffs.map((item: any) => [`${item.insuranceId}:${item.medicineId}`, item]),
+    );
+
+    return reservations.map((reservation) => {
+        const stock = inventoryByMedicine.get(reservation.medicineId);
         const unitPrice = stock ? Number(stock.price) : 0;
         const totalPrice = unitPrice * reservation.quantity;
         const providerName = reservation.patient.insuranceProvider?.trim();
 
         let insurancePays = 0;
         if (providerName && totalPrice > 0) {
-          const provider = await prisma.insuranceProvider.findFirst({
-            where: {
-              OR: [{ code: providerName }, { name: providerName }],
-              isActive: true,
-            },
-          });
+          const provider = providerByName.get(providerName);
 
           if (provider) {
-            const agreement =
-              await prisma.pharmacyInsuranceAgreement.findUnique({
-                where: {
-                  insuranceId_pharmacyId: {
-                    insuranceId: provider.id,
-                    pharmacyId: safePharmacyId,
-                  },
-                },
-              });
-            const tariff = await prisma.insuranceMedicineTariff.findUnique({
-              where: {
-                insuranceId_medicineId: {
-                  insuranceId: provider.id,
-                  medicineId: reservation.medicineId,
-                },
-              },
-            });
+            const agreement = agreementByProvider.get(provider.id);
+            const tariff = tariffByProviderMedicine.get(`${provider.id}:${reservation.medicineId}`);
 
             if (
               agreement?.status === 'ACTIVE' &&
@@ -365,8 +383,7 @@ export class ReservationsService {
           insurancePays: Math.round(insurancePays * 100) / 100,
           patientPays: Math.round((totalPrice - insurancePays) * 100) / 100,
         };
-      }),
-    );
+      });
   }
 
   async updatePharmacyStatus(

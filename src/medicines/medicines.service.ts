@@ -289,8 +289,28 @@ export class MedicinesService {
       },
     });
 
-    const results = await Promise.all(
-      inventories.map(async (inv) => {
+    let agreementsByPharmacy = new Map<string, any>();
+    let tariffsByMedicine = new Map<string, any>();
+    if (insuranceId && inventories.length > 0) {
+      const pharmacyIds = [...new Set(inventories.map((item) => item.pharmacyId))];
+      const [agreements, tariffs] = await Promise.all([
+        prisma.pharmacyInsuranceAgreement.findMany({
+          where: { insuranceId, pharmacyId: { in: pharmacyIds } },
+          include: {
+            insurance: {
+              select: { id: true, name: true, code: true, defaultCoveragePercentage: true },
+            },
+          },
+        }),
+        prisma.insuranceMedicineTariff.findMany({
+          where: { insuranceId, medicineId: safeId },
+        }),
+      ]);
+      agreementsByPharmacy = new Map(agreements.map((agreement) => [agreement.pharmacyId, agreement]));
+      tariffsByMedicine = new Map(tariffs.map((tariff) => [tariff.medicineId, tariff]));
+    }
+
+    const results = inventories.map((inv) => {
         const baseResult = {
           medicine: inv.medicine,
           pharmacy: inv.pharmacy,
@@ -312,19 +332,16 @@ export class MedicinesService {
         };
 
         if (insuranceId) {
-          const insuranceCoverage = await this.calculateInsuranceCoverage(
-            insuranceId,
-            inv.pharmacyId,
-            inv.medicineId,
+          const insuranceCoverage = this.calculateInsuranceCoverageFromData(
             Number(inv.price),
-            prisma,
+            agreementsByPharmacy.get(inv.pharmacyId),
+            tariffsByMedicine.get(inv.medicineId),
           );
           return { ...baseResult, insuranceCoverage };
         }
 
         return baseResult;
-      }),
-    );
+      });
 
     const hasLocation = safeLat !== undefined && safeLon !== undefined;
     const nearbyResults = hasLocation
@@ -452,6 +469,37 @@ export class MedicinesService {
       patientPays = retailPrice - insurancePays;
     }
 
+    return {
+      isCovered: true,
+      hasAgreement: true,
+      insurancePays: Math.round(insurancePays * 100) / 100,
+      patientPays: Math.round(patientPays * 100) / 100,
+      coveragePercentage,
+      copayPercentage: 100 - coveragePercentage,
+      requiresPreAuth: tariff.requiresPreAuth,
+      coveredPrice: Number(tariff.coveredPrice),
+      insuranceName: agreement.insurance.name,
+      insuranceCode: agreement.insurance.code,
+      insuranceId: agreement.insurance.id,
+    };
+  }
+
+  private calculateInsuranceCoverageFromData(
+    retailPrice: number,
+    agreement: any,
+    tariff: any,
+  ) {
+    if (!agreement || agreement.status !== 'ACTIVE') {
+      return { isCovered: false, hasAgreement: false, insurancePays: 0, patientPays: retailPrice, message: 'No active agreement between pharmacy and insurance' };
+    }
+    if (!tariff || !tariff.isCovered || tariff.status !== 'ACTIVE') {
+      return { isCovered: false, hasAgreement: true, insurancePays: 0, patientPays: retailPrice, message: 'Medicine not covered by insurance tariff', insuranceName: agreement.insurance.name, insuranceCode: agreement.insurance.code };
+    }
+    const coveragePercentage = agreement.customCoverageRate ? Number(agreement.customCoverageRate) : Number(tariff.coveragePercentage);
+    const insurancePays = tariff.fixedCopayAmount
+      ? Math.max(0, retailPrice - Number(tariff.fixedCopayAmount))
+      : retailPrice * (coveragePercentage / 100);
+    const patientPays = tariff.fixedCopayAmount ? Number(tariff.fixedCopayAmount) : retailPrice - insurancePays;
     return {
       isCovered: true,
       hasAgreement: true,
