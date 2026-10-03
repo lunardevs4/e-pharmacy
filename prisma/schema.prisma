@@ -391,6 +391,9 @@ model Reservation {
   @@index([medicineId])
   @@index([status])
   @@index([expiresAt])
+  @@index([pharmacyId, createdAt])
+  @@index([patientId, createdAt])
+  @@index([pharmacyId, status, expiresAt])
 }
 
 model Prescription {
@@ -480,6 +483,7 @@ model ReminderLog {
   @@index([provider])
   @@index([providerReference])
   @@index([createdAt])
+  @@index([patientId, status, createdAt])
 }
 
 model Notification {
@@ -495,6 +499,7 @@ model Notification {
 
   @@index([userId])
   @@index([isRead])
+  @@index([userId, isRead, createdAt])
 }
 
 model AuditLog {

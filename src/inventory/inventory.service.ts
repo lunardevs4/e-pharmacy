@@ -3,6 +3,7 @@ import {
   NotFoundException,
   ForbiddenException,
   BadRequestException,
+  Logger,
 } from '@nestjs/common';
 import { PrismaService } from '../common/prisma/prisma.service';
 import { CreateInventoryDto, UpdateInventoryDto } from './dto/inventory.dto';
@@ -27,6 +28,8 @@ interface AuthenticatedUser {
 
 @Injectable()
 export class InventoryService {
+  private readonly logger = new Logger(InventoryService.name);
+
   constructor(
     private prismaService: PrismaService,
     private emailService: EmailService,
@@ -244,7 +247,7 @@ export class InventoryService {
 
     const newQuantity = safeDto.quantity ?? inventory.quantity;
     if (inventory.quantity >= 10 && newQuantity < 10) {
-      const details = await prisma.inventory.findUnique({
+        const details = await prisma.inventory.findUnique({
         where: { id: safeId },
         include: { medicine: true, pharmacy: { include: { owner: true } } },
       });
@@ -266,12 +269,18 @@ export class InventoryService {
           },
         });
         if (emailEnabled) {
-          await this.emailService.sendNotificationEmail(
-            owner.email,
-            `${owner.firstName} ${owner.lastName}`.trim(),
-            'Low Stock Alert',
-            message,
-          );
+          // Email is advisory; do not make the inventory mutation wait on SMTP.
+          void this.emailService
+            .sendNotificationEmail(
+              owner.email,
+              `${owner.firstName} ${owner.lastName}`.trim(),
+              'Low Stock Alert',
+              message,
+            )
+            .catch((error: Error) => {
+              // Preserve the successful inventory response while retaining diagnostics.
+              this.logger.warn(`Low-stock email failed: ${error.message}`);
+            });
         }
       }
     }
