@@ -185,6 +185,7 @@ model Pharmacy {
 
   @@index([ownerId])
   @@index([status])
+  @@index([status, deletedAt])
   @@index([latitude, longitude])
 }
 

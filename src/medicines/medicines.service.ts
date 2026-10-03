@@ -12,6 +12,7 @@ import {
   validateUuid,
   sanitizeDeep,
   validateGeoCoordinate,
+  getSafePaginationParams,
 } from '../common/security/security.util';
 import { ApiCacheService } from '../common/cache/api-cache.service';
 
@@ -153,16 +154,19 @@ export class MedicinesService {
     category?: string,
   ) {
     const prisma = this.prismaService.prisma;
-    const safePage = validatePositiveInt(page, 'page', 1);
-    const safeLimit = validatePositiveInt(limit, 'limit', 10);
-    const skip = (safePage - 1) * safeLimit;
+    const { page: safePage, limit: safeLimit, skip, take } = getSafePaginationParams(
+      page,
+      limit,
+      10,
+      100,
+    );
     const safeSearch = search?.trim();
     const safeCategory = category?.trim();
 
     const cacheKey = `medicine:list:${safePage}:${safeLimit}:${includeArchived}:${safeSearch ?? ''}:${safeCategory ?? ''}`;
     return this.apiCache.getOrSet(cacheKey, () => prisma.medicine.findMany({
       skip,
-      take: safeLimit,
+      take,
       where: {
         ...(safeSearch
           ? {

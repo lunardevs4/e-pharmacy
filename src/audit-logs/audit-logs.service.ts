@@ -7,7 +7,9 @@ import {
   ALLOWED_AUDIT_ENTITY_TYPES,
   ALLOWED_AUDIT_ACTIONS,
   validateUuid,
+  getSafePaginationParams,
 } from '../common/security/security.util';
+import { TenantService } from '../common/security/tenant.service';
 
 interface AuthenticatedUser {
   id: string;
@@ -27,7 +29,10 @@ export interface CreateAuditLogDto {
 
 @Injectable()
 export class AuditLogsService {
-  constructor(private prismaService: PrismaService) {}
+  constructor(
+    private prismaService: PrismaService,
+    private tenantService: TenantService,
+  ) {}
 
   async log(dto: CreateAuditLogDto): Promise<void> {
     const prisma = this.prismaService.prisma;
@@ -53,8 +58,12 @@ export class AuditLogsService {
     action?: string,
   ) {
     const prisma = this.prismaService.prisma;
-    const safePage = validatePositiveInt(page, 'page', 1);
-    const safeLimit = validatePositiveInt(limit, 'limit', 10);
+    const { page: safePage, limit: safeLimit, skip, take } = getSafePaginationParams(
+      page,
+      limit,
+      10,
+      100,
+    );
     const safeEntityType = entityType
       ? validateWhitelist(entityType, ALLOWED_AUDIT_ENTITY_TYPES, 'entityType')
       : undefined;
@@ -62,7 +71,6 @@ export class AuditLogsService {
       ? validateWhitelist(action, ALLOWED_AUDIT_ACTIONS, 'action')
       : undefined;
 
-    const skip = (safePage - 1) * safeLimit;
     const where: any = {};
     if (safeEntityType) where.entityType = safeEntityType;
     if (safeAction) where.action = safeAction;
@@ -71,7 +79,7 @@ export class AuditLogsService {
       const [logs, total] = await Promise.all([
         prisma.auditLog.findMany({
           skip,
-          take: safeLimit,
+          take,
           where,
           include: {
             user: { select: { firstName: true, lastName: true, email: true } },
@@ -145,23 +153,7 @@ export class AuditLogsService {
   ) {
     const prisma = this.prismaService.prisma;
     const safePharmacyId = validateUuid(pharmacyId, 'pharmacyId');
-    const pharmacy = await prisma.pharmacy.findUnique({
-      where: { id: safePharmacyId },
-    });
-    if (!pharmacy) throw new ForbiddenException('Pharmacy not found');
-    if (user.role === UserRole.PHARMACY_OWNER && pharmacy.ownerId !== user.id)
-      throw new ForbiddenException('You do not own this pharmacy');
-    if (user.role === UserRole.PHARMACIST) {
-      const employee = await prisma.pharmacyEmployee.findFirst({
-        where: {
-          pharmacyId: safePharmacyId,
-          userId: user.id,
-          role: UserRole.PHARMACIST,
-        },
-      });
-      if (!employee)
-        throw new ForbiddenException('You are not employed at this pharmacy');
-    }
+    await this.tenantService.validatePharmacyAccess(safePharmacyId, user);
     const [reservations, inventory] = await Promise.all([
       prisma.reservation.findMany({
         where: { pharmacyId: safePharmacyId },

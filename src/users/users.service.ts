@@ -5,6 +5,7 @@ import {
   validatePositiveInt,
   validateUuid,
   sanitizeDeep,
+  getSafePaginationParams,
 } from '../common/security/security.util';
 
 @Injectable()
@@ -165,13 +166,16 @@ export class UsersService {
 
   async findAll(page: number = 1, limit: number = 10) {
     const prisma = this.prismaService.prisma;
-    const safePage = validatePositiveInt(page, 'page', 1);
-    const safeLimit = validatePositiveInt(limit, 'limit', 10);
-    const skip = (safePage - 1) * safeLimit;
+    const { page: safePage, limit: safeLimit, skip, take } = getSafePaginationParams(
+      page,
+      limit,
+      10,
+      100,
+    );
     const [users, total] = await Promise.all([
       prisma.user.findMany({
         skip,
-        take: safeLimit,
+        take,
         where: { deletedAt: null },
         select: {
           id: true,

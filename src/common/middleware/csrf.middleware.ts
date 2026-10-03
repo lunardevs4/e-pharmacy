@@ -28,7 +28,9 @@ export function csrfMiddleware(
 ) {
   if (EXEMPT_ROUTES.includes(request.path)) return next();
 
-  let csrfToken = readCookie(request, CSRF_TOKEN_COOKIE);
+  let csrfToken =
+    readCookie(request, CSRF_TOKEN_COOKIE) ||
+    readCookie(request, 'epharmacy_csrf');
   if (!csrfToken) {
     csrfToken = issueCsrfToken(response);
     (request as Request & { csrfToken?: string }).csrfToken = csrfToken;

@@ -156,15 +156,35 @@ export function validatePositiveInt(
   input: string | number | undefined,
   fieldName: string,
   defaultValue: number,
+  maxAllowed?: number,
 ): number {
   if (input === undefined || input === null || input === '')
     return defaultValue;
-  const n = typeof input === 'string' ? parseInt(input, 10) : input;
-  if (isNaN(n) || n < 0) {
-    throw new BadRequestException(`${fieldName} must be a positive integer`);
+  const n = typeof input === 'string' ? parseInt(input, 10) : Number(input);
+  if (isNaN(n) || n < 1) {
+    throw new BadRequestException(`${fieldName} must be a positive integer >= 1`);
+  }
+  if (maxAllowed !== undefined && n > maxAllowed) {
+    return maxAllowed;
   }
   return n;
 }
+
+export function getSafePaginationParams(
+  page?: number | string,
+  limit?: number | string,
+  defaultLimit = 20,
+  maxLimit = 100,
+) {
+  const safePage = validatePositiveInt(page, 'page', 1);
+  const safeLimit = Math.min(
+    validatePositiveInt(limit, 'limit', defaultLimit),
+    maxLimit,
+  );
+  const skip = (safePage - 1) * safeLimit;
+  return { page: safePage, limit: safeLimit, skip, take: safeLimit };
+}
+
 
 export function validateDate(
   input: string | Date | undefined,
@@ -217,4 +237,24 @@ export function validateGeoCoordinate(
     );
   }
   return n;
+}
+
+export function validateRwandanPhone(phone: string, fieldName = 'phone'): string {
+  if (!phone || typeof phone !== 'string') {
+    throw new BadRequestException(`${fieldName} is required`);
+  }
+  const cleaned = phone.trim().replace(/[\s-]/g, '');
+  const rwandaPhoneRegex = /^(?:\+?250|0)?7[2389]\d{7}$/;
+  if (!rwandaPhoneRegex.test(cleaned)) {
+    throw new BadRequestException(
+      `${fieldName} must be a valid Rwandan phone number (e.g., 078XXXXXXX or +25078XXXXXXX)`,
+    );
+  }
+  if (cleaned.startsWith('0')) {
+    return `+250${cleaned.slice(1)}`;
+  }
+  if (!cleaned.startsWith('+')) {
+    return `+${cleaned}`;
+  }
+  return cleaned;
 }

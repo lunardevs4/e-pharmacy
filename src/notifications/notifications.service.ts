@@ -59,12 +59,14 @@ export class NotificationsService {
     return value;
   }
 
-  async findAll(user: AuthenticatedUser) {
+  async findAll(user: AuthenticatedUser, limit = 50) {
     const prisma = this.prismaService.prisma;
     const safeUserId = validateUuid(user.id, 'userId');
+    const safeLimit = Math.min(Math.max(Number(limit) || 50, 1), 100);
 
     if (user.role === UserRole.ADMIN) {
       return prisma.notification.findMany({
+        take: safeLimit,
         orderBy: { createdAt: 'desc' },
       });
     }
@@ -96,6 +98,7 @@ export class NotificationsService {
         ...new Set([safeUserId, ...relatedUsers.map((u) => u.id)]),
       ];
       return prisma.notification.findMany({
+        take: safeLimit,
         where: { userId: { in: userIds } },
         orderBy: { createdAt: 'desc' },
       });
@@ -128,6 +131,7 @@ export class NotificationsService {
         ...new Set([safeUserId, ...relatedUsers.map((u) => u.id)]),
       ];
       return prisma.notification.findMany({
+        take: safeLimit,
         where: { userId: { in: userIds } },
         orderBy: { createdAt: 'desc' },
       });
@@ -139,6 +143,7 @@ export class NotificationsService {
       user.role === UserRole.INSURANCE
     ) {
       return prisma.notification.findMany({
+        take: safeLimit,
         where: { userId: safeUserId },
         orderBy: { createdAt: 'desc' },
       });

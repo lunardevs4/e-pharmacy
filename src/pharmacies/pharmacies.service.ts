@@ -18,11 +18,17 @@ import {
   validateEnum,
   validateUuid,
   sanitizeDeep,
+  getSafePaginationParams,
 } from '../common/security/security.util';
+
+import { TenantService } from '../common/security/tenant.service';
 
 @Injectable()
 export class PharmaciesService {
-  constructor(private prismaService: PrismaService) {}
+  constructor(
+    private prismaService: PrismaService,
+    private tenantService: TenantService,
+  ) {}
 
   create(ownerId: string, createPharmacyDto: CreatePharmacyDto) {
     const prisma = this.prismaService.prisma;
@@ -57,20 +63,23 @@ export class PharmaciesService {
 
   async findAll(page: number = 1, limit: number = 10, status?: PharmacyStatus) {
     const prisma = this.prismaService.prisma;
-    const safePage = validatePositiveInt(page, 'page', 1);
-    const safeLimit = validatePositiveInt(limit, 'limit', 10);
+    const { page: safePage, limit: safeLimit, skip, take } = getSafePaginationParams(
+      page,
+      limit,
+      10,
+      100,
+    );
     const safeStatus = status
       ? validateEnum(status as any, PharmacyStatus as any, 'status')
       : undefined;
 
-    const skip = (safePage - 1) * safeLimit;
     const where: any = { deletedAt: null };
     if (safeStatus) where.status = safeStatus;
 
     const [pharmacies, total] = await Promise.all([
       prisma.pharmacy.findMany({
         skip,
-        take: safeLimit,
+        take,
         where,
         include: {
           owner: { select: { firstName: true, lastName: true, email: true } },
@@ -544,25 +553,17 @@ export class PharmaciesService {
     const prisma = this.prismaService.prisma;
     const safePharmacyId = validateUuid(pharmacyId, 'pharmacyId');
 
-    const pharmacy = await prisma.pharmacy.findUnique({
-      where: { id: safePharmacyId },
+    await this.tenantService.validatePharmacyAccess(safePharmacyId, user, {
+      allowAdmin: true,
+      allowGovernment: false,
     });
-
-    if (!pharmacy) {
-      throw new NotFoundException('Pharmacy not found');
-    }
-
-    // Optionally add authorization check here
-    // if (pharmacy.ownerId !== user.id && user.role !== 'ADMIN') {
-    //   throw new ForbiddenException('You are not authorized to view this pharmacy\\'s patients');
-    // }
 
     const patients = await prisma.patient.findMany({
       where: {
         OR: [
           { reservations: { some: { pharmacyId: safePharmacyId } } },
           { prescriptions: { some: { pharmacyId: safePharmacyId } } },
-        ]
+        ],
       },
       include: {
         user: {
@@ -570,19 +571,22 @@ export class PharmaciesService {
             firstName: true,
             lastName: true,
             email: true,
-          }
+          },
         },
         prescriptions: {
           where: { pharmacyId: safePharmacyId },
           include: {
             medicines: true,
-          }
-        }
-      }
+          },
+        },
+      },
     });
 
-    return patients.map(p => {
-      const totalMedicines = p.prescriptions.reduce((acc, rx) => acc + rx.medicines.length, 0);
+    return patients.map((p) => {
+      const totalMedicines = p.prescriptions.reduce(
+        (acc, rx) => acc + rx.medicines.length,
+        0,
+      );
       return {
         id: p.id,
         user: p.user,

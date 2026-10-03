@@ -65,23 +65,28 @@ export function setAuthCookies(
 }
 
 export function csrfCookieOptions() {
+  const isSecureDeployment =
+    process.env.NODE_ENV === 'production' ||
+    process.env.FRONTEND_URL?.startsWith('https://');
+  const cookieName = isSecureDeployment ? CSRF_TOKEN_COOKIE : 'epharmacy_csrf';
   return {
-    // __Host- cookies must be Secure, use Path=/, and must not define Domain.
-    // Keep these properties explicit so they cannot inherit an unsafe value
-    // from the general authentication-cookie configuration.
-    sameSite: authCookieOptions(0).sameSite,
-    secure: true,
-    path: '/',
-    httpOnly: false,
-    maxAge: undefined,
-  } as const;
+    name: cookieName,
+    options: {
+      sameSite: authCookieOptions(0).sameSite,
+      secure: isSecureDeployment,
+      path: '/',
+      httpOnly: false,
+      maxAge: undefined,
+    } as const,
+  };
 }
 
 export function issueCsrfToken(
   response: Response,
   token = randomBytes(32).toString('hex'),
 ) {
-  response.cookie(CSRF_TOKEN_COOKIE, token, csrfCookieOptions());
+  const { name, options } = csrfCookieOptions();
+  response.cookie(name, token, options);
   return token;
 }
 
