@@ -4,6 +4,23 @@ import * as nodemailer from 'nodemailer';
 @Injectable()
 export class EmailService {
   private readonly logger = new Logger(EmailService.name);
+  private transport?: nodemailer.Transporter;
+
+  private getTransport(
+    gmailUser: string,
+    gmailAppPassword: string,
+  ): nodemailer.Transporter {
+    if (!this.transport) {
+      this.transport = nodemailer.createTransport({
+        service: 'gmail',
+        auth: { user: gmailUser, pass: gmailAppPassword },
+        connectionTimeout: 10_000,
+        greetingTimeout: 10_000,
+        socketTimeout: 15_000,
+      });
+    }
+    return this.transport;
+  }
 
   async sendNotificationEmail(
     recipientEmail: string,
@@ -20,10 +37,7 @@ export class EmailService {
       );
       return false;
     }
-    const transport = nodemailer.createTransport({
-      service: 'gmail',
-      auth: { user: gmailUser, pass: gmailAppPassword },
-    });
+    const transport = this.getTransport(gmailUser, gmailAppPassword);
     await transport.sendMail({
       from: `"Rwanda E-pharmacy" <${fromAddress}>`,
       to: recipientEmail,
@@ -69,13 +83,7 @@ export class EmailService {
       return false;
     }
 
-    const transport = nodemailer.createTransport({
-      service: 'gmail',
-      auth: {
-        user: gmailUser,
-        pass: gmailAppPassword,
-      },
-    });
+    const transport = this.getTransport(gmailUser, gmailAppPassword);
 
     await transport.sendMail({
       from: `"Rwanda E-pharmacy" <${fromAddress}>`,
@@ -139,10 +147,7 @@ export class EmailService {
       );
       return false;
     }
-    const transport = nodemailer.createTransport({
-      service: 'gmail',
-      auth: { user: gmailUser, pass: gmailAppPassword },
-    });
+    const transport = this.getTransport(gmailUser, gmailAppPassword);
     await transport.sendMail({
       from: `"Rwanda E-pharmacy" <${fromAddress}>`,
       to: recipientEmail,
@@ -209,13 +214,7 @@ export class EmailService {
       return false;
     }
 
-    const transport = nodemailer.createTransport({
-      service: 'gmail',
-      auth: { user: gmailUser, pass: gmailAppPassword },
-      connectionTimeout: 10000,
-      greetingTimeout: 10000,
-      socketTimeout: 15000,
-    });
+    const transport = this.getTransport(gmailUser, gmailAppPassword);
     await transport.sendMail({
       from: `"Rwanda E-pharmacy" <${fromAddress}>`,
       to: recipientEmail,
