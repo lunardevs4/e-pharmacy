@@ -2,25 +2,19 @@ import { Injectable, BadRequestException } from '@nestjs/common';
 import { diskStorage } from 'multer';
 import { extname, join } from 'path';
 import { randomBytes } from 'crypto';
-import { existsSync, mkdirSync } from 'fs';
+import { promises as fs } from 'fs';
 
 @Injectable()
 export class FileUploadsService {
-  constructor() {
-    const uploadPath = join(process.cwd(), 'uploads');
-    if (!existsSync(uploadPath)) {
-      mkdirSync(uploadPath, { recursive: true });
-    }
-  }
-
   getStorage(destination: string) {
     const fullPath = join(process.cwd(), 'uploads', destination);
-    if (!existsSync(fullPath)) {
-      mkdirSync(fullPath, { recursive: true });
-    }
 
     return diskStorage({
-      destination: fullPath,
+      destination: (_req, _file, cb) => {
+        fs.mkdir(fullPath, { recursive: true })
+          .then(() => cb(null, fullPath))
+          .catch((error) => cb(error, fullPath));
+      },
       filename: (req, file, cb) => {
         const randomName = randomBytes(16).toString('hex');
         cb(null, `${Date.now()}-${randomName}${extname(file.originalname)}`);

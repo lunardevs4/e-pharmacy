@@ -18,6 +18,8 @@ import { FileUploadsService } from './file-uploads.service';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { UserRole } from '@generated/prisma';
 import { Roles } from '../common/guards/roles.decorator';
+import { promises as fs } from 'fs';
+import { extname, join } from 'path';
 
 @ApiTags('File Uploads')
 @Controller('api/v1/upload')
@@ -52,7 +54,7 @@ export class FileUploadsController {
     description:
       'Endpoint: POST /api/v1/upload/prescription\n\nUploads a prescription document (PDF/JPEG/PNG) as a multipart/form-data request with a "file" field. Max file size: 10MB.',
   })
-  uploadPrescription(
+  async uploadPrescription(
     @UploadedFile()
     file: Express.Multer.File,
     @Req() req: any,
@@ -62,18 +64,16 @@ export class FileUploadsController {
       ['application/pdf', 'image/jpeg', 'image/png', 'image/jpg'],
       10 * 1024 * 1024,
     );
-    const fs = require('fs');
-    const path = require('path');
-    const uploadDirectory = path.join(
+    const uploadDirectory = join(
       process.cwd(),
       'uploads',
       'prescriptions',
     );
-    fs.mkdirSync(uploadDirectory, { recursive: true });
-    const extension = path.extname(file.originalname).toLowerCase();
+    await fs.mkdir(uploadDirectory, { recursive: true });
+    const extension = extname(file.originalname).toLowerCase();
     const randomName = `${Date.now()}-${Math.random().toString(36).substring(7)}${extension}`;
-    const fullPath = path.join(uploadDirectory, randomName);
-    fs.writeFileSync(fullPath, file.buffer);
+    const fullPath = join(uploadDirectory, randomName);
+    await fs.writeFile(fullPath, file.buffer);
     return { fileUrl: `/uploads/prescriptions/${randomName}` };
   }
 
@@ -99,7 +99,7 @@ export class FileUploadsController {
       },
     },
   })
-  uploadLicense(
+  async uploadLicense(
     @UploadedFile()
     file: Express.Multer.File,
     @Req() req: any,
@@ -109,21 +109,14 @@ export class FileUploadsController {
       ['application/pdf', 'image/jpeg', 'image/png', 'image/jpg'],
       10 * 1024 * 1024,
     );
-    const fs = require('fs');
-    const path = require('path');
     const randomName = `${Date.now()}-${Math.random().toString(36).substring(7)}.${file.originalname.split('.').pop()}`;
-    const fullPath = path.join(
+    const uploadDirectory = join(
       process.cwd(),
       'uploads',
       'licenses',
-      randomName,
     );
-    if (!fs.existsSync(path.join(process.cwd(), 'uploads', 'licenses'))) {
-      fs.mkdirSync(path.join(process.cwd(), 'uploads', 'licenses'), {
-        recursive: true,
-      });
-    }
-    fs.writeFileSync(fullPath, file.buffer);
+    await fs.mkdir(uploadDirectory, { recursive: true });
+    await fs.writeFile(join(uploadDirectory, randomName), file.buffer);
     return { fileUrl: `/uploads/licenses/${randomName}` };
   }
 }
