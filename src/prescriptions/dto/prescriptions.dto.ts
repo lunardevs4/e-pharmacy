@@ -50,4 +50,8 @@ export class CreatePrescriptionDto {
 export class UpdatePrescriptionStatusDto {
   @IsEnum(PrescriptionStatus)
   status: PrescriptionStatus;
+
+  @IsOptional()
+  @IsString()
+  notes?: string;
 }

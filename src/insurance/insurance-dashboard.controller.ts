@@ -493,8 +493,7 @@ export class InsuranceDashboardController {
     @Query('insuranceId') insuranceId: string,
     @Res() res: Response,
   ) {
-    // Placeholder, using the same method for now
-    await this.reportsService.generateMonthlySummary(insuranceId, res);
+    await this.reportsService.generateRejectionAnalysis(insuranceId, res);
   }
 
   @Get('reports/coverage-audit')
@@ -505,7 +504,6 @@ export class InsuranceDashboardController {
     @Query('insuranceId') insuranceId: string,
     @Res() res: Response,
   ) {
-    // Placeholder, using the same method for now
-    await this.reportsService.generatePayoutRegister(insuranceId, res);
+    await this.reportsService.generateCoverageAudit(insuranceId, res);
   }
 }

@@ -206,6 +206,10 @@ export class InsuranceReportsService {
       where: { id: insuranceId },
     });
 
+    if (!provider) {
+      throw new NotFoundException('Insurance provider not found');
+    }
+
     const rejectedClaims = await prisma.insuranceClaim.findMany({
       where: {
         insuranceId,
@@ -222,14 +226,14 @@ export class InsuranceReportsService {
     res.setHeader('Content-Type', 'application/pdf');
     res.setHeader(
       'Content-Disposition',
-      `attachment; filename="${provider?.code || 'insurance'}_rejection_analysis.pdf"`,
+      `attachment; filename="${provider.code || 'insurance'}_rejection_analysis.pdf"`,
     );
     doc.pipe(res);
 
     doc
       .fontSize(18)
       .fillColor('#991b1b')
-      .text(`${provider?.name || 'Insurance'} - Claims Rejection Analysis`, {
+      .text(`${provider.name || 'Insurance'} - Claims Rejection Analysis`, {
         align: 'center',
       });
     doc.moveDown(0.5);
@@ -280,6 +284,10 @@ export class InsuranceReportsService {
     const provider = await prisma.insuranceProvider.findUnique({
       where: { id: insuranceId },
     });
+
+    if (!provider) {
+      throw new NotFoundException('Insurance provider not found');
+    }
 
     const patients = await prisma.insuredPatient.findMany({
       where: { insuranceId },

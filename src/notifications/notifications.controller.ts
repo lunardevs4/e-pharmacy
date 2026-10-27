@@ -2,6 +2,9 @@ import {
   Controller,
   Get,
   Patch,
+  Delete,
+  HttpCode,
+  HttpStatus,
   Param,
   UseGuards,
   Req,
@@ -80,5 +83,33 @@ export class NotificationsController {
   })
   markAllAsRead(@Req() req: any) {
     return this.notificationsService.markAllAsRead(req.user);
+  }
+
+  @Delete(':id')
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({
+    summary: 'Delete notification by ID',
+    description:
+      'Endpoint: DELETE /api/v1/notifications/:id\nDeletes a specific notification if owned by the user or within pharmacy/admin scope.',
+  })
+  @ApiParam({
+    name: 'id',
+    type: 'string',
+    description: 'Notification UUID',
+    example: '550e8400-e29b-41d4-a716-446655440000',
+  })
+  delete(@Param('id') id: string, @Req() req: any) {
+    return this.notificationsService.delete(req.user, id);
+  }
+
+  @Delete()
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({
+    summary: 'Clear all notifications for current user',
+    description:
+      'Endpoint: DELETE /api/v1/notifications\nDeletes all notifications for the authenticated user.',
+  })
+  deleteAll(@Req() req: any) {
+    return this.notificationsService.deleteAll(req.user);
   }
 }

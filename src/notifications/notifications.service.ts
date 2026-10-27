@@ -329,4 +329,99 @@ export class NotificationsService {
 
     throw new ForbiddenException('Insufficient permissions');
   }
+
+  async delete(user: AuthenticatedUser, id: string) {
+    const prisma = this.prismaService.prisma;
+    const safeUserId = validateUuid(user.id, 'userId');
+    const safeId = validateUuid(id, 'id');
+
+    const notification = await prisma.notification.findUnique({
+      where: { id: safeId },
+    });
+    if (!notification) throw new NotFoundException('Notification not found');
+
+    if (notification.userId === safeUserId || user.role === UserRole.ADMIN) {
+      await prisma.notification.delete({
+        where: { id: safeId },
+      });
+      return { success: true, message: 'Notification deleted successfully' };
+    }
+
+    if (user.role === UserRole.PHARMACY_OWNER) {
+      const ownedPharmacies = await prisma.pharmacy.findMany({
+        where: { ownerId: safeUserId },
+        select: { id: true },
+      });
+      const pharmacyIds = ownedPharmacies.map((p) => p.id);
+      const relatedUsers = await prisma.user.findMany({
+        where: {
+          OR: [
+            {
+              pharmacyEmployees: { some: { pharmacyId: { in: pharmacyIds } } },
+            },
+            { pharmacies: { some: { id: { in: pharmacyIds } } } },
+            {
+              patient: {
+                reservations: { some: { pharmacyId: { in: pharmacyIds } } },
+              },
+            },
+          ],
+        },
+        select: { id: true },
+      });
+      const userIds = [safeUserId, ...relatedUsers.map((u) => u.id)];
+      if (userIds.includes(notification.userId)) {
+        await prisma.notification.delete({
+          where: { id: safeId },
+        });
+        return { success: true, message: 'Notification deleted successfully' };
+      }
+    }
+
+    if (user.role === UserRole.PHARMACIST) {
+      const staff = await prisma.pharmacyEmployee.findMany({
+        where: { userId: safeUserId, role: UserRole.PHARMACIST },
+        select: { pharmacyId: true },
+      });
+      const pharmacyIds = staff.map((s) => s.pharmacyId);
+      const relatedUsers = await prisma.user.findMany({
+        where: {
+          OR: [
+            {
+              pharmacyEmployees: { some: { pharmacyId: { in: pharmacyIds } } },
+            },
+            { pharmacies: { some: { id: { in: pharmacyIds } } } },
+            {
+              patient: {
+                reservations: { some: { pharmacyId: { in: pharmacyIds } } },
+              },
+            },
+          ],
+        },
+        select: { id: true },
+      });
+      const userIds = [safeUserId, ...relatedUsers.map((u) => u.id)];
+      if (userIds.includes(notification.userId)) {
+        await prisma.notification.delete({
+          where: { id: safeId },
+        });
+        return { success: true, message: 'Notification deleted successfully' };
+      }
+    }
+
+    throw new ForbiddenException(
+      'You do not have permission to delete this notification',
+    );
+  }
+
+  async deleteAll(user: AuthenticatedUser) {
+    const prisma = this.prismaService.prisma;
+    const safeUserId = validateUuid(user.id, 'userId');
+
+    // Scope: delete only the authenticated user's notifications
+    const result = await prisma.notification.deleteMany({
+      where: { userId: safeUserId },
+    });
+    return { success: true, count: result.count };
+  }
 }

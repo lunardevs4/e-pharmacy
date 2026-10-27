@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
 import { PrismaService } from '../common/prisma/prisma.service';
 import { UpdateUserDto } from './dto/users.dto';
 import {
@@ -56,7 +56,11 @@ export class UsersService {
     return {
       ...rest,
       pharmacy: ownedPharmacy || employedPharmacy,
-      insuranceProvider: insuranceProvider ?? null,
+      insuranceProvider:
+        patient?.insuranceProvider ||
+        (typeof insuranceProvider === 'string'
+          ? insuranceProvider
+          : insuranceProvider?.code || insuranceProvider?.name || null),
       province: patient?.province ?? null,
       district: patient?.district ?? null,
       sector: patient?.sector ?? null,
@@ -87,18 +91,72 @@ export class UsersService {
       ...userFields
     } = safeDto;
 
+    let normalizedInsuranceProvider: string | null | undefined = undefined;
+    if (insuranceProvider !== undefined) {
+      const trimmed = typeof insuranceProvider === 'string' ? insuranceProvider.trim() : '';
+      if (!trimmed || trimmed === 'None' || trimmed.toLowerCase() === 'none' || trimmed.toLowerCase() === 'null') {
+        normalizedInsuranceProvider = null;
+      } else {
+        // Must match a registered active insurance provider on the platform
+        const registered = await prisma.insuranceProvider.findFirst({
+          where: {
+            isActive: true,
+            status: 'ACTIVE',
+            OR: [
+              { code: trimmed },
+              { name: trimmed },
+              { id: trimmed },
+            ],
+          },
+        });
+        if (!registered) {
+          throw new BadRequestException(
+            `Insurance provider "${trimmed}" is not a registered active provider on this platform.`,
+          );
+        }
+        normalizedInsuranceProvider = registered.code || registered.name;
+      }
+    }
+
     await prisma.$transaction(async (tx) => {
-      await tx.user.update({ where: { id: safeUserId }, data: userFields });
-      const patient = await tx.patient.findUnique({
+      const userUpdateData: Record<string, any> = {};
+      if (userFields.firstName !== undefined) userUpdateData.firstName = userFields.firstName;
+      if (userFields.lastName !== undefined) userUpdateData.lastName = userFields.lastName;
+      if (userFields.phone !== undefined) userUpdateData.phone = userFields.phone;
+      if (userFields.email !== undefined && userFields.email) userUpdateData.email = userFields.email;
+
+      if (Object.keys(userUpdateData).length > 0) {
+        await tx.user.update({ where: { id: safeUserId }, data: userUpdateData });
+      }
+
+      const existingPatient = await tx.patient.findUnique({
         where: { userId: safeUserId },
       });
-      if (patient) {
-        await tx.patient.update({
+      const currentUser = await tx.user.findUnique({
+        where: { id: safeUserId },
+        select: { role: true },
+      });
+
+      if (existingPatient || currentUser?.role === 'PATIENT') {
+        await tx.patient.upsert({
           where: { userId: safeUserId },
-          data: {
+          create: {
+            userId: safeUserId,
+            insuranceProvider: normalizedInsuranceProvider ?? null,
+            province: province || null,
+            district: district || null,
+            sector: sector || null,
+            cell: cell || null,
+            village: village || null,
+            emergencyContact: emergencyContact || null,
+            preferredPharmacy: preferredPharmacy || null,
+            medicalNotes: medicalNotes || null,
+            profilePhoto: profilePhoto || null,
+          },
+          update: {
             insuranceProvider:
-              insuranceProvider !== undefined
-                ? insuranceProvider || null
+              normalizedInsuranceProvider !== undefined
+                ? normalizedInsuranceProvider
                 : undefined,
             province: province !== undefined ? province : undefined,
             district: district !== undefined ? district : undefined,
@@ -110,6 +168,7 @@ export class UsersService {
             preferredPharmacy:
               preferredPharmacy !== undefined ? preferredPharmacy : undefined,
             medicalNotes: medicalNotes !== undefined ? medicalNotes : undefined,
+            profilePhoto: profilePhoto !== undefined ? profilePhoto : undefined,
           },
         });
       }
